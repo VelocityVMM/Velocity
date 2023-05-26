@@ -7,8 +7,6 @@
 
 import Foundation
 import Virtualization
-import Cocoa
-import CoreGraphics
 
 enum MachineType: Codable {
     case MAC
@@ -17,14 +15,6 @@ enum MachineType: Codable {
 }
 
 class Delegate: NSObject { }
-
-extension VZVirtualMachineView {
-    func data(using fileType: NSBitmapImageRep.FileType = .png, properties: [NSBitmapImageRep.PropertyKey: Any] = [:]) -> Data {
-        let imageRepresentation = bitmapImageRepForCachingDisplay(in: bounds)!
-        cacheDisplay(in: bounds, to: imageRepresentation)
-        return imageRepresentation.representation(using: fileType, properties: properties)!
-    }
-}
 
 extension NSImage {
     func pngWrite(to url: URL, options: Data.WritingOptions = .atomic) -> Bool {
@@ -286,11 +276,8 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     let virtualMachineView = VZVirtualMachineView()
     virtualMachineView.setFrameSize(NSSize(width: 1920, height: 1080))
     
-    NSLog("HACK: Setting Activation Policy to accessory to Hide NSWindow..")
-    NSApp.setActivationPolicy(.accessory)
-    //virtualMachineView.layoutSubtreeIfNeeded()
-    //virtualMachineView.wantsLayer = true
-    //virtualMachineView.layer?.backgroundColor = NSColor.blue.cgColor
+    //NSLog("HACK: Setting Activation Policy to accessory to Hide NSWindow..")
+    //NSApp.setActivationPolicy(.accessory)
     
     virtualMachineView.virtualMachine = virtualMachine
     
@@ -308,22 +295,13 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
         NSLog("Start exiting.")
     }
 
-    /*
-    let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1280, height: 720),
-                          styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                          backing: .buffered,
-                          defer: false)
-    window.contentView = virtualMachineView
-    window.makeKeyAndOrderFront(nil)
-    */
     var i = 0;
+    let new_win = create_hidden_window(virtualMachineView, vm_view_size: VMViewSize(width: 1920, height: 1080))
     
-    let new_win = createOffscreenWindowAndAddVirtualMachineView(virtualMachineView)
-    
-    let _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-        let capturedImage = captureContentOfWindow(windowNumber: CGWindowID(new_win.windowNumber))
+    let _ = Timer.scheduledTimer(withTimeInterval: (1.0 / 60), repeats: true) { _ in
+        let capturedImage = capture_hidden_window(windowNumber: CGWindowID(new_win.windowNumber))
         NSLog("Capturing \(i)")
-        capturedImage?.pngWrite(to: URL(filePath: "/Users/zimsneexh/Desktop/sond/sond-\(i).png"))
+        capturedImage?.pngWrite(to: URL(filePath: "/Users/zimsneexh/Desktop/sond/sond.png"))
         i = i + 1
         if(i == 10) {
             sendEnterKeyEvent(to: virtualMachineView)
@@ -342,53 +320,6 @@ func sendEnterKeyEvent(to virtualMachineView: VZVirtualMachineView) {
         virtualMachineView.keyDown(with: enterEvent)
     }
 }
-
-func createOffscreenWindowAndAddVirtualMachineView(_ virtualMachineView: VZVirtualMachineView) -> NSWindow {
-    let contentRect = virtualMachineView.frame
-    
-    //MARK: really ugly hack.. but cannot capture framebuffer directly
-    let transparentWindowStyle = NSWindow.StyleMask.init(rawValue: 0)
-    let offscreenWindow = NSWindow(contentRect: contentRect, styleMask: transparentWindowStyle, backing: .buffered, defer: false)
-    
-    offscreenWindow.isReleasedWhenClosed = false
-    offscreenWindow.isExcludedFromWindowsMenu = true
-    offscreenWindow.isMovableByWindowBackground = true
-    offscreenWindow.level = .floating
-    offscreenWindow.backgroundColor = NSColor.clear
-    offscreenWindow.titleVisibility = .hidden
-    offscreenWindow.standardWindowButton(.miniaturizeButton)?.isHidden = true
-    offscreenWindow.standardWindowButton(.closeButton)?.isHidden = true
-    offscreenWindow.standardWindowButton(.zoomButton)?.isHidden = true
-    
-    let offscreenFrame = CGRect(x: -10000, y: -10000, width: 1920, height: 1080)
-    offscreenWindow.setFrame(offscreenFrame, display: false)
-    
-    // Add the VZVirtualMachineView to the offscreen window
-    let viewWrapper = NSView(frame: contentRect)
-    offscreenWindow.contentView = viewWrapper
-    offscreenWindow.contentView?.addSubview(virtualMachineView)
-    
-    offscreenWindow.orderBack(nil)
-    offscreenWindow.displayIfNeeded()
-
-    return offscreenWindow
-}
-
-func captureContentOfWindow(windowNumber: CGWindowID) -> NSImage? {
-    let windowImageOption = CGWindowListOption(arrayLiteral: .optionIncludingWindow)
-    let windowInfoList = CGWindowListCopyWindowInfo(windowImageOption, windowNumber) as? [[String: AnyObject]]
-    let windowInfo = windowInfoList?.first
-    let windowBoundsDict = (windowInfo?[kCGWindowBounds as String] as! CFDictionary)
-    
-    let windowBounds = CGRect(dictionaryRepresentation: windowBoundsDict)!
-    guard let cgImage = CGWindowListCreateImage(windowBounds, windowImageOption, windowNumber, [.bestResolution]) else {
-        return nil
-    }
-
-    return NSImage(cgImage: cgImage, size: windowBounds.size)
-}
-
-
 
 internal func create_disk_image(pathTo: String, disk: Disk) throws {
     let disk_path = pathTo + "/\(disk.name).img"

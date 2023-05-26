@@ -14,8 +14,8 @@
             filePath = "velocity/vmm.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "304"
-            endingLineNumber = "304"
+            startingLineNumber = "291"
+            endingLineNumber = "291"
             landmarkName = "start_vm_by_name(velocity_config:vm_name:)"
             landmarkType = "9">
             <Locations>
@@ -62,6 +62,51 @@
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "304"
                   endingLineNumber = "304"
+                  offsetFromSymbolStart = "352">
+               </Location>
+               <Location
+                  uuid = "9A91D433-64AD-4794-AF7C-98418E9D4D1F - 67c1dbcc4356aa52"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in velocity.start_vm_by_name(velocity_config: velocity.VelocityConfig, vm_name: Swift.String) throws -&gt; ()"
+                  moduleName = "velocity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zimsneexh/Desktop/velocity/velocity/velocity/vmm.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "296"
+                  endingLineNumber = "296"
+                  offsetFromSymbolStart = "352">
+               </Location>
+               <Location
+                  uuid = "9A91D433-64AD-4794-AF7C-98418E9D4D1F - 67c1dbcc4356aa14"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in velocity.start_vm_by_name(velocity_config: velocity.VelocityConfig, vm_name: Swift.String) throws -&gt; ()"
+                  moduleName = "velocity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zimsneexh/Desktop/velocity/velocity/velocity/vmm.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "294"
+                  endingLineNumber = "294"
+                  offsetFromSymbolStart = "352">
+               </Location>
+               <Location
+                  uuid = "9A91D433-64AD-4794-AF7C-98418E9D4D1F - 67c1dbcc4356aaf9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in velocity.start_vm_by_name(velocity_config: velocity.VelocityConfig, vm_name: Swift.String) throws -&gt; ()"
+                  moduleName = "velocity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zimsneexh/Desktop/velocity/velocity/velocity/vmm.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "291"
+                  endingLineNumber = "291"
                   offsetFromSymbolStart = "352">
                </Location>
             </Locations>

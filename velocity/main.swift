@@ -48,9 +48,6 @@ public struct VelocityConfig {
 
 public func main() {
     NSLog("Velocity 0.1 -> Starting up..")
-    
-
-    
     NSLog("Checking directory structure..")
     
     let velocity_config = VelocityConfig();
@@ -60,7 +57,7 @@ public func main() {
         fatalError("Could not setup required directories for Velocity.");
     }
     
-    let vminfo = VMInfo(name: "TestVM", cpu_count: 2, memory_size: 4096, machine_type: MachineType.EFI_BOOTLOADER, iso_image_path: "/Users/zimsneexh/Downloads/debian-11.7.0-arm64-netinst.iso", rosetta: true, disks: [ Disk(name: "main", size_mb: 4096) ])
+    let vminfo = VMInfo(name: "TestVM", cpu_count: 2, memory_size: 4096, machine_type: MachineType.EFI_BOOTLOADER, iso_image_path: "/Users/zimsneexh/Downloads/Fedora-Workstation-Live-aarch64-38-1.6.iso", rosetta: true, disks: [ Disk(name: "main", size_mb: 4096) ])
     
     do {
         let _ = try new_vm(velocity_config: velocity_config, vm_info: vminfo)
@@ -74,17 +71,7 @@ public func main() {
         NSLog("Could not start VirtualMachine: \(error.localizedDescription)")
     }
     
-    return;
-    /*let configuration = VZVirtualMachineConfiguration()
-    
-    do {
-        try configuration.validate();
-    // catch implicitly adds (error)
-    } catch {
-        NSLog("Could not validate VM config: \(error)")
-    }
-    */
-    
+    return
 }
 
 main();
