@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "4AA3D43B-C874-44B3-B573-26F9D9E91272"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9A91D433-64AD-4794-AF7C-98418E9D4D1F"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "velocity/vmm.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "304"
+            endingLineNumber = "304"
+            landmarkName = "start_vm_by_name(velocity_config:vm_name:)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "9A91D433-64AD-4794-AF7C-98418E9D4D1F - 67c1dbcc4356ab6d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in velocity.start_vm_by_name(velocity_config: velocity.VelocityConfig, vm_name: Swift.String) throws -&gt; ()"
+                  moduleName = "velocity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zimsneexh/Desktop/velocity/velocity/velocity/vmm.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "303"
+                  endingLineNumber = "303"
+                  offsetFromSymbolStart = "240">
+               </Location>
+               <Location
+                  uuid = "9A91D433-64AD-4794-AF7C-98418E9D4D1F - 67c1dbcc4356ab0c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in velocity.start_vm_by_name(velocity_config: velocity.VelocityConfig, vm_name: Swift.String) throws -&gt; ()"
+                  moduleName = "velocity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zimsneexh/Desktop/velocity/velocity/velocity/vmm.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "302"
+                  endingLineNumber = "302"
+                  offsetFromSymbolStart = "352">
+               </Location>
+               <Location
+                  uuid = "9A91D433-64AD-4794-AF7C-98418E9D4D1F - 67c1dbcc4356ab4a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in velocity.start_vm_by_name(velocity_config: velocity.VelocityConfig, vm_name: Swift.String) throws -&gt; ()"
+                  moduleName = "velocity"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zimsneexh/Desktop/velocity/velocity/velocity/vmm.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "304"
+                  endingLineNumber = "304"
+                  offsetFromSymbolStart = "352">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

@@ -7,6 +7,7 @@
 
 import Foundation
 import Virtualization
+import AppKit
 
 public struct VelocityConfig {
     
@@ -46,7 +47,10 @@ public struct VelocityConfig {
 
 
 public func main() {
-    NSLog("Starting up..")
+    NSLog("Velocity 0.1 -> Starting up..")
+    
+
+    
     NSLog("Checking directory structure..")
     
     let velocity_config = VelocityConfig();
@@ -56,12 +60,18 @@ public func main() {
         fatalError("Could not setup required directories for Velocity.");
     }
     
-    let vminfo = VMInfo(name: "TestVM", cpu_count: 2, machine_type: MachineType.EFI_BOOTLOADER, iso_image_path: "", rosetta: true)
+    let vminfo = VMInfo(name: "TestVM", cpu_count: 2, memory_size: 4096, machine_type: MachineType.EFI_BOOTLOADER, iso_image_path: "/Users/zimsneexh/Downloads/debian-11.7.0-arm64-netinst.iso", rosetta: true, disks: [ Disk(name: "main", size_mb: 4096) ])
     
     do {
         let _ = try new_vm(velocity_config: velocity_config, vm_info: vminfo)
     } catch {
         NSLog("Creation Error: \(error.localizedDescription)")
+    }
+    
+    do {
+        try start_vm_by_name(velocity_config: velocity_config, vm_name: "TestVM")
+    } catch {
+        NSLog("Could not start VirtualMachine: \(error.localizedDescription)")
     }
     
     return;

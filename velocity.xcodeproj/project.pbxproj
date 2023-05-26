@@ -10,6 +10,7 @@
 		47D62A252A1E72C4006FFE2A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A242A1E72C4006FFE2A /* main.swift */; };
 		47D62A2C2A1E7366006FFE2A /* vmm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2B2A1E7366006FFE2A /* vmm.swift */; };
 		47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2E2A1EB00A006FFE2A /* utils.swift */; };
+		47D62A332A20EEDA006FFE2A /* capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A322A20EEDA006FFE2A /* capture.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,6 +31,7 @@
 		47D62A2B2A1E7366006FFE2A /* vmm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vmm.swift; sourceTree = "<group>"; };
 		47D62A2D2A1E744D006FFE2A /* velocity.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = velocity.entitlements; sourceTree = "<group>"; };
 		47D62A2E2A1EB00A006FFE2A /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
+		47D62A322A20EEDA006FFE2A /* capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = capture.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				47D62A242A1E72C4006FFE2A /* main.swift */,
 				47D62A2B2A1E7366006FFE2A /* vmm.swift */,
 				47D62A2E2A1EB00A006FFE2A /* utils.swift */,
+				47D62A322A20EEDA006FFE2A /* capture.swift */,
 			);
 			path = velocity;
 			sourceTree = "<group>";
@@ -128,6 +131,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47D62A332A20EEDA006FFE2A /* capture.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
 				47D62A2C2A1E7366006FFE2A /* vmm.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
