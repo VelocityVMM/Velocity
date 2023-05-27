@@ -7,10 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4707A5622A21692600E0B517 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = 4707A5612A21692600E0B517 /* Vapor */; };
+		4707A5642A21699900E0B517 /* httpserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5632A21699900E0B517 /* httpserver.swift */; };
+		4707A5662A22A09200E0B517 /* log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5652A22A09200E0B517 /* log.swift */; };
 		47D62A252A1E72C4006FFE2A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A242A1E72C4006FFE2A /* main.swift */; };
-		47D62A2C2A1E7366006FFE2A /* vmm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2B2A1E7366006FFE2A /* vmm.swift */; };
+		47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2B2A1E7366006FFE2A /* vz.swift */; };
 		47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2E2A1EB00A006FFE2A /* utils.swift */; };
 		47D62A332A20EEDA006FFE2A /* capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A322A20EEDA006FFE2A /* capture.swift */; };
+		47D62A352A210095006FFE2A /* manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A342A210095006FFE2A /* manager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,12 +30,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4707A5632A21699900E0B517 /* httpserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = httpserver.swift; sourceTree = "<group>"; };
+		4707A5652A22A09200E0B517 /* log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = log.swift; sourceTree = "<group>"; };
 		47D62A212A1E72C4006FFE2A /* velocity */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = velocity; sourceTree = BUILT_PRODUCTS_DIR; };
 		47D62A242A1E72C4006FFE2A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		47D62A2B2A1E7366006FFE2A /* vmm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vmm.swift; sourceTree = "<group>"; };
+		47D62A2B2A1E7366006FFE2A /* vz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vz.swift; sourceTree = "<group>"; };
 		47D62A2D2A1E744D006FFE2A /* velocity.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = velocity.entitlements; sourceTree = "<group>"; };
 		47D62A2E2A1EB00A006FFE2A /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		47D62A322A20EEDA006FFE2A /* capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = capture.swift; sourceTree = "<group>"; };
+		47D62A342A210095006FFE2A /* manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = manager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4707A5622A21692600E0B517 /* Vapor in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,9 +74,12 @@
 			children = (
 				47D62A2D2A1E744D006FFE2A /* velocity.entitlements */,
 				47D62A242A1E72C4006FFE2A /* main.swift */,
-				47D62A2B2A1E7366006FFE2A /* vmm.swift */,
+				47D62A2B2A1E7366006FFE2A /* vz.swift */,
 				47D62A2E2A1EB00A006FFE2A /* utils.swift */,
 				47D62A322A20EEDA006FFE2A /* capture.swift */,
+				47D62A342A210095006FFE2A /* manager.swift */,
+				4707A5632A21699900E0B517 /* httpserver.swift */,
+				4707A5652A22A09200E0B517 /* log.swift */,
 			);
 			path = velocity;
 			sourceTree = "<group>";
@@ -89,6 +100,9 @@
 			dependencies = (
 			);
 			name = velocity;
+			packageProductDependencies = (
+				4707A5612A21692600E0B517 /* Vapor */,
+			);
 			productName = velocity;
 			productReference = 47D62A212A1E72C4006FFE2A /* velocity */;
 			productType = "com.apple.product-type.tool";
@@ -117,6 +131,9 @@
 				Base,
 			);
 			mainGroup = 47D62A182A1E72C4006FFE2A;
+			packageReferences = (
+				4707A5602A21692600E0B517 /* XCRemoteSwiftPackageReference "vapor" */,
+			);
 			productRefGroup = 47D62A222A1E72C4006FFE2A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -132,8 +149,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				47D62A332A20EEDA006FFE2A /* capture.swift in Sources */,
+				47D62A352A210095006FFE2A /* manager.swift in Sources */,
+				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
-				47D62A2C2A1E7366006FFE2A /* vmm.swift in Sources */,
+				47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */,
+				4707A5662A22A09200E0B517 /* log.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,6 +322,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4707A5602A21692600E0B517 /* XCRemoteSwiftPackageReference "vapor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vapor/vapor.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4707A5612A21692600E0B517 /* Vapor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4707A5602A21692600E0B517 /* XCRemoteSwiftPackageReference "vapor" */;
+			productName = Vapor;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 47D62A192A1E72C4006FFE2A /* Project object */;
 }
