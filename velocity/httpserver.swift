@@ -67,7 +67,13 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     app!.get("listRunningVMs") { req -> Response in
         let jsonData: Data
         do {
-            jsonData = try encoder.encode(Manager.running_vms)
+            var vms: Array<VirtualMachine> = [ ]
+            
+            for vme in Manager.running_vms {
+                vms.append(vme.virtual_machine)
+            }
+            
+            jsonData = try encoder.encode(vms)
         } catch {
             throw VelocityVMMError("Could not decode as JSON")
         }
@@ -140,7 +146,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         var headers = HTTPHeaders()
                 
         if let vm = Manager.get_running_vm_by_name(name: vm_name) {
-            NSLog("Capturing snapshot for \(vm.vm_info.name)..")
+            NSLog("Capturing snapshot for \(vm.virtual_machine.vm_info.name)..")
             if let png_data = Manager.screen_snapshot(vm: vm) {
                 headers.add(name: .contentType, value: "image/png")
                 NSLog("PNG Size is \(png_data.count)")
@@ -152,6 +158,25 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             
         }
         headers.add(name: .contentType, value: "application/json")
+        return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("No such VM."))))
+    }
+    
+    app!.get("sendKeycode") { req in
+        guard let vm_name = req.query[String.self, at: "name"] else {
+            throw Abort(.badRequest)
+        }
+        guard let keycode = req.query[String.self, at: "keycode"] else {
+            throw Abort(.badRequest)
+        }
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        
+        if let vm = Manager.get_running_vm_by_name(name: vm_name) {
+            NSLog("Sending keycode '\(keycode)' to VM '\(vm_name)'")
+            send_key_event_to_vm(to: vm.vm_view, key_code: UInt16(keycode) ?? 0)
+            return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Keycode sent to VM."))))
+        }
+                
         return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("No such VM."))))
     }
 

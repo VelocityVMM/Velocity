@@ -173,7 +173,7 @@ public func deploy_vm(velocity_config: VelocityConfig, vm_info: VMInfo) throws {
     }
 }
 
-public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) throws -> VirtualMachine {
+public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) throws -> VirtualMachineExt {
     let bundle_path = velocity_config.velocity_bundle_dir.appendingPathComponent("/\(vm_name).bundle/")
 
     if(!FileManager.default.fileExists(atPath: bundle_path.path)) {
@@ -309,17 +309,30 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
      NSLog("Main loop")
      RunLoop.main.run(until: Date.distantFuture)
     */
-    
-    return VirtualMachine(vm_state: VMState.RUNNING, vm_info: vm_info, window_id: UInt32(new_win.windowNumber))
+    return VirtualMachineExt(virtual_machine: VirtualMachine(vm_state: VMState.RUNNING, vm_info: vm_info), vm_view: virtual_machine_view, window_id: UInt32(new_win.windowNumber))
 }
 
-//MARK: send enter key to vm, PoC for VNC Server implementation..
-func sendEnterKeyEvent(to virtualMachineView: VZVirtualMachineView) {
-    let enterKeyCode: UInt16 = 0x24
-    let enterEvent = NSEvent.keyEvent(with: .keyDown, location: NSPoint.zero, modifierFlags: [], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: enterKeyCode)
+//MARK: send key to vm, PoC for VNC Server implementation..
+func send_key_event_to_vm(to vm_view: NSView, key_code: UInt16) {
+    let key_event = NSEvent.keyEvent(with: .keyDown, location: NSPoint.zero, modifierFlags: [], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: key_code)
     
-    if let enterEvent = enterEvent {
-        virtualMachineView.keyDown(with: enterEvent)
+    let key_release_event = NSEvent.keyEvent(with: .keyUp, location: NSPoint.zero, modifierFlags: [], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: key_code)
+    
+    NSLog("Sending keyevent \(key_event)")
+    if let key_event = key_event {
+        /*
+        DispatchQueue.main.async {
+            NSLog("Pressing..")
+            vm_view.keyDown(with: key_event)
+
+        }
+         */
+        
+        let delay = 0.1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NSLog("Releasing..")
+            vm_view.keyUp(with: key_event)
+        }
     }
 }
 

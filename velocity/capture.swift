@@ -9,6 +9,7 @@ import Foundation
 import Cocoa
 import CoreGraphics
 import Virtualization
+import Quartz
 
 public struct VMViewSize {
     var width: UInt32
@@ -24,17 +25,18 @@ public struct VMViewSize {
 // Capture a given NSWindow -> NSImage?
 //
 func capture_hidden_window(windowNumber: CGWindowID) -> NSImage? {
-    let windowImageOption = CGWindowListOption(arrayLiteral: .optionIncludingWindow)
-    let windowInfoList = CGWindowListCopyWindowInfo(windowImageOption, windowNumber) as? [[String: AnyObject]]
-    let windowInfo = windowInfoList?.first
-    let windowBoundsDict = (windowInfo?[kCGWindowBounds as String] as! CFDictionary)
+    let windowListOption = CGWindowListOption(arrayLiteral: .optionIncludingWindow)
+    let imageOption: CGWindowImageOption = [.boundsIgnoreFraming, .nominalResolution]
+    let windowImage = CGWindowListCreateImage(.null, windowListOption, windowNumber, imageOption)
     
-    let windowBounds = CGRect(dictionaryRepresentation: windowBoundsDict)!
-    guard let cgImage = CGWindowListCreateImage(windowBounds, windowImageOption, windowNumber, [.bestResolution]) else {
+    guard let cgImage = windowImage else {
         return nil
     }
-
-    return NSImage(cgImage: cgImage, size: windowBounds.size)
+    
+    let imageSize = CGSize(width: cgImage.width, height: cgImage.height)
+    let nsImage = NSImage(cgImage: cgImage, size: imageSize)
+    
+    return nsImage
 }
 
 //
@@ -57,7 +59,7 @@ func create_hidden_window(_ virtual_machine_view: VZVirtualMachineView, vm_view_
     offscreen_window.standardWindowButton(.miniaturizeButton)?.isHidden = true
     offscreen_window.standardWindowButton(.closeButton)?.isHidden = true
     offscreen_window.standardWindowButton(.zoomButton)?.isHidden = true
-    
+     
     // position the windows frame at -10k, so it is far offscreen
     let offscreenFrame = CGRect(x: -10000, y: -10000, width: Int(vm_view_size.width), height: Int(vm_view_size.height))
     offscreen_window.setFrame(offscreenFrame, display: false)

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Virtualization
 
 internal struct VelocityVMMError: Error, LocalizedError {
     let errorDescription: String?
@@ -20,19 +21,33 @@ enum VMState: Codable {
     case STOPPED
 }
 
+
+
 public struct VirtualMachine: Codable {
     var vm_state: VMState
     var vm_info: VMInfo
-    var window_id: UInt32
     
-    init(vm_state: VMState, vm_info: VMInfo, window_id: UInt32) {
+    init(vm_state: VMState, vm_info: VMInfo) {
         self.vm_state = vm_state
         self.vm_info = vm_info
+    }
+}
+
+// Non-Serializable VM Object for internal data
+public struct VirtualMachineExt {
+    var virtual_machine: VirtualMachine
+    var vm_view: NSView
+    var window_id: UInt32
+    
+    init(virtual_machine: VirtualMachine, vm_view: NSView, window_id: UInt32) {
+        self.virtual_machine = virtual_machine
+        self.vm_view = vm_view
         self.window_id = window_id
     }
 }
+
 typealias availableVMList = [VMInfo]
-typealias VMList = [VirtualMachine]
+typealias VMList = [VirtualMachineExt]
 
 struct Manager {
     static var running_vms: VMList = [ ]
@@ -87,7 +102,7 @@ struct Manager {
     //
     static func start_vm(velocity_config: VelocityConfig, name: String) throws {
         NSLog("VM start request received.")
-        if let vm =  get_running_vm_by_name(name: name) {
+        if let _ =  get_running_vm_by_name(name: name) {
             throw VelocityVMMError("VZError: VM is already running!")
         }
         
@@ -115,9 +130,9 @@ struct Manager {
     //
     // Get running vm by its name
     //
-    static func get_running_vm_by_name(name: String) -> VirtualMachine? {
+    static func get_running_vm_by_name(name: String) -> VirtualMachineExt? {
         for vm in Manager.running_vms {
-            if vm.vm_info.name == name {
+            if vm.virtual_machine.vm_info.name == name {
                 return vm;
             }
         }
@@ -127,9 +142,11 @@ struct Manager {
     //
     // Take a snapshot from given VM
     //
-    static func screen_snapshot(vm: VirtualMachine) -> Data? {
-        let image = capture_hidden_window(windowNumber: vm.window_id)
-        return image?.pngData
+    static func screen_snapshot(vm: VirtualMachineExt) -> Data? {
+        DispatchQueue.main.sync {
+            let image = capture_hidden_window(windowNumber: vm.window_id)
+            return image?.pngData
+        }
     }
     
     
