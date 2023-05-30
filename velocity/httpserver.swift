@@ -75,7 +75,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             
             jsonData = try encoder.encode(vms)
         } catch {
-            throw VelocityVMMError("Could not decode as JSON")
+            throw VelocityWebError("Could not decode as JSON")
         }
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
@@ -90,7 +90,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         do {
             jsonData = try encoder.encode(Manager.available_vms)
         } catch {
-            throw VelocityVMMError("Could not decode as JSON")
+            throw VelocityWebError("Could not decode as JSON")
         }
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
@@ -105,8 +105,8 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         headers.add(name: .contentType, value: "application/json")
         
         do {
-            let vm_info = try req.content.decode(VMInfo.self)
-            try Manager.create_vm(velocity_config: velocity_config, vm_info: vm_info)
+            let vm_properties = try req.content.decode(VMProperties.self)
+            try Manager.create_vm(velocity_config: velocity_config, vm_properties: vm_properties)
         } catch {
             return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message(error.localizedDescription))))
         }
@@ -132,6 +132,23 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         }
         
         return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Virtual Machine started."))))
+    }
+    
+    app!.get("stopVM") { req in
+        // badRequest if name query param is missing
+        guard let vm_name = req.query[String.self, at: "name"] else {
+            throw Abort(.badRequest)
+        }
+        
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        
+        do {
+            try Manager.stop_vm(name: vm_name)
+            return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Virtual Machine stopped."))))
+        } catch {
+            return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Error: \(error.localizedDescription)"))))
+        }
     }
     
     //

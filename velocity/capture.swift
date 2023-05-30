@@ -71,6 +71,11 @@ func create_hidden_window(_ virtual_machine_view: VZVirtualMachineView, vm_view_
     
     offscreen_window.orderBack(nil)
     offscreen_window.displayIfNeeded()
+    
+    NSEvent.addLocalMonitorForEvents(matching: .any) { event in
+        print("Event: \(event)")
+        return event
+    }
 
     return offscreen_window
 }
