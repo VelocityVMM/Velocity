@@ -59,7 +59,9 @@ func create_hidden_window(_ virtual_machine_view: VZVirtualMachineView, vm_view_
     offscreen_window.standardWindowButton(.miniaturizeButton)?.isHidden = true
     offscreen_window.standardWindowButton(.closeButton)?.isHidden = true
     offscreen_window.standardWindowButton(.zoomButton)?.isHidden = true
-     
+    let window_uuid = UUID().uuidString;
+    offscreen_window.title = window_uuid;
+
     // position the windows frame at -10k, so it is far offscreen
     let offscreenFrame = CGRect(x: -10000, y: -10000, width: Int(vm_view_size.width), height: Int(vm_view_size.height))
     offscreen_window.setFrame(offscreenFrame, display: false)
