@@ -29,11 +29,12 @@ struct Message: Codable {
 public func start_web_server(velocity_config: VelocityConfig) throws {
     let app: Application?
     do {
-         app = try Application(.detect())
+        app = try Application(.detect())
     } catch {
         throw VelocityWebError("Could not setup WS: \(error.localizedDescription)")
     }
-    
+    app?.logger.logLevel = Logger.Level.error;
+
     // CORS headers
     let corsConfiguration = CORSMiddleware.Configuration(
         allowedOrigin: .all,
