@@ -24,8 +24,6 @@ struct Message: Codable {
     }
 }
 
-
-
 public func start_web_server(velocity_config: VelocityConfig) throws {
     let app: Application?
     do {
@@ -134,6 +132,9 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Virtual Machine started."))))
     }
     
+    //
+    // Stop a virtual machine by name
+    //
     app!.get("stopVM") { req in
         // badRequest if name query param is missing
         guard let vm_name = req.query[String.self, at: "name"] else {
@@ -178,6 +179,9 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("No such VM."))))
     }
     
+    //
+    // Send a keycode to the vm
+    //
     app!.get("sendKeycode") { req in
         guard let vm_name = req.query[String.self, at: "name"] else {
             throw Abort(.badRequest)
@@ -196,6 +200,49 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
                 
         return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("No such VM."))))
     }
+    
+    //
+    // Upload an ISO file to the server.
+    // Content-Type: octet-stream / File-Name: file-name-on-srv.iso
+    app!.on(.POST, "uploadISO", body: .stream) { req -> EventLoopFuture<String> in
+        guard let file_name = req.headers["File-Name"].first else {
+            throw Abort(.badRequest)
+        }
+        
+        VLog("Receiving ISO file named '\(file_name)'..")
+        let file_path = velocity_config.velocity_iso_dir.appendingPathComponent(file_name).absoluteString
+        FileManager.default.createFile(atPath: file_path, contents: nil, attributes: nil)
+        
+        let io = req.application.fileio
+        return io.openFile(path: file_path, mode: .write, eventLoop: req.eventLoop).flatMap { handle -> EventLoopFuture<String> in
+            
+            func handleChunks(promise: EventLoopPromise<Void>) {
+                req.body.drain { drainResult -> EventLoopFuture<Void> in
+                    switch drainResult {
+                    case .buffer(let chunk):
+                        return io.write(fileHandle: handle, buffer: chunk, eventLoop: req.eventLoop).flatMap { _ in
+                            return req.eventLoop.future()
+                        }
+                    case .error(let error):
+                        promise.fail(error)
+                        return req.eventLoop.future(error: error) 
+                    case .end:
+                        promise.succeed(())
+                        return req.eventLoop.future()
+                    }
+                }
+            }
+            
+            let promise = req.eventLoop.makePromise(of: Void.self)
+            handleChunks(promise: promise)
+            
+            return promise.futureResult.always { result in
+                _ = try? handle.close()
+            }.map {
+                return "File upload completed."
+            }
+        }
+    }
 
     do {
         try app!.run()
@@ -204,5 +251,3 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     }
     try! app!.run()
 }
-
-

@@ -295,18 +295,16 @@ func send_key_event_to_vm(to vm_view: NSView, key_code: UInt16) {
     
     let key_release_event = NSEvent.keyEvent(with: .keyUp, location: NSPoint.zero, modifierFlags: [], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: key_code)
     
-    NSLog("Sending keyevent \(key_event)")
+    // Execute keyDown immediately
     if let key_event = key_event {
         DispatchQueue.main.async {
-            NSLog("Pressing..")
             vm_view.keyDown(with: key_event)
         }
     }
     
+    //Execute keyUp with 0.1 delay
     if let key_release_event = key_release_event {
-        let delay = 0.1
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            NSLog("Releasing..")
             vm_view.keyUp(with: key_release_event)
         }
     }
