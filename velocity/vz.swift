@@ -1,5 +1,5 @@
 //
-//  VirtualMachineManager
+//  Simple Interface to Virtualization.framework
 //  velocity
 //
 //  Created by zimsneexh on 24.05.23.
@@ -8,25 +8,6 @@
 import Foundation
 import Virtualization
 
-//MARK: Delete as soon as we are not writing the data to PNG anymore.
-extension NSImage {
-    func pngWrite(to url: URL, options: Data.WritingOptions = .atomic) -> Bool {
-        do {
-            let data = self.pngData
-            try data?.write(to: url, options: options)
-            return true
-        } catch {
-            print(error)
-            return false
-        }
-    }
-
-    var pngData: Data? {
-        guard let tiffRepresentation = tiffRepresentation, let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else { return nil }
-        return bitmapImage.representation(using: .png, properties: [:])
-    }
-}
-
 class Delegate: NSObject { }
 extension Delegate: VZVirtualMachineDelegate {
     
@@ -34,7 +15,7 @@ extension Delegate: VZVirtualMachineDelegate {
     //MARK: Probably pretty easy?
     func guestDidStop(_ virtualMachine: VZVirtualMachine) {
         print("The guest shut down or crashed. Exiting.")
-        exit(EXIT_SUCCESS)
+        //exit(EXIT_SUCCESS)
     }
 }
 
@@ -56,7 +37,7 @@ internal struct Disk: Codable {
     }
 }
 
-public struct VMInfo: Codable {
+public struct VMProperties: Codable {
     var name: String
     var cpu_count: Int
     var machine_type: String
@@ -96,8 +77,6 @@ public struct VMInfo: Codable {
         if(available_cpus < self.cpu_count) {
             throw VelocityVZError("Cannot allocate more CPUs than are available.")
         }
-        
-        
     }
     
     func write(atPath: String) throws {
@@ -113,12 +92,10 @@ public struct VMInfo: Codable {
 // Create a new virtual machine with
 // given Struct
 //
-public func deploy_vm(velocity_config: VelocityConfig, vm_info: VMInfo) throws {
-    let bundle_path = velocity_config.velocity_bundle_dir.appendingPathComponent("/\(vm_info.name).bundle/")
+public func deploy_vm(velocity_config: VelocityConfig, vm_properties: VMProperties) throws {
+    let bundle_path = velocity_config.velocity_bundle_dir.appendingPathComponent("/\(vm_properties.name).bundle/")
     
-    NSLog("Creating new virtual machine '\(vm_info.name)' at \(bundle_path.absoluteString) ..")
-
-    
+    NSLog("Creating new virtual machine '\(vm_properties.name)' at \(bundle_path.absoluteString) ..")
     // Check if already exists?
     if(FileManager.default.fileExists(atPath: bundle_path.absoluteString)) {
         throw VelocityVZError("Could not create VM because a VM with this name already exists.")
@@ -133,7 +110,7 @@ public func deploy_vm(velocity_config: VelocityConfig, vm_info: VMInfo) throws {
     // Write bundle json file to disk
     NSLog("Writing VM.json to disk..")
     do {
-        try vm_info.write(atPath: bundle_path.appendingPathComponent("Velocity.json").absoluteString)
+        try vm_properties.write(atPath: bundle_path.appendingPathComponent("Velocity.json").absoluteString)
     } catch {
         throw VelocityVZError(error.localizedDescription)
     }
@@ -141,7 +118,7 @@ public func deploy_vm(velocity_config: VelocityConfig, vm_info: VMInfo) throws {
     // Create MachineIdentifier
     let machine_identifier_path = bundle_path.appendingPathComponent("MachineIdentifier").absoluteString
 
-    switch(vm_info.machine_type) {
+    switch(vm_properties.machine_type) {
     case "MAC":
         throw VelocityVZError("Machine type not implemented.");
         
@@ -164,7 +141,7 @@ public func deploy_vm(velocity_config: VelocityConfig, vm_info: VMInfo) throws {
     }
     
     NSLog("Creating Disk Image(s)..")
-    for disk in vm_info.disks {
+    for disk in vm_properties.disks {
         do {
             try create_disk_image(pathTo: bundle_path.absoluteString, disk: disk)
         } catch {
@@ -188,7 +165,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     }
     
     let decoder = JSONDecoder()
-    let vm_info = try decoder.decode(VMInfo.self, from: Data(file_content.utf8))
+    let vm_info = try decoder.decode(VMProperties.self, from: Data(file_content.utf8))
     let vm_disks = NSMutableArray()
     
     // Setup the VM
@@ -290,7 +267,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
         NSLog("Start exiting.")
     }
     let new_win = create_hidden_window(virtual_machine_view, vm_view_size: VMViewSize(width: 1920, height: 1080))
-    
+
     /*
     var i = 0;
     
@@ -309,7 +286,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
      NSLog("Main loop")
      RunLoop.main.run(until: Date.distantFuture)
     */
-    return VirtualMachineExt(virtual_machine: VirtualMachine(vm_state: VMState.RUNNING, vm_info: vm_info), vm_view: virtual_machine_view, window_id: UInt32(new_win.windowNumber))
+    return VirtualMachineExt(virtual_machine: VirtualMachine(vm_state: VMState.RUNNING, vm_info: vm_info), vm_view: virtual_machine_view, window_id: UInt32(new_win.windowNumber), vz_virtual_machine: virtual_machine)
 }
 
 //MARK: send key to vm, PoC for VNC Server implementation..
@@ -320,18 +297,17 @@ func send_key_event_to_vm(to vm_view: NSView, key_code: UInt16) {
     
     NSLog("Sending keyevent \(key_event)")
     if let key_event = key_event {
-        /*
         DispatchQueue.main.async {
             NSLog("Pressing..")
             vm_view.keyDown(with: key_event)
-
         }
-         */
-        
+    }
+    
+    if let key_release_event = key_release_event {
         let delay = 0.1
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             NSLog("Releasing..")
-            vm_view.keyUp(with: key_event)
+            vm_view.keyUp(with: key_release_event)
         }
     }
 }

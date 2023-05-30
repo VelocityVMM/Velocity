@@ -19,15 +19,16 @@ internal struct VelocityVMMError: Error, LocalizedError {
 enum VMState: Codable {
     case RUNNING
     case STOPPED
+    case SHUTTING_DOWN
+    case CRASHED
+    case ABORTED
 }
-
-
 
 public struct VirtualMachine: Codable {
     var vm_state: VMState
-    var vm_info: VMInfo
+    var vm_info: VMProperties
     
-    init(vm_state: VMState, vm_info: VMInfo) {
+    init(vm_state: VMState, vm_info: VMProperties) {
         self.vm_state = vm_state
         self.vm_info = vm_info
     }
@@ -38,15 +39,17 @@ public struct VirtualMachineExt {
     var virtual_machine: VirtualMachine
     var vm_view: NSView
     var window_id: UInt32
+    var vz_virtual_machine: VZVirtualMachine
     
-    init(virtual_machine: VirtualMachine, vm_view: NSView, window_id: UInt32) {
+    init(virtual_machine: VirtualMachine, vm_view: NSView, window_id: UInt32, vz_virtual_machine: VZVirtualMachine) {
         self.virtual_machine = virtual_machine
         self.vm_view = vm_view
         self.window_id = window_id
+        self.vz_virtual_machine = vz_virtual_machine
     }
 }
 
-typealias availableVMList = [VMInfo]
+typealias availableVMList = [VMProperties]
 typealias VMList = [VirtualMachineExt]
 
 struct Manager {
@@ -70,10 +73,10 @@ struct Manager {
                     do {
                         file_content = try String(contentsOfFile: velocity_json, encoding: .utf8)
                     } catch {
-                        throw VelocityVZError("Could not read VM definition: \(error)")
+                        throw VelocityVMMError("Could not read VM definition: \(error)")
                     }
                     
-                    let vm_info = try decoder.decode(VMInfo.self, from: Data(file_content.utf8))
+                    let vm_info = try decoder.decode(VMProperties.self, from: Data(file_content.utf8))
                     NSLog("[Index] Found VM '\(vm_info.name)'.")
                     Manager.available_vms.append(vm_info)
                     
@@ -87,10 +90,10 @@ struct Manager {
     //
     // Deploys a new bundle, registers the VM as an available_vm
     //
-    static func create_vm(velocity_config: VelocityConfig, vm_info: VMInfo) throws {
+    static func create_vm(velocity_config: VelocityConfig, vm_properties: VMProperties) throws {
         do {
-            try deploy_vm(velocity_config: velocity_config, vm_info: vm_info)
-            self.available_vms.append(vm_info)
+            try deploy_vm(velocity_config: velocity_config, vm_properties: vm_properties)
+            self.available_vms.append(vm_properties)
         } catch {
             throw VelocityVMMError("VZError: \(error.localizedDescription)")
         }
@@ -101,7 +104,7 @@ struct Manager {
     // name
     //
     static func start_vm(velocity_config: VelocityConfig, name: String) throws {
-        NSLog("VM start request received.")
+        NSLog("VM start request received for \(name).")
         if let _ =  get_running_vm_by_name(name: name) {
             throw VelocityVMMError("VZError: VM is already running!")
         }
@@ -118,9 +121,35 @@ struct Manager {
             }
         }
     }
+    
+    //
+    // Stop a VM by name
+    //
+    static func stop_vm(name: String) throws {
+        NSLog("VM stop request received for \(name)")
         
-    static func stop_vm() {
-        
+        // Iterate with Index
+        for (index, vm) in Manager.running_vms.enumerated() {
+            if vm.virtual_machine.vm_info.name == name {
+                // check if VM can shut down.
+                if !vm.vz_virtual_machine.canRequestStop {
+                    throw VelocityVMMError("Could not stop Virtual Machine.")
+                }
+                
+                // Set VM State
+                Manager.running_vms[index].virtual_machine.vm_state = VMState.SHUTTING_DOWN
+
+                // Dispatch VM Stop to MainThread
+                DispatchQueue.main.sync {
+                    vm.vz_virtual_machine.stop { (result) in
+                        VLog("Virtual Machine stopped.")
+                        Manager.running_vms.remove(at: index)
+                    }
+                }
+                return
+            }
+        }
+        throw VelocityVMMError("Cannot stop VM that is not running.")
     }
     
     static func remove_vm() {
