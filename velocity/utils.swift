@@ -77,7 +77,7 @@ public func create_directory_safely(path: String) -> Bool {
         do {
             try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false)
         } catch {
-            NSLog("Could not create directory: \(path)")
+            VErr("Could not create directory: \(path)")
             return false;
         }
     }

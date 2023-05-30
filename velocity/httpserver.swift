@@ -165,10 +165,10 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         var headers = HTTPHeaders()
                 
         if let vm = Manager.get_running_vm_by_name(name: vm_name) {
-            NSLog("Capturing snapshot for \(vm.virtual_machine.vm_info.name)..")
+            VDebug("Capturing snapshot for \(vm.virtual_machine.vm_info.name)..")
             if let png_data = Manager.screen_snapshot(vm: vm) {
                 headers.add(name: .contentType, value: "image/png")
-                NSLog("PNG Size is \(png_data.count)")
+                VDebug("PNG Size is \(png_data.count)")
                 return Response(status: .ok, headers: headers, body: .init(data: png_data))
             }
             
@@ -194,7 +194,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         headers.add(name: .contentType, value: "application/json")
         
         if let vm = Manager.get_running_vm_by_name(name: vm_name) {
-            NSLog("Sending keycode '\(keycode)' to VM '\(vm_name)'")
+            VDebug("Sending keycode '\(keycode)' to VM '\(vm_name)'")
             send_key_event_to_vm(to: vm.vm_view, key_code: UInt16(keycode) ?? 0)
             return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Keycode sent to VM."))))
         }

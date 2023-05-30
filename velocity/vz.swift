@@ -95,20 +95,20 @@ public struct VMProperties: Codable {
 public func deploy_vm(velocity_config: VelocityConfig, vm_properties: VMProperties) throws {
     let bundle_path = velocity_config.velocity_bundle_dir.appendingPathComponent("/\(vm_properties.name).bundle/")
     
-    NSLog("Creating new virtual machine '\(vm_properties.name)' at \(bundle_path.absoluteString) ..")
+    VInfo("Creating new virtual machine '\(vm_properties.name)' at \(bundle_path.absoluteString) ..")
     // Check if already exists?
     if(FileManager.default.fileExists(atPath: bundle_path.absoluteString)) {
         throw VelocityVZError("Could not create VM because a VM with this name already exists.")
     }
         
     // Create a VM Bundle
-    NSLog("Creating Bundle at \(bundle_path)..")
+    VDebug("Creating Bundle at \(bundle_path)..")
     if(!create_directory_safely(path: bundle_path.absoluteString)) {
         throw VelocityVZError("Could not create VM bundle directory.")
     }
     
     // Write bundle json file to disk
-    NSLog("Writing VM.json to disk..")
+    VDebug("Writing VM.json to disk..")
     do {
         try vm_properties.write(atPath: bundle_path.appendingPathComponent("Velocity.json").absoluteString)
     } catch {
@@ -140,7 +140,7 @@ public func deploy_vm(velocity_config: VelocityConfig, vm_properties: VMProperti
         throw VelocityVZError("Unknown machine type.")
     }
     
-    NSLog("Creating Disk Image(s)..")
+    VInfo("Creating Disk Image(s)..")
     for disk in vm_properties.disks {
         do {
             try create_disk_image(pathTo: bundle_path.absoluteString, disk: disk)
@@ -174,33 +174,34 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     virtual_machine_config.memorySize = (vm_info.memory_size * 1024 * 1024)
     
     virtual_machine_config.keyboards = [VZUSBKeyboardConfiguration()]
+    virtual_machine_config.pointingDevices = [VZUSBScreenCoordinatePointingDeviceConfiguration()]
     
-    NSLog("Selected Machine type is \(vm_info.machine_type)")
+    VDebug("Selected Machine type is \(vm_info.machine_type)")
     switch(vm_info.machine_type) {
     case "EFI_BOOTLOADER":
         let platform = VZGenericPlatformConfiguration()
         let bootloader = VZEFIBootLoader()
         
         // Check for EFI Store and import it
-        NSLog("Checking for NVRAM..")
+        VDebug("Checking for NVRAM..")
         if !FileManager.default.fileExists(atPath: bundle_path.appendingPathComponent("NVRAM").absoluteString) {
             throw VelocityVZError("EFI variable store does not exist.")
         }
         
         bootloader.variableStore = VZEFIVariableStore(url: bundle_path.appendingPathComponent("NVRAM"))
         
-        NSLog("NVRAM set.")
-        NSLog("Checking for MachineIdentifier..")
+        VDebug("NVRAM set.")
+        VDebug("Checking for MachineIdentifier..")
         guard let machine_identifier_data = try? Data(contentsOf: URL(fileURLWithPath: bundle_path.appendingPathComponent("MachineIdentifier").absoluteString)) else {
             throw VelocityVZError("Failed to retrieve machine identifier data.")
         }
         
-        NSLog("Setting MachineIdentifier..")
+        VDebug("Setting MachineIdentifier..")
         guard let machine_identifier = VZGenericMachineIdentifier(dataRepresentation: machine_identifier_data) else {
             throw VelocityVZError("Could not load Machine Identifier data.")
         }
         platform.machineIdentifier = machine_identifier
-        NSLog("EFI Setup completed.")
+        VDebug("EFI Setup completed.")
         
         virtual_machine_config.platform = platform
         virtual_machine_config.bootLoader = bootloader
@@ -208,7 +209,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
         virtual_machine_config.memoryBalloonDevices = [VZVirtioTraditionalMemoryBalloonDeviceConfiguration()]
         virtual_machine_config.entropyDevices = [VZVirtioEntropyDeviceConfiguration()]
         
-        NSLog("Adding VirtioGraphics..")
+        VDebug("Adding Virtio Graphics..")
         let graphics_device = VZVirtioGraphicsDeviceConfiguration()
         graphics_device.scanouts = [
             VZVirtioGraphicsScanoutConfiguration(widthInPixels: 1920, heightInPixels: 1080)
@@ -226,7 +227,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     }
     
     if(vm_info.iso_image_path != nil) {
-        NSLog("Attaching ISO image at path \(vm_info.iso_image_path!)..")
+        VDebug("Attaching ISO image at path \(vm_info.iso_image_path!)..")
         guard let installer_disk_attachment = try? VZDiskImageStorageDeviceAttachment(url: URL(fileURLWithPath: vm_info.iso_image_path!), readOnly: true) else {
             throw VelocityVZError("Could not attach ISO image to VM")
         }
@@ -239,9 +240,9 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     virtual_machine_config.storageDevices = disks
     
     do {
-        NSLog("Validating Machine Configuration.")
+        VDebug("Validating Machine Configuration.")
         try virtual_machine_config.validate()
-        NSLog("Machine configuration is valid! Starting..")
+        VDebug("Machine configuration is valid! Starting..")
     } catch {
         throw VelocityVZError("Virtual Machine configuration is invalid: \(error)")
     }
@@ -250,7 +251,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     let virtual_machine_view = VZVirtualMachineView()
     virtual_machine_view.setFrameSize(NSSize(width: 1920, height: 1080))
     
-    NSLog("HACK: Setting Activation Policy to accessory to Hide NSWindow..")
+    VDebug("HACK: Setting Activation Policy to accessory to Hide NSWindow..")
     NSApp.setActivationPolicy(.accessory)
     
     virtual_machine_view.virtualMachine = virtual_machine
@@ -258,13 +259,12 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     virtual_machine.delegate = delegate
     
     virtual_machine.start { (result) in
-        NSLog("Hypervisor called back..")
+        VDebug("Hypervisor callback..")
         
         if case let .failure(error) = result {
             print("Failed to start the virtual machine. \(error)")
             exit(EXIT_FAILURE)
         }
-        NSLog("Start exiting.")
     }
     let new_win = create_hidden_window(virtual_machine_view, vm_view_size: VMViewSize(width: 1920, height: 1080))
 
@@ -325,7 +325,7 @@ internal func create_disk_image(pathTo: String, disk: Disk) throws {
 
     do {
         try main_disk.truncate(atOffset: disk.size_mb * 1024 * 1024)
-        NSLog("Disk image created at \(disk_path).")
+        VInfo("Disk image created at \(disk_path).")
     } catch {
         throw VelocityVZError("Could not truncate the VM's main disk image.")
     }
@@ -343,13 +343,13 @@ private func createSpiceAgentConsoleDeviceConfiguration() -> VZVirtioConsoleDevi
 }
 
 internal func new_generic_machine_identifier(pathTo: String) -> Bool {
-    NSLog("Creating VZGenericMachineIdentifier..")
+    VDebug("Creating VZGenericMachineIdentifier..")
     let machine_identifier = VZGenericMachineIdentifier()
     
     do {
         try machine_identifier.dataRepresentation.write(to: URL(fileURLWithPath: pathTo))
     } catch {
-        NSLog("Could not write bundle file to disk.")
+        VErr("Could not write bundle file to disk.")
         return false;
     }
     return true;
@@ -357,7 +357,7 @@ internal func new_generic_machine_identifier(pathTo: String) -> Bool {
 
 
 func createConsoleConfiguration() -> VZSerialPortConfiguration {
-    NSLog("Creating console device.")
+    VDebug("Creating console device.")
     let consoleConfiguration = VZVirtioConsoleDeviceSerialPortConfiguration()
 
     let inputFileHandle = FileHandle.standardInput

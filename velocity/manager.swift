@@ -77,7 +77,7 @@ struct Manager {
                     }
                     
                     let vm_info = try decoder.decode(VMProperties.self, from: Data(file_content.utf8))
-                    NSLog("[Index] Found VM '\(vm_info.name)'.")
+                    VInfo("[Index] Found VM '\(vm_info.name)'.")
                     Manager.available_vms.append(vm_info)
                     
                 }
@@ -104,7 +104,7 @@ struct Manager {
     // name
     //
     static func start_vm(velocity_config: VelocityConfig, name: String) throws {
-        NSLog("VM start request received for \(name).")
+        VInfo("VM start request received for \(name).")
         if let _ =  get_running_vm_by_name(name: name) {
             throw VelocityVMMError("VZError: VM is already running!")
         }
@@ -126,15 +126,18 @@ struct Manager {
     // Stop a VM by name
     //
     static func stop_vm(name: String) throws {
-        NSLog("VM stop request received for \(name)")
+        VInfo("VM stop request received for \(name)")
         
         // Iterate with Index
         for (index, vm) in Manager.running_vms.enumerated() {
             if vm.virtual_machine.vm_info.name == name {
                 // check if VM can shut down.
-                if !vm.vz_virtual_machine.canRequestStop {
-                    throw VelocityVMMError("Could not stop Virtual Machine.")
+                try DispatchQueue.main.sync {
+                    if !vm.vz_virtual_machine.canRequestStop {
+                        throw VelocityVMMError("Could not stop Virtual Machine.")
+                    }
                 }
+
                 
                 // Set VM State
                 Manager.running_vms[index].virtual_machine.vm_state = VMState.SHUTTING_DOWN

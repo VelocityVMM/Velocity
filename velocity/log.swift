@@ -17,7 +17,7 @@ enum Loglevel: Int {
 }
 
 /// The current loglevel to use
-var VLoglevel: Loglevel = Loglevel.Trace;
+var VLoglevel: Loglevel = Loglevel.Info;
 
 /// Log the specified message to the log
 /// - Parameter message: The message to print

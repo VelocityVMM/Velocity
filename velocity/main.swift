@@ -51,8 +51,8 @@ public func main() {
     print("Copyright (c) 2023 zimsneexh (https://zsxh.eu)")
     print("")
     
-    VLog("Starting up..")
-    VLog("Checking directory structure..")
+    VInfo("Starting up..")
+    VInfo("Checking directory structure..")
     let velocity_config = VelocityConfig();
     
     // check if required directories exist.
