@@ -55,7 +55,6 @@ func get_available_disk_space() -> Int {
     return 0
 }
 
-
 func get_model_name() -> String {
     var size = 0
     sysctlbyname("hw.model", nil, &size, nil, 0)
@@ -83,4 +82,3 @@ public func create_directory_safely(path: String) -> Bool {
     }
     return true;
 }
-

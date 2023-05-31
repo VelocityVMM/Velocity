@@ -220,6 +220,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
         break
         
     case "MAC":
+        VDebug("???")
         break
         
     default:
@@ -268,24 +269,6 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
     }
     let new_win = create_hidden_window(virtual_machine_view, vm_view_size: VMViewSize(width: 1920, height: 1080))
 
-    /*
-    var i = 0;
-    
-    //MARK: poor attempt at capturing 60 frames / s
-    let _ = Timer.scheduledTimer(withTimeInterval: (1.0 / 60), repeats: true) { _ in
-        let capturedImage = capture_hidden_window(windowNumber: CGWindowID(new_win.windowNumber))
-        NSLog("Capturing \(i)")
-        let _ = capturedImage?.pngWrite(to: URL(filePath: "/Users/zimsneexh/Desktop/sond/sond.png"))
-        
-        i = i + 1
-        if(i == 10) {
-            sendEnterKeyEvent(to: virtual_machine_view)
-        }
-    }
-     
-     NSLog("Main loop")
-     RunLoop.main.run(until: Date.distantFuture)
-    */
     return VirtualMachineExt(virtual_machine: VirtualMachine(vm_state: VMState.RUNNING, vm_info: vm_info), vm_view: virtual_machine_view, window_id: UInt32(new_win.windowNumber), vz_virtual_machine: virtual_machine)
 }
 
