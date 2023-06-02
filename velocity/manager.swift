@@ -16,41 +16,21 @@ internal struct VelocityVMMError: Error, LocalizedError {
     }
 }
 
-enum VMState: Codable {
-    case RUNNING
-    case STOPPED
-    case SHUTTING_DOWN
-    case CRASHED
-    case ABORTED
-}
-
-public struct VirtualMachine: Codable {
-    var vm_state: VMState
-    var vm_info: VMProperties
-    
-    init(vm_state: VMState, vm_info: VMProperties) {
-        self.vm_state = vm_state
-        self.vm_info = vm_info
-    }
-}
-
 // Non-Serializable VM Object for internal data
 public struct VirtualMachineExt {
     var virtual_machine: VirtualMachine
-    var vm_view: NSView
-    var window_id: UInt32
+    var window: VWindow
     var vz_virtual_machine: VZVirtualMachine
     
-    init(virtual_machine: VirtualMachine, vm_view: NSView, window_id: UInt32, vz_virtual_machine: VZVirtualMachine) {
+    init(virtual_machine: VirtualMachine, vm_view: VZVirtualMachineView, vz_virtual_machine: VZVirtualMachine) {
         self.virtual_machine = virtual_machine
-        self.vm_view = vm_view
-        self.window_id = window_id
+        self.window = VWindow(vm_view: vm_view);
         self.vz_virtual_machine = vz_virtual_machine
     }
 }
 
 typealias availableVMList = [VMProperties]
-typealias VMList = [VirtualMachineExt]
+typealias VMList = [VLVirtualMachine]
 
 struct Manager {
     static var running_vms: VMList = [ ]
@@ -130,21 +110,21 @@ struct Manager {
         
         // Iterate with Index
         for (index, vm) in Manager.running_vms.enumerated() {
-            if vm.virtual_machine.vm_info.name == name {
+            if vm.vm_info.name == name {
                 // check if VM can shut down.
                 try DispatchQueue.main.sync {
-                    if !vm.vz_virtual_machine.canRequestStop {
+                    if !vm.canRequestStop {
                         throw VelocityVMMError("Could not stop Virtual Machine.")
                     }
                 }
 
                 
                 // Set VM State
-                Manager.running_vms[index].virtual_machine.vm_state = VMState.SHUTTING_DOWN
+                Manager.running_vms[index].vm_state = VMState.SHUTTING_DOWN
 
                 // Dispatch VM Stop to MainThread
                 DispatchQueue.main.sync {
-                    vm.vz_virtual_machine.stop { (result) in
+                    vm.stop { (result) in
                         VLog("Virtual Machine stopped.")
                         Manager.running_vms.remove(at: index)
                     }
@@ -162,9 +142,9 @@ struct Manager {
     //
     // Get running vm by its name
     //
-    static func get_running_vm_by_name(name: String) -> VirtualMachineExt? {
+    static func get_running_vm_by_name(name: String) -> VLVirtualMachine? {
         for vm in Manager.running_vms {
-            if vm.virtual_machine.vm_info.name == name {
+            if vm.vm_info.name == name {
                 return vm;
             }
         }
@@ -175,10 +155,7 @@ struct Manager {
     // Take a snapshot from given VM
     //
     static func screen_snapshot(vm: VirtualMachineExt) -> Data? {
-        DispatchQueue.main.sync {
-            let image = capture_hidden_window(windowNumber: vm.window_id)
-            return image?.pngData
-        }
+        return vm.window.cur_frame?.pngData;
     }
     
     

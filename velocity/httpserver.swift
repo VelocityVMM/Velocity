@@ -69,7 +69,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             var vms: Array<VirtualMachine> = [ ]
             
             for vme in Manager.running_vms {
-                vms.append(vme.virtual_machine)
+                vms.append(vme.get_vm())
             }
             
             jsonData = try encoder.encode(vms)
@@ -165,8 +165,8 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         var headers = HTTPHeaders()
                 
         if let vm = Manager.get_running_vm_by_name(name: vm_name) {
-            VDebug("Capturing snapshot for \(vm.virtual_machine.vm_info.name)..")
-            if let png_data = Manager.screen_snapshot(vm: vm) {
+            VDebug("Capturing snapshot for \(vm.vm_info.name)..")
+            if let png_data = vm.get_cur_screen_contents() {
                 headers.add(name: .contentType, value: "image/png")
                 VDebug("PNG Size is \(png_data.count)")
                 return Response(status: .ok, headers: headers, body: .init(data: png_data))
@@ -195,7 +195,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         
         if let vm = Manager.get_running_vm_by_name(name: vm_name) {
             VDebug("Sending keycode '\(keycode)' to VM '\(vm_name)'")
-            send_key_event_to_vm(to: vm.vm_view, key_code: UInt16(keycode) ?? 0)
+            vm.send_key_event(key_code: UInt16(keycode) ?? 0)
             return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Keycode sent to VM."))))
         }
                 
