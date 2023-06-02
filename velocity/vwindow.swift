@@ -116,8 +116,6 @@ class VWindow : NSWindow, SCStreamOutput {
 
             self.cur_frame = NSImage(cgImage: cgImage, size: .zero);
             
-            self.cur_frame?.pngWrite(to: URL(string: "file:///Users/max/Velocity/Capture/\(sample_count).png")!);
-            
             sample_count += 1;
             VTrace("[capture] Processing screen sample #\(sample_count): \(self.vm_size.width)x\(self.vm_size.height)");
             

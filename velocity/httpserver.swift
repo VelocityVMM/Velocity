@@ -244,6 +244,8 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             }
         }
     }
+    
+    app?.http.server.configuration.hostname = "0.0.0.0"
 
     do {
         try app!.run()

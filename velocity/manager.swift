@@ -16,18 +16,6 @@ internal struct VelocityVMMError: Error, LocalizedError {
     }
 }
 
-// Non-Serializable VM Object for internal data
-public struct VirtualMachineExt {
-    var virtual_machine: VirtualMachine
-    var window: VWindow
-    var vz_virtual_machine: VZVirtualMachine
-    
-    init(virtual_machine: VirtualMachine, vm_view: VZVirtualMachineView, vz_virtual_machine: VZVirtualMachine) {
-        self.virtual_machine = virtual_machine
-        self.window = VWindow(vm_view: vm_view);
-        self.vz_virtual_machine = vz_virtual_machine
-    }
-}
 
 typealias availableVMList = [VMProperties]
 typealias VMList = [VLVirtualMachine]
@@ -96,7 +84,7 @@ struct Manager {
                     let vm = try start_vm_by_name(velocity_config: velocity_config, vm_name: name)
                     Manager.running_vms.append(vm)
                 } catch {
-                    VLog("Could not start VirtualMachine.")
+                    VErr("Could not start VirtualMachine: \(error)")
                 }
             }
         }
@@ -154,7 +142,7 @@ struct Manager {
     //
     // Take a snapshot from given VM
     //
-    static func screen_snapshot(vm: VirtualMachineExt) -> Data? {
+    static func screen_snapshot(vm: VLVirtualMachine) -> Data? {
         return vm.window.cur_frame?.pngData;
     }
     
