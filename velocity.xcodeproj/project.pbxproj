@@ -11,10 +11,11 @@
 		4707A5642A21699900E0B517 /* httpserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5632A21699900E0B517 /* httpserver.swift */; };
 		4707A5662A22A09200E0B517 /* log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5652A22A09200E0B517 /* log.swift */; };
 		476083922A260F0200A93368 /* nsimage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476083912A260F0200A93368 /* nsimage.swift */; };
+		479DE7EA2A2A881900B190C9 /* vlvirtualmachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479DE7E82A2A881900B190C9 /* vlvirtualmachine.swift */; };
+		479DE7EB2A2A881900B190C9 /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479DE7E92A2A881900B190C9 /* vwindow.swift */; };
 		47D62A252A1E72C4006FFE2A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A242A1E72C4006FFE2A /* main.swift */; };
 		47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2B2A1E7366006FFE2A /* vz.swift */; };
 		47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2E2A1EB00A006FFE2A /* utils.swift */; };
-		47D62A332A20EEDA006FFE2A /* capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A322A20EEDA006FFE2A /* capture.swift */; };
 		47D62A352A210095006FFE2A /* manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A342A210095006FFE2A /* manager.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,12 +35,13 @@
 		4707A5632A21699900E0B517 /* httpserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = httpserver.swift; sourceTree = "<group>"; };
 		4707A5652A22A09200E0B517 /* log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = log.swift; sourceTree = "<group>"; };
 		476083912A260F0200A93368 /* nsimage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nsimage.swift; sourceTree = "<group>"; };
+		479DE7E82A2A881900B190C9 /* vlvirtualmachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vlvirtualmachine.swift; sourceTree = "<group>"; };
+		479DE7E92A2A881900B190C9 /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
 		47D62A212A1E72C4006FFE2A /* velocity */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = velocity; sourceTree = BUILT_PRODUCTS_DIR; };
 		47D62A242A1E72C4006FFE2A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		47D62A2B2A1E7366006FFE2A /* vz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vz.swift; sourceTree = "<group>"; };
 		47D62A2D2A1E744D006FFE2A /* velocity.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = velocity.entitlements; sourceTree = "<group>"; };
 		47D62A2E2A1EB00A006FFE2A /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
-		47D62A322A20EEDA006FFE2A /* capture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = capture.swift; sourceTree = "<group>"; };
 		47D62A342A210095006FFE2A /* manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = manager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -74,11 +76,12 @@
 		47D62A232A1E72C4006FFE2A /* velocity */ = {
 			isa = PBXGroup;
 			children = (
+				479DE7E82A2A881900B190C9 /* vlvirtualmachine.swift */,
+				479DE7E92A2A881900B190C9 /* vwindow.swift */,
 				47D62A2D2A1E744D006FFE2A /* velocity.entitlements */,
 				47D62A242A1E72C4006FFE2A /* main.swift */,
 				47D62A2B2A1E7366006FFE2A /* vz.swift */,
 				47D62A2E2A1EB00A006FFE2A /* utils.swift */,
-				47D62A322A20EEDA006FFE2A /* capture.swift */,
 				47D62A342A210095006FFE2A /* manager.swift */,
 				4707A5632A21699900E0B517 /* httpserver.swift */,
 				4707A5652A22A09200E0B517 /* log.swift */,
@@ -151,14 +154,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				47D62A332A20EEDA006FFE2A /* capture.swift in Sources */,
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
 				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
+				479DE7EB2A2A881900B190C9 /* vwindow.swift in Sources */,
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
 				47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */,
 				4707A5662A22A09200E0B517 /* log.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
+				479DE7EA2A2A881900B190C9 /* vlvirtualmachine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
