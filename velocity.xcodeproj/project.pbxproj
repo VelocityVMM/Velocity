@@ -23,7 +23,8 @@
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */; };
-		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
+		509804A22A274729009DAAFF /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509804A12A274729009DAAFF /* vwindow.swift */; };
+		509804A62A286FEE009DAAFF /* vlvirtualmachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,8 +55,8 @@
 		50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBUtil.swift; sourceTree = "<group>"; };
 		50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBStructs.swift; sourceTree = "<group>"; };
 		50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBSession.swift; sourceTree = "<group>"; };
-		504601342A346B0F003FF29A /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
-		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
+		509804A12A274729009DAAFF /* vwindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
+		509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vlvirtualmachine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +111,8 @@
 				476083912A260F0200A93368 /* nsimage.swift */,
 				470D4C282A326ED10057B58E /* virtualization */,
 				50394E322A2CC962006A7CB4 /* vrfb */,
+				509804A12A274729009DAAFF /* vwindow.swift */,
+				509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */,
 			);
 			path = velocity;
 			sourceTree = "<group>";
@@ -197,6 +200,8 @@
 				509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */,
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
 				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
+				509804A62A286FEE009DAAFF /* vlvirtualmachine.swift in Sources */,
+				509804A22A274729009DAAFF /* vwindow.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
 				47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */,
