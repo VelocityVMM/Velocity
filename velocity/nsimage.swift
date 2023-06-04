@@ -17,7 +17,7 @@ extension NSImage {
     func pngWrite(to url: URL, options: Data.WritingOptions = .atomic) -> Bool {
         do {
             let data = self.pngData
-            try! data?.write(to: url, options: options)
+            try data?.write(to: url, options: options)
             return true
         } catch {
             return false

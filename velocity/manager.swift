@@ -138,6 +138,18 @@ struct Manager {
         }
         return nil;
     }
+
+    //
+    // Get running vm by its name
+    //
+    static func get_available_vm_by_name(name: String) -> VMProperties? {
+        for vm in Manager.available_vms {
+            if vm.name == name {
+                return vm;
+            }
+        }
+        return nil;
+    }
     
     //
     // Take a snapshot from given VM
