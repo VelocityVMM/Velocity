@@ -32,17 +32,19 @@ public struct VMProperties: Codable {
     var machine_type: String
     var iso_image_path: String?
     var rosetta: Bool
+    var autostart: Bool
     var disks: Array<Disk>
     var memory_size: UInt64
     var screen_size: NSSize
 
-    init(name: String, cpu_count: Int, memory_size: UInt64, machine_type: String, iso_image_path: String, rosetta: Bool, disks: Array<Disk>, screen_size: NSSize) {
+    init(name: String, cpu_count: Int, memory_size: UInt64, machine_type: String, iso_image_path: String, rosetta: Bool, autostart: Bool, disks: Array<Disk>, screen_size: NSSize) {
         self.name = name
         self.cpu_count = cpu_count
         self.memory_size = memory_size
         self.machine_type = machine_type
         self.iso_image_path = iso_image_path
         self.rosetta = rosetta
+        self.autostart = autostart
         self.disks = disks
         self.screen_size = screen_size;
     }

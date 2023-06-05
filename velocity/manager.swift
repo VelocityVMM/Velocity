@@ -47,7 +47,12 @@ struct Manager {
                     let vm_info = try decoder.decode(VMProperties.self, from: Data(file_content.utf8))
                     VInfo("[Index] Found VM '\(vm_info.name)'.")
                     Manager.available_vms.append(vm_info)
-                    
+
+                    if vm_info.autostart {
+                        VInfo("Autostarting VM '\(vm_info.name)'");
+                        let vm = try start_vm_by_name(velocity_config: velocity_config, vm_name: vm_info.name);
+                        self.running_vms.append(vm);
+                    }
                 }
             }
         } catch {
