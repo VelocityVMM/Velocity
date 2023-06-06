@@ -11,7 +11,7 @@ import ScreenCaptureKit
 import Virtualization
 
 class VWindow : NSWindow, SCStreamOutput {
-    var cur_frame: NSImage?;
+    var cur_frame: CGImage?;
     var sample_count = 0;
     var sc_stream: SCStream?;
     var vm_view: VZVirtualMachineView;
@@ -114,19 +114,15 @@ class VWindow : NSWindow, SCStreamOutput {
                 return
             }
 
-            self.cur_frame = NSImage(cgImage: cgImage, size: .zero);
-            
-            sample_count += 1;
-            VTrace("[capture] Processing screen sample #\(sample_count): \(self.vm_size.width)x\(self.vm_size.height)");
-            
-            /*VDebug("Surface has format: \(surface.width)x\(surface.height) (\(surface.pixelFormat))");
-            VDebug("Image has format: \(contentRect.width)x\(contentRect.height) (\(contentRect.size.debugDescription))");
-            
-            // Convert CIImage to CGImage
-            
+            self.cur_frame = cgImage;
 
-            // Create a bitmap representation from CGImage
-            let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+            sample_count += 1;
+            VDebug("[capture] Processing screen sample #\(sample_count): \(self.vm_size.width)x\(self.vm_size.height)");
+
+        default:
+            VWarn("[capture] Unexpected [unsupported] stream type encountered!");
+        }
+    }
 
             // Get the data of the bitmap representation
             guard let imageData = bitmapRep.representation(using: .png, properties: [:]) else {
@@ -143,16 +139,15 @@ class VWindow : NSWindow, SCStreamOutput {
                 print("Failed to save image: \(error)")
             }
 
-            self.cur_frame = NSImage(cgImage: cgImage, size: .zero)
-             */
-            
-            
+        self.cur_frame = cgImage;
 
-        default:
-            VWarn("[capture] Unexpected [unsupported] stream type encountered!");
-        }
+        return cgImage;
+
+        /*let imageSize = CGSize(width: cgImage.width, height: cgImage.height)
+        let nsImage = NSImage(cgImage: cgImage, size: imageSize)
+
+        return nsImage*/
     }
-        
 }
 
 func filter_window(window: NSWindow) async -> SCWindow? {

@@ -96,6 +96,9 @@ public class VLVirtualMachine : VZVirtualMachine {
 
     /// Returns the currently displayed frame data
     func get_cur_screen_contents() -> Data? {
-        return self.window.cur_frame?.pngData;
+        guard let image = self.window.cur_frame else {
+            return nil;
+        }
+        return NSImage(cgImage: image, size: .zero).pngData;
     }
 }

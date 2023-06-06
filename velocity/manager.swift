@@ -171,7 +171,8 @@ struct Manager {
     // Take a snapshot from given VM
     //
     static func screen_snapshot(vm: VLVirtualMachine) -> Data? {
-        return vm.window.cur_frame?.pngData;
+        let image = vm.window.cur_frame!;
+        return NSImage(cgImage: image, size: .zero).pngData;
     }
     
     static func vnc_for_vm() {
