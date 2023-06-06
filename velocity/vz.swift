@@ -205,7 +205,7 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
         VDebug("Adding Virtio Graphics..")
         let graphics_device = VZVirtioGraphicsDeviceConfiguration()
         graphics_device.scanouts = [
-            VZVirtioGraphicsScanoutConfiguration(widthInPixels: 1920, heightInPixels: 1080)
+            VZVirtioGraphicsScanoutConfiguration(widthInPixels: Int(vm_info.screen_size.width), heightInPixels: Int(vm_info.screen_size.height))
         ]
         virtual_machine_config.graphicsDevices = [ graphics_device ]
         
