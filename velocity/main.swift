@@ -77,6 +77,11 @@ public func main() {
             fatalError("Could not start webserver: \(error.localizedDescription)")
         }
     }
+
+    // Start the RFB server
+    let rfb_server = VRFBServer(port: 1337);
+    rfb_server.start();
+
     RunLoop.main.run(until: Date.distantFuture)
 }
 
