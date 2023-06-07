@@ -58,10 +58,9 @@ class VRFBSession : Loggable {
             do {
                 repeat {
                     var message = try self.socket.read_arr();
-                    VDebug("Received \(message.count) bytes");
+                    VTrace("Received client message \(message)");
 
                     if message.count > 0 {
-                        //handle_event(pixelformat: &pixel_format, socket: socket, buffer: &readData)
                         while message.count > 0 {
                             try self.queue.sync {
                                 try self.handle_message(message: &message);
@@ -170,7 +169,6 @@ class VRFBSession : Loggable {
     /// The handler for client messages
     /// - Parameter message: The message data
     internal func handle_message(message: inout [UInt8]) throws {
-        VDebug("Message length: \(message.count)");
         guard let command = VRFBClientCommand(rawValue: message[0]) else {
             VErr("Client sent invalid command \(message[0])");
             throw VRFBSessionError("Client sent invalid command \(message[0])");
@@ -188,7 +186,7 @@ class VRFBSession : Loggable {
     /// - Parameter image: The image to send
     internal func update_fb(image: CGImage) throws {
         guard let cur_request = self.cur_fb_update else {
-            VErr("No update in flight!");
+            VTrace("Updated framebuffer but no request in flight");
             return;
         }
         
@@ -201,8 +199,6 @@ class VRFBSession : Loggable {
         data.append(contentsOf: pack_u16(1));
 
         data.append(contentsOf: r);
-
-        VDebug("Data size: \(data.count)");
 
         try self.socket.write_arr(data);
         self.cur_fb_update = nil;
