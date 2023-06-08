@@ -102,10 +102,7 @@
 				476083912A260F0200A93368 /* nsimage.swift */,
 				509804A12A274729009DAAFF /* vwindow.swift */,
 				509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */,
-<<<<<<< HEAD
 				50394E322A2CC962006A7CB4 /* vrfb */,
-=======
->>>>>>> d18cfa6 (fixup! Updated project structure, use new sckit capture)
 			);
 			path = velocity;
 			sourceTree = "<group>";
