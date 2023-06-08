@@ -23,6 +23,7 @@ typealias VMList = [VLVirtualMachine]
 struct Manager {
     static var running_vms: VMList = [ ]
     static var available_vms: availableVMList = [ ]
+    static var iso_images: [String] = [ ]
     
     //
     // Indexes the local storage on startup
@@ -31,6 +32,7 @@ struct Manager {
         do {
             let directory_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_bundle_dir.absoluteString)
             
+            // Index VM Bundles
             for url in directory_content {
                 let velocity_json = velocity_config.velocity_bundle_dir.appendingPathComponent(url).appendingPathComponent("Velocity.json").absoluteString
                 
@@ -54,6 +56,15 @@ struct Manager {
                         self.running_vms.append(vm);
                     }
                 }
+            }
+            
+            VLog("[Index] Indexing ISO Storage")
+            
+            // Index ISO image
+            let iso_dir_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_iso_dir.absoluteString)
+            
+            for url in iso_dir_content {
+                Manager.iso_images.append(url)
             }
         } catch {
             throw VelocityVMMError("Could not index local storage: \(error)")
@@ -145,7 +156,7 @@ struct Manager {
     }
 
     //
-    // Get running vm by its name
+    // Get available vm by its name
     //
     static func get_available_vm_by_name(name: String) -> VMProperties? {
         for vm in Manager.available_vms {
@@ -162,7 +173,6 @@ struct Manager {
     static func screen_snapshot(vm: VLVirtualMachine) -> Data? {
         return vm.window.cur_frame?.pngData;
     }
-    
     
     static func vnc_for_vm() {
         

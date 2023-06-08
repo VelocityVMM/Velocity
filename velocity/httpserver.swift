@@ -38,11 +38,12 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     
     app.logger.logLevel = Logger.Level.error;
 
+    
     // CORS headers
     let corsConfiguration = CORSMiddleware.Configuration(
         allowedOrigin: .all,
         allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
-        allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin]
+        allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin, "File-Name" ]
     )
     let cors = CORSMiddleware(configuration: corsConfiguration)
     app.middleware.use(cors, at: .beginning)
@@ -129,6 +130,22 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         headers.add(name: .contentType, value: "application/json")
         return Response(status: .ok, headers: headers, body: .init(data: jsonData))
     }
+    
+    //
+    // Get a list of ISO images on the server
+    //
+    app.get("listISOs") { req -> Response in
+        let jsonData: Data
+        do {
+            jsonData = try encoder.encode(Manager.iso_images)
+        } catch {
+            throw VelocityWebError("Could not decode as JSON")
+        }
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        return Response(status: .ok, headers: headers, body: .init(data: jsonData))
+    }
+    
     
     //
     // Create a new virtual machine
@@ -271,10 +288,12 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             let promise = req.eventLoop.makePromise(of: Void.self)
             handleChunks(promise: promise)
             
+            let json_data = try! encoder.encode(Message("File upload completed."))
+                        
             return promise.futureResult.always { result in
                 _ = try? handle.close()
             }.map {
-                return "File upload completed."
+                return String(data: json_data, encoding: .utf8)!
             }
         }
     }
