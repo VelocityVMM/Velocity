@@ -289,7 +289,13 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             handleChunks(promise: promise)
             
             let json_data = try! encoder.encode(Message("File upload completed."))
-                        
+
+            do {
+                try Manager.index_storage(velocity_config: velocity_config)
+            } catch {
+                VWarn("Could not index iso storage, ignoring.")
+            }
+
             return promise.futureResult.always { result in
                 _ = try? handle.close()
             }.map {

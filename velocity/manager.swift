@@ -29,6 +29,9 @@ struct Manager {
     // Indexes the local storage on startup
     //
     static func index_storage(velocity_config: VelocityConfig) throws {
+        self.iso_images = [ ]
+        self.available_vms = [ ]
+
         do {
             let directory_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_bundle_dir.absoluteString)
             
@@ -174,9 +177,4 @@ struct Manager {
         let image = vm.window.cur_frame!;
         return NSImage(cgImage: image, size: .zero).pngData;
     }
-    
-    static func vnc_for_vm() {
-        
-    }
-    
 }
