@@ -268,7 +268,7 @@ class VRFBSession : Loggable {
 
     /// Perform the version handshake. This negotiates and enforces the server's version
     func version_handshake() throws {
-        try self.socket.write(from: "\(self.server.serverVersion)\n".data(using: String.Encoding.ascii)!);
+        try self.socket.write_arr(Array<UInt8>("\(self.server.serverVersion)\n".utf8));
 
         let version_response = try self.socket.read_arr();
         if version_response.count != 12 {
