@@ -148,6 +148,7 @@ class VRFBSession : Loggable {
     internal func handle_set_pixel_format(message: inout [UInt8]) {
         if message.count < 20 {
             VErr("[SetPixelFormat] Expected at least 20 bytes, got \(message.count)");
+            message = [];
             return;
         }
         guard let new_format = VRFBPixelFormat.unpack(data: Array<UInt8>(message[4...19])) else {
@@ -167,6 +168,7 @@ class VRFBSession : Loggable {
     internal func handle_set_encodings(message: inout [UInt8]) {
         if message.count < 4 {
             VErr("[SetEncodings] Expected at least 4 bytes, got \(message.count)");
+            message = [];
             return;
         }
 
@@ -186,6 +188,7 @@ class VRFBSession : Loggable {
     internal func handle_fb_update(message: inout [UInt8]) throws {
         if message.count < 10 {
             VErr("[FBUpdateRequest] Expected at least 10 bytes, got \(message.count)");
+            message = [];
             return;
         }
         guard let request = VRFBFBUpdateRequest.unpack(data: Array(message[1...9])) else {
