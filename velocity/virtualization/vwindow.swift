@@ -17,10 +17,13 @@ class VWindow : NSWindow {
     var vm_size: CGSize;
     var rfb_sessions: [VRFBSession] = Array();
     var timer: Timer? = nil;
+    var fps = 25;
+    let queue: DispatchQueue;
 
-    init(vm_view: VZVirtualMachineView) {
+    init(vm_view: VZVirtualMachineView, vm_info: VMProperties) {
         self.vm_view = vm_view;
         self.vm_size = vm_view.frame.size;
+        self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.vwindow.\(vm_info.name)", qos: .userInteractive);
 
         let content_rect = self.vm_view.frame;
 
@@ -60,8 +63,11 @@ class VWindow : NSWindow {
             print("Event: \(event)")
             return event
         }
+        self.timer = Timer.scheduledTimer(timeInterval: 1.0 / Double(self.fps), target: self, selector: #selector(self.update_frame), userInfo: nil, repeats: true);
+    }
 
-        self.timer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true){ _ in
+    @objc func update_frame() {
+        self.queue.sync {
             if self.rfb_sessions.count == 0 {
                 return;
             }
@@ -117,22 +123,20 @@ extension CGImage {
             return false
         }
 
-        // Compare raw pixel data
-        let dataSize = self.height * self.bytesPerRow
-        let data1 = UnsafeMutablePointer<UInt8>.allocate(capacity: dataSize)
-        let data2 = UnsafeMutablePointer<UInt8>.allocate(capacity: dataSize)
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let context1 = CGContext(data: data1, width: self.width, height: self.height, bitsPerComponent: self.bitsPerComponent, bytesPerRow: self.bytesPerRow, space: colorSpace, bitmapInfo: self.bitmapInfo.rawValue)
-        let context2 = CGContext(data: data2, width: to.width, height: to.height, bitsPerComponent: to.bitsPerComponent, bytesPerRow: to.bytesPerRow, space: colorSpace, bitmapInfo: to.bitmapInfo.rawValue)
+        guard let data_1 = self.dataProvider?.data else {
+            VErr("Failed to get dataProvider.data of image 1");
+            return false;
+        }
 
-        context1?.draw(self, in: CGRect(x: 0, y: 0, width: self.width, height: self.height))
-        context2?.draw(to, in: CGRect(x: 0, y: 0, width: to.width, height: to.height))
+        guard let data_2 = to.dataProvider?.data else {
+            VErr("Failed to get dataProvider.data of image 2");
+            return false;
+        }
 
-        let result = memcmp(data1, data2, dataSize) == 0
-
-        data1.deallocate()
-        data2.deallocate()
-
-        return result
+        return (data_1 as Data).withUnsafeBytes { rd_1 in
+            (data_2 as Data).withUnsafeBytes { rd_2 in
+                return memcmp(rd_1.baseAddress!, rd_2.baseAddress!, CFDataGetLength(data_1)) == 0;
+            }
+        }
     }
 }

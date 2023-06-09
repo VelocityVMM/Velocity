@@ -53,7 +53,7 @@ public class VLVirtualMachine : VZVirtualMachine {
         let vm_view = VZVirtualMachineView();
         vm_view.setFrameSize(self.vm_info.screen_size);
 
-        self.window = VWindow(vm_view: vm_view);
+        self.window = VWindow(vm_view: vm_view, vm_info: vm_info);
 
         // The VM is stopped upon creation
         self.vm_state = VMState.STOPPED;
