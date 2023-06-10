@@ -24,7 +24,8 @@ struct Manager {
     static var running_vms: VMList = [ ]
     static var available_vms: availableVMList = [ ]
     static var iso_images: [String] = [ ]
-    
+    static var autostart_completed = false
+
     //
     // Indexes the local storage on startup
     //
@@ -53,14 +54,18 @@ struct Manager {
                     VInfo("[Index] Found VM '\(vm_info.name)'.")
                     Manager.available_vms.append(vm_info)
 
-                    if vm_info.autostart {
-                        VInfo("Autostarting VM '\(vm_info.name)'");
-                        let vm = try start_vm_by_name(velocity_config: velocity_config, vm_name: vm_info.name);
-                        self.running_vms.append(vm);
+                    // Only start VM's on first index
+                    if !Manager.autostart_completed {
+                        if vm_info.autostart {
+                            VInfo("Autostarting VM '\(vm_info.name)'");
+                            let vm = try start_vm_by_name(velocity_config: velocity_config, vm_name: vm_info.name);
+                            self.running_vms.append(vm);
+                        }
                     }
                 }
             }
-            
+
+            Manager.autostart_completed = true;
             VLog("[Index] Indexing ISO Storage")
             
             // Index ISO image
