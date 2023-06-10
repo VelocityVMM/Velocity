@@ -191,6 +191,25 @@ struct VRFBFBUpdateRequest {
     }
 }
 
+/// A KeyEvent struct
+struct VRFBKeyEvent {
+    var down_flag: Bool = false;
+    var key_sym: UInt32 = 0;
+
+    static func unpack(data: [UInt8]) -> VRFBKeyEvent? {
+        if data.count != 7 {
+            return nil;
+        }
+
+        var res = VRFBKeyEvent();
+        res.down_flag = data[0] > 0;
+
+        res.key_sym = unpack_u32(Array(data[3...6]))!;
+        return res;
+    }
+}
+
+
 /// A rectangle describing a rectangular area of the framebuffer that gets updated
 struct VRFBRect {
     let dimensions: CGRect;

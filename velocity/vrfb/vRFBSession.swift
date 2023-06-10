@@ -98,6 +98,30 @@ class VRFBSession : Loggable {
         }
     }
 
+    /// The handler for a client `KeyEvent` message
+    /// - Parameter message: The message data
+    internal func handle_key_event(message: inout [UInt8]) {
+        if message.count < 8 {
+            VErr("[KeyEvent] Expected at least 8 bytes, got \(message.count)");
+            return;
+        }
+
+        guard let key_event = VRFBKeyEvent.unpack(data: Array<UInt8>(message[1...7])) else {
+            VErr("[KeyEvent] Could not unpack KeyEvent struct");
+            return;
+        }
+
+        guard let macos_keycode = convertXKeySymToKeyCode(XKeySym: key_event.key_sym) else {
+            VErr("[KeyEvent] Got unmapped X11 KeySym: \(key_event.key_sym)");
+            message.removeFirst(8)
+            return;
+        }
+
+        VTrace("[KeyEvent] Generated KeyEvent: \(macos_keycode)")
+        self.vm.send_macos_keyevent(macos_key_event: macos_keycode, pressed: key_event.down_flag)
+        message.removeFirst(8)
+    }
+
     /// The handler for a client `SetPixelFormat` message
     /// - Parameter message: The message data
     internal func handle_set_pixel_format(message: inout [UInt8]) {
@@ -178,6 +202,7 @@ class VRFBSession : Loggable {
         case VRFBClientCommand.SetPixelFormat: handle_set_pixel_format(message: &message);
         case VRFBClientCommand.SetEncodings: handle_set_encodings(message: &message);
         case VRFBClientCommand.FramebufferUpdateRequest: try handle_fb_update(message: &message);
+        case VRFBClientCommand.KeyEvent: handle_key_event(message: &message)
         case _: message.removeFirst(message.count);
         }
     }
