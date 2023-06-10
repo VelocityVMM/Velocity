@@ -16,53 +16,26 @@ internal struct VelocityVMMError: Error, LocalizedError {
     }
 }
 
-enum VMState: Codable {
-    case RUNNING
-    case STOPPED
-    case SHUTTING_DOWN
-    case CRASHED
-    case ABORTED
-}
-
-public struct VirtualMachine: Codable {
-    var vm_state: VMState
-    var vm_info: VMProperties
-    
-    init(vm_state: VMState, vm_info: VMProperties) {
-        self.vm_state = vm_state
-        self.vm_info = vm_info
-    }
-}
-
-// Non-Serializable VM Object for internal data
-public struct VirtualMachineExt {
-    var virtual_machine: VirtualMachine
-    var vm_view: NSView
-    var window_id: UInt32
-    var vz_virtual_machine: VZVirtualMachine
-    
-    init(virtual_machine: VirtualMachine, vm_view: NSView, window_id: UInt32, vz_virtual_machine: VZVirtualMachine) {
-        self.virtual_machine = virtual_machine
-        self.vm_view = vm_view
-        self.window_id = window_id
-        self.vz_virtual_machine = vz_virtual_machine
-    }
-}
 
 typealias availableVMList = [VMProperties]
-typealias VMList = [VirtualMachineExt]
+typealias VMList = [VLVirtualMachine]
 
 struct Manager {
     static var running_vms: VMList = [ ]
     static var available_vms: availableVMList = [ ]
+    static var iso_images: [String] = [ ]
     
     //
     // Indexes the local storage on startup
     //
     static func index_storage(velocity_config: VelocityConfig) throws {
+        self.iso_images = [ ]
+        self.available_vms = [ ]
+
         do {
             let directory_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_bundle_dir.absoluteString)
             
+            // Index VM Bundles
             for url in directory_content {
                 let velocity_json = velocity_config.velocity_bundle_dir.appendingPathComponent(url).appendingPathComponent("Velocity.json").absoluteString
                 
@@ -79,8 +52,22 @@ struct Manager {
                     let vm_info = try decoder.decode(VMProperties.self, from: Data(file_content.utf8))
                     VInfo("[Index] Found VM '\(vm_info.name)'.")
                     Manager.available_vms.append(vm_info)
-                    
+
+                    if vm_info.autostart {
+                        VInfo("Autostarting VM '\(vm_info.name)'");
+                        let vm = try start_vm_by_name(velocity_config: velocity_config, vm_name: vm_info.name);
+                        self.running_vms.append(vm);
+                    }
                 }
+            }
+            
+            VLog("[Index] Indexing ISO Storage")
+            
+            // Index ISO image
+            let iso_dir_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_iso_dir.absoluteString)
+            
+            for url in iso_dir_content {
+                Manager.iso_images.append(url)
             }
         } catch {
             throw VelocityVMMError("Could not index local storage: \(error)")
@@ -116,7 +103,7 @@ struct Manager {
                     let vm = try start_vm_by_name(velocity_config: velocity_config, vm_name: name)
                     Manager.running_vms.append(vm)
                 } catch {
-                    VLog("Could not start VirtualMachine.")
+                    VErr("Could not start VirtualMachine: \(error)")
                 }
             }
         }
@@ -130,21 +117,21 @@ struct Manager {
         
         // Iterate with Index
         for (index, vm) in Manager.running_vms.enumerated() {
-            if vm.virtual_machine.vm_info.name == name {
+            if vm.vm_info.name == name {
                 // check if VM can shut down.
                 try DispatchQueue.main.sync {
-                    if !vm.vz_virtual_machine.canRequestStop {
+                    if !vm.canRequestStop {
                         throw VelocityVMMError("Could not stop Virtual Machine.")
                     }
                 }
 
                 
                 // Set VM State
-                Manager.running_vms[index].virtual_machine.vm_state = VMState.SHUTTING_DOWN
+                Manager.running_vms[index].vm_state = VMState.SHUTTING_DOWN
 
                 // Dispatch VM Stop to MainThread
                 DispatchQueue.main.sync {
-                    vm.vz_virtual_machine.stop { (result) in
+                    vm.stop { (result) in
                         VLog("Virtual Machine stopped.")
                         Manager.running_vms.remove(at: index)
                     }
@@ -162,9 +149,21 @@ struct Manager {
     //
     // Get running vm by its name
     //
-    static func get_running_vm_by_name(name: String) -> VirtualMachineExt? {
+    static func get_running_vm_by_name(name: String) -> VLVirtualMachine? {
         for vm in Manager.running_vms {
-            if vm.virtual_machine.vm_info.name == name {
+            if vm.vm_info.name == name {
+                return vm;
+            }
+        }
+        return nil;
+    }
+
+    //
+    // Get available vm by its name
+    //
+    static func get_available_vm_by_name(name: String) -> VMProperties? {
+        for vm in Manager.available_vms {
+            if vm.name == name {
                 return vm;
             }
         }
@@ -174,16 +173,8 @@ struct Manager {
     //
     // Take a snapshot from given VM
     //
-    static func screen_snapshot(vm: VirtualMachineExt) -> Data? {
-        DispatchQueue.main.sync {
-            let image = capture_hidden_window(windowNumber: vm.window_id)
-            return image?.pngData
-        }
+    static func screen_snapshot(vm: VLVirtualMachine) -> Data? {
+        let image = vm.window.cur_frame!;
+        return NSImage(cgImage: image, size: .zero).pngData;
     }
-    
-    
-    static func vnc_for_vm() {
-        
-    }
-    
 }

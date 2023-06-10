@@ -31,24 +31,30 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     } catch {
         throw VelocityWebError("Could not setup WS: \(error.localizedDescription)")
     }
-    app?.logger.logLevel = Logger.Level.error;
+    
+    guard let app = app else {
+        throw VelocityWebError("Could not unwrap WebServer..")
+    }
+    
+    app.logger.logLevel = Logger.Level.error;
 
+    
     // CORS headers
     let corsConfiguration = CORSMiddleware.Configuration(
         allowedOrigin: .all,
         allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
-        allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin]
+        allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin, "File-Name" ]
     )
     let cors = CORSMiddleware(configuration: corsConfiguration)
-    app!.middleware.use(cors, at: .beginning)
+    app.middleware.use(cors, at: .beginning)
     
-    defer { app!.shutdown() }
+    defer { app.shutdown() }
     let encoder = JSONEncoder()
     
     //
     // Get host info (CPUName, ModelName, Uptime and Disk space)
     //
-    app!.get("hostInfo") { req in
+    app.get("hostInfo") { req in
         let jsonData: Data
         do {
             jsonData = try encoder.encode(HostInfo())
@@ -60,31 +66,60 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         return Response(status: .ok, headers: headers, body: .init(data: jsonData))
     }
     
+    app.get("getVM") { req -> Response in
+        // badRequest if name query param is missing
+        guard let vm_name = req.query[String.self, at: "name"] else {
+            throw Abort(.badRequest)
+        }
+        
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        
+        let vm = Manager.get_available_vm_by_name(name: vm_name)
+                
+        let jsonData: Data?
+        do {
+            jsonData = try encoder.encode(vm)
+        } catch {
+            VErr("Could not encode as json")
+            throw VelocityWebError("Could not encode as json")
+        }
+        
+        guard let jsonData = jsonData else {
+            VErr("Could not unwrap json data.")
+            throw VelocityWebError("Could not unwrap json data.")
+        }
+                
+        return Response(status: .ok, headers: headers, body: .init(data: jsonData))
+    }
+    
     //
     // Get a list of all currently running VMs
     //
-    app!.get("listRunningVMs") { req -> Response in
+    app.get("listRunningVMs") { req -> Response in
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        
         let jsonData: Data
         do {
             var vms: Array<VirtualMachine> = [ ]
             
             for vme in Manager.running_vms {
-                vms.append(vme.virtual_machine)
+                vms.append(vme.get_vm())
             }
             
             jsonData = try encoder.encode(vms)
         } catch {
-            throw VelocityWebError("Could not decode as JSON")
+            throw VelocityWebError("Could not encode as JSON")
         }
-        var headers = HTTPHeaders()
-        headers.add(name: .contentType, value: "application/json")
+
         return Response(status: .ok, headers: headers, body: .init(data: jsonData))
     }
     
     //
     // Get a list of all available VMs
     //
-    app!.get("listAvailableVMs") { req -> Response in
+    app.get("listAvailableVMs") { req -> Response in
         let jsonData: Data
         do {
             jsonData = try encoder.encode(Manager.available_vms)
@@ -97,9 +132,25 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     }
     
     //
+    // Get a list of ISO images on the server
+    //
+    app.get("listISOs") { req -> Response in
+        let jsonData: Data
+        do {
+            jsonData = try encoder.encode(Manager.iso_images)
+        } catch {
+            throw VelocityWebError("Could not decode as JSON")
+        }
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        return Response(status: .ok, headers: headers, body: .init(data: jsonData))
+    }
+    
+    
+    //
     // Create a new virtual machine
     //
-    app!.post("createVM") { req -> Response in
+    app.post("createVM") { req -> Response in
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
         
@@ -115,7 +166,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     //
     // Start a virtual machine by name
     //
-    app!.get("startVM") { req -> Response in
+    app.get("startVM") { req -> Response in
         // badRequest if name query param is missing
         guard let vm_name = req.query[String.self, at: "name"] else {
             throw Abort(.badRequest)
@@ -136,7 +187,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     //
     // Stop a virtual machine by name
     //
-    app!.get("stopVM") { req in
+    app.get("stopVM") { req in
         // badRequest if name query param is missing
         guard let vm_name = req.query[String.self, at: "name"] else {
             throw Abort(.badRequest)
@@ -156,7 +207,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     //
     // Take a snapshot of the virtualmachine
     //
-    app!.get("snapshot") { req in
+    app.get("snapshot") { req in
         // badRequest if name query param is missing
         guard let vm_name = req.query[String.self, at: "name"] else {
             throw Abort(.badRequest)
@@ -165,8 +216,8 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         var headers = HTTPHeaders()
                 
         if let vm = Manager.get_running_vm_by_name(name: vm_name) {
-            VDebug("Capturing snapshot for \(vm.virtual_machine.vm_info.name)..")
-            if let png_data = Manager.screen_snapshot(vm: vm) {
+            VDebug("Capturing snapshot for \(vm.vm_info.name)..")
+            if let png_data = vm.get_cur_screen_contents() {
                 headers.add(name: .contentType, value: "image/png")
                 VDebug("PNG Size is \(png_data.count)")
                 return Response(status: .ok, headers: headers, body: .init(data: png_data))
@@ -183,7 +234,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     //
     // Send a keycode to the vm
     //
-    app!.get("sendKeycode") { req in
+    app.get("sendKeycode") { req in
         guard let vm_name = req.query[String.self, at: "name"] else {
             throw Abort(.badRequest)
         }
@@ -195,7 +246,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         
         if let vm = Manager.get_running_vm_by_name(name: vm_name) {
             VDebug("Sending keycode '\(keycode)' to VM '\(vm_name)'")
-            send_key_event_to_vm(to: vm.vm_view, key_code: UInt16(keycode) ?? 0)
+            vm.send_key_event(key_code: UInt16(keycode) ?? 0)
             return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Keycode sent to VM."))))
         }
                 
@@ -205,7 +256,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     //
     // Upload an ISO file to the server.
     // Content-Type: octet-stream / File-Name: file-name-on-srv.iso
-    app!.on(.POST, "uploadISO", body: .stream) { req -> EventLoopFuture<String> in
+    app.on(.POST, "uploadISO", body: .stream) { req -> EventLoopFuture<String> in
         guard let file_name = req.headers["File-Name"].first else {
             throw Abort(.badRequest)
         }
@@ -237,18 +288,27 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             let promise = req.eventLoop.makePromise(of: Void.self)
             handleChunks(promise: promise)
             
+            let json_data = try! encoder.encode(Message("File upload completed."))
+
+            do {
+                try Manager.index_storage(velocity_config: velocity_config)
+            } catch {
+                VWarn("Could not index iso storage, ignoring.")
+            }
+
             return promise.futureResult.always { result in
                 _ = try? handle.close()
             }.map {
-                return "File upload completed."
+                return String(data: json_data, encoding: .utf8)!
             }
         }
     }
+    
+    app.http.server.configuration.hostname = "0.0.0.0"
 
     do {
-        try app!.run()
+        try app.run()
     } catch {
-        throw VelocityWebError("Could not start WS: \(error.localizedDescription)")
+        throw VelocityWebError("Could not start WebServer: \(error.localizedDescription)")
     }
-    try! app!.run()
 }

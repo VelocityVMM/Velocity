@@ -8,17 +8,6 @@
 import Foundation
 import Virtualization
 
-class Delegate: NSObject { }
-extension Delegate: VZVirtualMachineDelegate {
-    
-    //MARK: How do we handle this callback?
-    //MARK: Probably pretty easy?
-    func guestDidStop(_ virtualMachine: VZVirtualMachine) {
-        print("The guest shut down or crashed. Exiting.")
-        //exit(EXIT_SUCCESS)
-    }
-}
-
 internal struct VelocityVZError: Error, LocalizedError {
     let errorDescription: String?
 
@@ -43,17 +32,21 @@ public struct VMProperties: Codable {
     var machine_type: String
     var iso_image_path: String?
     var rosetta: Bool
+    var autostart: Bool
     var disks: Array<Disk>
     var memory_size: UInt64
-    
-    init(name: String, cpu_count: Int, memory_size: UInt64, machine_type: String, iso_image_path: String, rosetta: Bool, disks: Array<Disk>) {
+    var screen_size: NSSize
+
+    init(name: String, cpu_count: Int, memory_size: UInt64, machine_type: String, iso_image_path: String, rosetta: Bool, autostart: Bool, disks: Array<Disk>, screen_size: NSSize) {
         self.name = name
         self.cpu_count = cpu_count
         self.memory_size = memory_size
         self.machine_type = machine_type
         self.iso_image_path = iso_image_path
         self.rosetta = rosetta
+        self.autostart = autostart
         self.disks = disks
+        self.screen_size = screen_size;
     }
     
     func as_json() throws  -> String {
@@ -150,7 +143,7 @@ public func deploy_vm(velocity_config: VelocityConfig, vm_properties: VMProperti
     }
 }
 
-public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) throws -> VirtualMachineExt {
+public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) throws -> VLVirtualMachine {
     let bundle_path = velocity_config.velocity_bundle_dir.appendingPathComponent("/\(vm_name).bundle/")
 
     if(!FileManager.default.fileExists(atPath: bundle_path.path)) {
@@ -212,9 +205,16 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
         VDebug("Adding Virtio Graphics..")
         let graphics_device = VZVirtioGraphicsDeviceConfiguration()
         graphics_device.scanouts = [
-            VZVirtioGraphicsScanoutConfiguration(widthInPixels: 1920, heightInPixels: 1080)
+            VZVirtioGraphicsScanoutConfiguration(widthInPixels: Int(vm_info.screen_size.width), heightInPixels: Int(vm_info.screen_size.height))
         ]
         virtual_machine_config.graphicsDevices = [ graphics_device ]
+
+
+        //MARK: Add NAT networking for now, should be configurable in Velocity.json
+        VDebug("Adding Virtio Networking (Type NAT)")
+        let network_device = VZVirtioNetworkDeviceConfiguration()
+        network_device.attachment = VZNATNetworkDeviceAttachment()
+        virtual_machine_config.networkDevices = [ network_device ]
         
     case "KERNEL_BOOT":
         break
@@ -248,18 +248,9 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
         throw VelocityVZError("Virtual Machine configuration is invalid: \(error)")
     }
     
-    let virtual_machine = VZVirtualMachine(configuration: virtual_machine_config)
-    let virtual_machine_view = VZVirtualMachineView()
-    virtual_machine_view.setFrameSize(NSSize(width: 1920, height: 1080))
-    
-    VDebug("HACK: Setting Activation Policy to accessory to Hide NSWindow..")
-    NSApp.setActivationPolicy(.accessory)
-    
-    virtual_machine_view.virtualMachine = virtual_machine
-    let delegate = Delegate()
-    virtual_machine.delegate = delegate
-    
-    virtual_machine.start { (result) in
+    let vvm = VLVirtualMachine(vm_config: virtual_machine_config, vm_info: vm_info);
+
+    vvm.start { (result) in
         VDebug("Hypervisor callback..")
         
         if case let .failure(error) = result {
@@ -267,9 +258,8 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
             exit(EXIT_FAILURE)
         }
     }
-    let new_win = create_hidden_window(virtual_machine_view, vm_view_size: VMViewSize(width: 1920, height: 1080))
 
-    return VirtualMachineExt(virtual_machine: VirtualMachine(vm_state: VMState.RUNNING, vm_info: vm_info), vm_view: virtual_machine_view, window_id: UInt32(new_win.windowNumber), vz_virtual_machine: virtual_machine)
+    return vvm;
 }
 
 //MARK: send key to vm, PoC for VNC Server implementation..
