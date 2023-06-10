@@ -47,6 +47,8 @@ var XKeyToMac: [UInt32:MacOSKeyEvent] = [
     0x0020: MacOSKeyEvent(char: "",  keycode: 49), // Space
     0xffe1: MacOSKeyEvent(char: "",  keycode: 56), // Shift
     0xff1b: MacOSKeyEvent(char: "",  keycode: 53), // ESC
+    0xffe3: MacOSKeyEvent(char: "",  keycode: 59), // CTRL
+    0xffe9: MacOSKeyEvent(char: "",  keycode: 58), // L-Alt
     0x0071: MacOSKeyEvent(char: "q", keycode: 12),
     0x0077: MacOSKeyEvent(char: "w", keycode: 13),
     0x0065: MacOSKeyEvent(char: "e", keycode: 14),
