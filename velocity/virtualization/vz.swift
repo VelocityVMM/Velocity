@@ -208,6 +208,13 @@ public func start_vm_by_name(velocity_config: VelocityConfig, vm_name: String) t
             VZVirtioGraphicsScanoutConfiguration(widthInPixels: Int(vm_info.screen_size.width), heightInPixels: Int(vm_info.screen_size.height))
         ]
         virtual_machine_config.graphicsDevices = [ graphics_device ]
+
+
+        //MARK: Add NAT networking for now, should be configurable in Velocity.json
+        VDebug("Adding Virtio Networking (Type NAT)")
+        let network_device = VZVirtioNetworkDeviceConfiguration()
+        network_device.attachment = VZNATNetworkDeviceAttachment()
+        virtual_machine_config.networkDevices = [ network_device ]
         
     case "KERNEL_BOOT":
         break
