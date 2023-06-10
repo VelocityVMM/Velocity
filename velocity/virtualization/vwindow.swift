@@ -41,6 +41,9 @@ class VWindow : NSWindow {
         let window_uuid = UUID().uuidString;
         self.title = window_uuid;
 
+        //
+        self.acceptsMouseMovedEvents = true
+
         // position the windows frame at -10k, so it is far offscreen
         let offscreenFrame = CGRect(x: -10000, y: -10000, width: Int(self.vm_size.width), height: Int(self.vm_size.height))
         self.setFrame(offscreenFrame, display: false)

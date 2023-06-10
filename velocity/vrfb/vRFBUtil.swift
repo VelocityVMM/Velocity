@@ -70,6 +70,16 @@ func pack_i16(_ value: Int32) -> [UInt8] {
     return packed_data
 }
 
+func unpack_u8_bool(value: UInt8) -> [Bool] {
+    var booleans: [Bool] = []
+    for i in 0..<8 {
+        let mask = UInt8(1 << i)
+        let bit = value & mask
+        booleans.append(bit != 0)
+    }
+    return booleans
+}
+
 extension Array<UInt8> {
     /// Converts the contents of this array to a `Data` value
     /// - Returns: The `Data` object containing a representation of this data

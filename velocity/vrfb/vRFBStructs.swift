@@ -209,6 +209,29 @@ struct VRFBKeyEvent {
     }
 }
 
+/// A PointerEvent struct
+struct VRFBPointerEvent {
+    // All 8 'Mouse button states'
+    var buttons_pressed: [Bool] = [ ];
+
+    // X / Y in the FB
+    var x_position: UInt16 = 0
+    var y_position: UInt16 = 0
+
+    static func unpack(data: [UInt8]) -> VRFBPointerEvent? {
+        if data.count != 5 {
+            return nil;
+        }
+
+        var res = VRFBPointerEvent();
+        // left-click: bool[0], right-click: bool[2]
+        res.buttons_pressed = unpack_u8_bool(value: data[0])
+        res.x_position = unpack_u16(Array(data[1...2]))!
+        res.y_position = unpack_u16(Array(data[3...4]))!
+        return res;
+    }
+}
+
 
 /// A rectangle describing a rectangular area of the framebuffer that gets updated
 struct VRFBRect {
