@@ -120,7 +120,74 @@ public class VLVirtualMachine : VZVirtualMachine {
         }
     }
 
+    /// Sends the provided pointerEvent to the window
+    func send_pointer_event(pointerEvent: VRFBPointerEvent) {
+        let transformed_y_position = UInt16(self.vm_info.screen_size.height) - pointerEvent.y_position
+        VTrace("Moving pointer to x=\(pointerEvent.x_position) y=\(pointerEvent.y_position) (y-transformed=\(transformed_y_position))")
 
+        let move_event = NSEvent.mouseEvent(
+                with: .mouseMoved,
+                location: NSPoint(x: Int(pointerEvent.x_position), y: Int(transformed_y_position)),
+                modifierFlags: [ ],
+                timestamp: TimeInterval(),
+                windowNumber: 0,
+                context: nil,
+                eventNumber: 0,
+                clickCount: 0,
+                pressure: 0
+            )
+
+        let click_event_left = NSEvent.mouseEvent(
+            with: pointerEvent.buttons_pressed[0] ? .leftMouseDown : .leftMouseUp,
+            location: NSPoint(x: Int(pointerEvent.x_position), y: Int(transformed_y_position)),
+            modifierFlags: [ ],
+            timestamp: TimeInterval(),
+            windowNumber: 0,
+            context: nil,
+            eventNumber: 0,
+            clickCount: 0,
+            pressure: 0
+        )
+
+        let click_event_right = NSEvent.mouseEvent(
+            with: pointerEvent.buttons_pressed[2] ? .rightMouseDown : .rightMouseUp,
+            location: NSPoint(x: Int(pointerEvent.x_position), y: Int(transformed_y_position)),
+            modifierFlags: [ ],
+            timestamp: TimeInterval(),
+            windowNumber: 0,
+            context: nil,
+            eventNumber: 0,
+            clickCount: 0,
+            pressure: 0
+        )
+
+        DispatchQueue.main.async {
+            if let move_event {
+                self.window.vm_view.mouseMoved(with: move_event)
+            }
+
+            if let click_event_left {
+                if pointerEvent.buttons_pressed[0] {
+                    self.window.vm_view.mouseDown(with: click_event_left)
+                } else {
+                    self.window.vm_view.mouseUp(with: click_event_left)
+                }
+            }
+
+            if let click_event_right {
+                if pointerEvent.buttons_pressed[2] {
+                    self.window.vm_view.mouseDown(with: click_event_right)
+                } else {
+                    self.window.vm_view.mouseUp(with: click_event_right)
+                }
+            }
+
+            VTrace("Mouse events sent.")
+        }
+    }
+
+
+    // MARK: Remove this and duplicate in Manager?
     /// Sends the provided keycode to the virtual machine
     /// - Parameter key_code: The code to send
     func send_key_event(key_code: UInt16) {

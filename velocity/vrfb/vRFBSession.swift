@@ -98,16 +98,37 @@ class VRFBSession : Loggable {
         }
     }
 
+    /// The handler for a client `PointerEvent` message
+    /// - Parameter message: The message data
+    internal func handle_pointer_event(message: inout [UInt8]) {
+        if message.count < 6 {
+            VErr("[PointerEvent] Expected at least 6 bytes, got \(message.count)");
+            message.removeFirst(6)
+            return;
+        }
+
+        guard let pointer_event = VRFBPointerEvent.unpack(data: Array<UInt8>(message[1...5])) else {
+            VErr("[PointerEvent] Could not unpack PointerEvent..")
+            message.removeFirst(6)
+            return;
+        }
+
+        self.vm.send_pointer_event(pointerEvent: pointer_event)
+        message.removeFirst(6)
+    }
+
     /// The handler for a client `KeyEvent` message
     /// - Parameter message: The message data
     internal func handle_key_event(message: inout [UInt8]) {
         if message.count < 8 {
             VErr("[KeyEvent] Expected at least 8 bytes, got \(message.count)");
+            message.removeFirst(8)
             return;
         }
 
         guard let key_event = VRFBKeyEvent.unpack(data: Array<UInt8>(message[1...7])) else {
             VErr("[KeyEvent] Could not unpack KeyEvent struct");
+            message.removeFirst(8)
             return;
         }
 
@@ -202,7 +223,8 @@ class VRFBSession : Loggable {
         case VRFBClientCommand.SetPixelFormat: handle_set_pixel_format(message: &message);
         case VRFBClientCommand.SetEncodings: handle_set_encodings(message: &message);
         case VRFBClientCommand.FramebufferUpdateRequest: try handle_fb_update(message: &message);
-        case VRFBClientCommand.KeyEvent: handle_key_event(message: &message)
+        case VRFBClientCommand.KeyEvent: handle_key_event(message: &message);
+        case VRFBClientCommand.PointerEvent: handle_pointer_event(message: &message);
         case _: message.removeFirst(message.count);
         }
     }
