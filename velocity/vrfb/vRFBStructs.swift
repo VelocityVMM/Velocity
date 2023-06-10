@@ -64,7 +64,7 @@ struct VRFBPixelFormat {
     /// The color depth in bits (8 + 8 + 8) = 24
     var depth: UInt8 = 24
     /// If not `0`, this indicates a big endian format
-    var big_endian_flag: UInt8 = 0
+    var big_endian_flag: Bool = false
     /// If not `0`, this indicated a full color pixel format
     var true_color_flag: UInt8 = 1
 
@@ -93,15 +93,15 @@ struct VRFBPixelFormat {
         packed_data[1] = self.depth
         
         // BigEndianFlag
-        packed_data[2] = self.big_endian_flag
+        packed_data[2] = self.big_endian_flag ? 1 : 0
         
         // TrueColorFlag
         packed_data[3] = self.true_color_flag
         
         // Red, green, blue Max as UInt8
-        let red_max = pack_u16(self.red_max)
-        let green_max = pack_u16(self.green_max)
-        let blue_max = pack_u16(self.blue_max)
+        let red_max = pack_u16(self.red_max, big_endian: self.big_endian_flag)
+        let green_max = pack_u16(self.green_max, big_endian: self.big_endian_flag)
+        let blue_max = pack_u16(self.blue_max, big_endian: self.big_endian_flag)
         
         // Red
         packed_data[4] = red_max[0]
@@ -143,13 +143,13 @@ struct VRFBPixelFormat {
 
         res.bits_per_pixel = data[0];
         res.depth = data[1];
-        res.big_endian_flag = data[2];
+        res.big_endian_flag = data[2] != 0;
         res.true_color_flag = data[3];
 
         // We can force unwrap these since we check for length at the beginning
-        res.red_max = unpack_u16(Array(data[4...5]))!;
-        res.green_max = unpack_u16(Array(data[6...7]))!;
-        res.blue_max = unpack_u16(Array(data[8...9]))!;
+        res.red_max = unpack_u16(Array(data[4...5]), big_endian: res.big_endian_flag)!;
+        res.green_max = unpack_u16(Array(data[6...7]), big_endian: res.big_endian_flag)!;
+        res.blue_max = unpack_u16(Array(data[8...9]), big_endian: res.big_endian_flag)!;
 
         res.red_shift = data[10];
         res.green_shift = data[11];
