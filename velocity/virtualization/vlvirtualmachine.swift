@@ -67,9 +67,64 @@ public class VLVirtualMachine : VZVirtualMachine {
         self.delegate = self.vm_delegate;
     }
 
+    /// Sends a macOS KeyEvent to the VM's Window
+    /// - Parameter key_event: The MacOS KeyEvent from vRFBConvertKey
+    /// - Parameter pressed: true -> Press / false -> release
+    func send_macos_keyevent(macos_key_event: MacOSKeyEvent, pressed: Bool) {
+        var keyevent: NSEvent? = nil;
+        var char_ignoring_modifiers: Character? = nil;
+
+        if let char = macos_key_event.char {
+
+            // Set char_ignoring_modifiers if modifier flag .shift is set
+            if let modifier_flag = macos_key_event.modifier_flag {
+                if modifier_flag.contains(.shift) {
+                    char_ignoring_modifiers = char.uppercased().first ?? char;
+                } else {
+                    char_ignoring_modifiers = char.lowercased().first ?? char;
+                }
+            }
+        }
+
+        // KeyEvent with Char
+        if let char = macos_key_event.char {
+
+            // modifier set
+            if let char_ignoring_modifiers {
+                VTrace("Generating NSEvent with modifiers")
+                keyevent = NSEvent.keyEvent(with: pressed ? .keyDown : .keyUp, location: NSPoint.zero, modifierFlags: macos_key_event.modifier_flag ?? [ ], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: String(char), charactersIgnoringModifiers: String(char_ignoring_modifiers), isARepeat: false, keyCode: UInt16(macos_key_event.keycode))
+
+            // No modifier
+            } else {
+                VTrace("Generating NSEvent without modifiers")
+                keyevent = NSEvent.keyEvent(with: pressed ? .keyDown : .keyUp, location: NSPoint.zero, modifierFlags: macos_key_event.modifier_flag ?? [ ], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: String(char), charactersIgnoringModifiers: "", isARepeat: false, keyCode: UInt16(macos_key_event.keycode))
+            }
+
+        // KeyEvent does not have a char
+        } else {
+            VTrace("Generating NSEvent without char and modifiers")
+            keyevent = NSEvent.keyEvent(with: pressed ? .keyDown : .keyUp, location: NSPoint.zero, modifierFlags: macos_key_event.modifier_flag ?? [ ], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: UInt16(macos_key_event.keycode))
+        }
+
+        VTrace("Generated NSEvent: \(String(describing: keyevent))")
+
+        // Execute keyDown immediately
+        if let keyevent {
+            DispatchQueue.main.async {
+                if(pressed) {
+                    self.window.vm_view.keyDown(with: keyevent)
+                } else {
+                    self.window.vm_view.keyUp(with: keyevent)
+                }
+            }
+        }
+    }
+
+
     /// Sends the provided keycode to the virtual machine
     /// - Parameter key_code: The code to send
     func send_key_event(key_code: UInt16) {
+
         let key_event = NSEvent.keyEvent(with: .keyDown, location: NSPoint.zero, modifierFlags: [], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: key_code)
         
         let key_release_event = NSEvent.keyEvent(with: .keyUp, location: NSPoint.zero, modifierFlags: [], timestamp: TimeInterval(), windowNumber: 0, context: nil, characters: "", charactersIgnoringModifiers: "", isARepeat: false, keyCode: key_code)
