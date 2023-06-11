@@ -59,7 +59,7 @@ class Loggable {
 }
 
 /// The current loglevel to use
-var VLoglevel: Loglevel = Loglevel.Info;
+var VLoglevel: Loglevel = Loglevel.Debug;
 
 /// Log the specified message to the log
 /// - Parameter message: The message to print
