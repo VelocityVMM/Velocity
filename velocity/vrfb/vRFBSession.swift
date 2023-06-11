@@ -30,7 +30,7 @@ class VRFBSession : Loggable {
     let server: VRFBServer;
     let socket: Socket;
     let name: String;
-    let vm: VLVirtualMachine;
+    let vm: vVirtualMachine;
     var pixel_format: VRFBPixelFormat;
     var security: VRFBSecurityType = VRFBSecurityType.None;
     var cur_fb_update: VRFBFBUpdateRequest? = nil;
@@ -38,10 +38,10 @@ class VRFBSession : Loggable {
 
     /// Established a new RFB session using the supplied socket by performing the RFB handshake
     /// - Parameter socket: The socket to use for communication
-    init(_ server: VRFBServer, vm: VLVirtualMachine, socket: Socket) throws {
+    init(_ server: VRFBServer, vm: vVirtualMachine, socket: Socket) throws {
         self.server = server;
         self.socket = socket;
-        self.name = "Velocity - \(vm.vm_info.name)";
+        self.name = "Velocity - \(vm.name)";
         self.vm = vm;
         self.pixel_format = server.preferred_pixelformat;
         self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.RFBSessionHandler\(self.socket.describe())");
@@ -81,10 +81,10 @@ class VRFBSession : Loggable {
                 VErr("Socket error: \(error)");
             }
 
-            vm.window.rfb_sessions.removeAll(where: { e in
+            vm.window?.rfb_sessions.removeAll(where: { e in
                 return e.socket == self.socket;
             })
-            VInfo("Connection closed, \(vm.window.rfb_sessions.count) active RFB sessions for vm '\(vm.vm_info.name)' remaining");
+            VInfo("Connection closed, \(vm.window!.rfb_sessions.count) active RFB sessions for vm '\(vm.name)' remaining");
             socket.close()
             return;
         }
@@ -202,7 +202,7 @@ class VRFBSession : Loggable {
             VDebug("Client requested full frame update");
             // If a non-incremental frame is requested, snapshot the screen contents and respond immediately
             let cur_frame = DispatchQueue.main.sync {
-                self.vm.window.capture_window();
+                self.vm.window?.capture_window();
             }!;
             try self.update_fb(image: cur_frame);
         }
@@ -331,8 +331,8 @@ class VRFBSession : Loggable {
         var server_init = Array<UInt8>();
 
         // The screen size
-        server_init.append(contentsOf: pack_u16(UInt16(self.vm.vm_info.screen_size.width)));
-        server_init.append(contentsOf: pack_u16(UInt16(self.vm.vm_info.screen_size.height)));
+        server_init.append(contentsOf: pack_u16(UInt16(self.vm.screen_size.width)));
+        server_init.append(contentsOf: pack_u16(UInt16(self.vm.screen_size.height)));
 
         // The native pixel format
         server_init.append(contentsOf: self.pixel_format.pack());

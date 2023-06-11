@@ -96,16 +96,16 @@ class VRFBServer : Loggable {
         }
 
         do {
-            guard let vm = Manager.running_vms.last else {
+            guard let vm = Manager.virtual_machines.last else {
                 VErr("Could not get last started vm");
                 return;
             };
 
             // Create the new session by attaching it to the appropriate virtual machine
             let session = try VRFBSession(self, vm: vm, socket: socket);
-            vm.window.rfb_sessions.append(session);
+            vm.get_window()?.rfb_sessions.append(session);
 
-            VInfo("Initialized new session with \(socket.describe()), \(vm.window.rfb_sessions.count) active RFB sessions");
+            VInfo("Initialized new session with \(socket.describe()), \(vm.get_window()!.rfb_sessions.count) active RFB sessions");
         } catch let error {
             VErr("Failed to establish a session with \(socket.describe()): \(error)");
             return;
