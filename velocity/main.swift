@@ -59,17 +59,18 @@ public func main() {
     if(!velocity_config.check_directory()) {
         fatalError("Could not setup required directories for Velocity.");
     }
-    
-    VLog("Indexing local storage..")
+
+    // Index local storage
     do {
+        try Manager.index_iso_storage(velocity_config: velocity_config)
         try Manager.index_storage(velocity_config: velocity_config)
     } catch {
-        fatalError("Could not index local storage: \(error.localizedDescription)")
+        fatalError("Could not index local storage.")
     }
-    
+
     // Need to dispatch webserver as a background thread, because
     // the UI needs the main thread to render
-    VLog("Preflight checks completed. Starting webserver..")
+    VLog("Starting webserver..")
     DispatchQueue.global().async {
         do {
             try start_web_server(velocity_config: velocity_config)

@@ -20,10 +20,10 @@ class VWindow : NSWindow {
     var fps = 25;
     let queue: DispatchQueue;
 
-    init(vm_view: VZVirtualMachineView, vm_info: VMProperties) {
+    init(vm_view: VZVirtualMachineView, vm_name: String) {
         self.vm_view = vm_view;
         self.vm_size = vm_view.frame.size;
-        self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.vwindow.\(vm_info.name)", qos: .userInteractive);
+        self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.vwindow.\(vm_name)", qos: .userInteractive);
 
         let content_rect = self.vm_view.frame;
 
@@ -44,7 +44,7 @@ class VWindow : NSWindow {
         let window_uuid = UUID().uuidString;
         self.title = window_uuid;
 
-        //
+        // Window accepts MouseMovedEvents
         self.acceptsMouseMovedEvents = true
 
         // position the windows frame at -10k, so it is far offscreen
