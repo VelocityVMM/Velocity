@@ -372,7 +372,10 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
     }
 
     func get_png_snapshot() -> Data? {
-        let image = self.window?.cur_frame!;
-        return NSImage(cgImage: image!, size: .zero).pngData;
+        if let image = self.window?.cur_frame {
+            return NSImage(cgImage: image, size: .zero).pngData;
+        }
+
+        return nil;
     }
 }
