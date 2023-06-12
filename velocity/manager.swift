@@ -27,12 +27,14 @@ struct Manager {
     // Indexes the ISO image storage
     //
     static func index_iso_storage(velocity_config: VelocityConfig) throws {
-        VLog("[Index] Indexing ISO Storage")
+        Manager.iso_images = [ ]
+        VInfo("[Index] Indexing ISO Storage")
 
         // Index ISO image
         let iso_dir_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_iso_dir.absoluteString)
 
         for url in iso_dir_content {
+            VTrace("Adding ISO: \(url)")
             Manager.iso_images.append(url)
         }
     }
@@ -43,7 +45,7 @@ struct Manager {
         self.iso_images = [ ]
         self.virtual_machines = [ ]
 
-        VInfo("Indexing local bundles..")
+        VInfo("[Index] Indexing local bundles..")
         let directory_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_bundle_dir.absoluteString)
         
         for bundle_path in directory_content {

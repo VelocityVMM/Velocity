@@ -33,7 +33,7 @@ internal func create_disk_image(pathTo: String, disk: vDisk) throws {
         try main_disk.truncate(atOffset: disk.size_mb * 1024 * 1024)
         VInfo("Disk image created at \(disk_path).")
     } catch {
-        throw VelocityVZError("Could not truncate the VM's main disk image.")
+        throw VelocityVZError("Could not truncate disk image '\(disk.name)'.")
     }
 }
 
@@ -44,7 +44,7 @@ internal func new_generic_machine_identifier(pathTo: String) -> Bool {
     do {
         try machine_identifier.dataRepresentation.write(to: URL(fileURLWithPath: pathTo))
     } catch {
-        VErr("Could not write bundle file to disk.")
+        VErr("Could not write machine identifier to disk.")
         return false;
     }
     return true;
