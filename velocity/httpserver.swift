@@ -140,14 +140,23 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     app.post("createVM") { req -> Response in
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
-        
-        do {
-            let storage_format = try req.content.decode(vVMStorageFormat.self)
-            let _ = vVirtualMachine.from_storage_format(vc: velocity_config, storage_format: storage_format)
-        } catch {
-            return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message(error.localizedDescription))))
+
+        let res = DispatchQueue.main.sync {
+            do {
+                let storage_format = try req.content.decode(vVMStorageFormat.self)
+                let vm = vVirtualMachine.from_storage_format(vc: velocity_config, storage_format: storage_format)
+
+                guard let vm = vm else {
+                    return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Could not unwrap VirtualMachine"))))
+                }
+
+                Manager.virtual_machines.append(vm)
+                return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Virtual machine created."))))
+            } catch {
+                return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message(error.localizedDescription))))
+            }
         }
-        return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Virtual machine created."))))
+        return res;
     }
 
 
@@ -169,7 +178,10 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             return try! Response(status: .notFound, headers: headers, body: .init(data: encoder.encode(Message("No such VM"))))
         }
 
-        vm.start()
+        DispatchQueue.main.sync {
+            vm.start()
+        }
+
         return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Virtual Machine started."))))
     }
 
@@ -191,7 +203,9 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             return try! Response(status: .notFound, headers: headers, body: .init(data: encoder.encode(Message("No such VM"))))
         }
 
-        vm.stop()
+        DispatchQueue.main.sync {
+            vm.stop()
+        }
         return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Virtual Machine stopped."))))
     }
 
@@ -261,7 +275,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             let json_data = try! encoder.encode(Message("File upload completed."))
 
             do {
-                try Manager.index_storage(velocity_config: velocity_config)
+                try Manager.index_iso_storage(velocity_config: velocity_config)
             } catch {
                 VWarn("Could not index iso storage, ignoring.")
             }
