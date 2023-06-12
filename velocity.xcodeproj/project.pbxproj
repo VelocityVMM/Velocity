@@ -24,6 +24,7 @@
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */; };
+		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
 /* End PBXBuildFile section */
 
@@ -56,6 +57,7 @@
 		50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBUtil.swift; sourceTree = "<group>"; };
 		50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBStructs.swift; sourceTree = "<group>"; };
 		50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBSession.swift; sourceTree = "<group>"; };
+		5075244D2A37A2810072B094 /* vNWConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vNWConnection.swift; sourceTree = "<group>"; };
 		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,6 +105,7 @@
 		47D62A232A1E72C4006FFE2A /* velocity */ = {
 			isa = PBXGroup;
 			children = (
+				5075244C2A37A26A0072B094 /* network */,
 				47D62A2D2A1E744D006FFE2A /* velocity.entitlements */,
 				47D62A242A1E72C4006FFE2A /* main.swift */,
 				47D62A2E2A1EB00A006FFE2A /* utils.swift */,
@@ -126,6 +129,14 @@
 				50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */,
 			);
 			path = vrfb;
+			sourceTree = "<group>";
+		};
+		5075244C2A37A26A0072B094 /* network */ = {
+			isa = PBXGroup;
+			children = (
+				5075244D2A37A2810072B094 /* vNWConnection.swift */,
+			);
+			path = network;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -205,6 +216,7 @@
 				47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
 				4707A5662A22A09200E0B517 /* log.swift in Sources */,
+				5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */,
 				47A78B4C2A350181007C8FB8 /* vVMStructs.swift in Sources */,
 				50394E342A2CC9BF006A7CB4 /* vRFBUtil.swift in Sources */,
 				50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */,
