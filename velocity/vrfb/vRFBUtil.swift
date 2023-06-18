@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Socket
 
 /// Packs a `UInt32` value into an array of `UInt8` for use with the RFB protocol
 /// - Parameter value: The value to pack
@@ -125,35 +124,5 @@ extension Array<UInt8> {
     /// - Returns: The `Data` object containing a representation of this data
     func data() -> Data {
         return Data(bytes: self, count: self.count);
-    }
-}
-
-extension Socket {
-    func write_arr(_ data: Array<UInt8>) throws {
-        // MARK: Debugging can be enabled here by uncommenting the statement
-        // Check loglevel here for performance reasons of constructing the string
-        /*if VLoglevel.rawValue >= Loglevel.Trace.rawValue {
-            VTrace("( <- \(data)", "[\(self.remoteHostname)(\(self.remotePort))]");
-        }*/
-        try self.write(from: data.data());
-    }
-
-    func read_arr() throws -> Array<UInt8> {
-        var buffer = Data(capacity: 8192);
-
-        let len = try self.read(into: &buffer);
-        if len == 0 {
-            return Array();
-        }
-
-        let res = Array(buffer[0...len-1]);
-
-        // MARK: Debugging can be enabled here by uncommenting the statement
-        // Check loglevel here for performance reasons of constructing the string
-        /*if VLoglevel.rawValue >= Loglevel.Trace.rawValue {
-            VTrace("( -> \(res)", "[\(self.remoteHostname)(\(self.remotePort))]")
-        }*/
-
-        return res;
     }
 }
