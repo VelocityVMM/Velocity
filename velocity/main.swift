@@ -80,8 +80,14 @@ public func main() {
     }
 
     // Start the RFB server
-    let rfb_server = VRFBServer(port: 1337);
-    rfb_server.start();
+    do {
+        let rfb_server = try VRFBServer(port: 1337);
+        rfb_server.start();
+    } catch let e {
+        VErr("Failed to create RFB server: \(e)");
+        return;
+    }
+
 
     RunLoop.main.run(until: Date.distantFuture)
 }
