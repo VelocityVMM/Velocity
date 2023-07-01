@@ -10,19 +10,20 @@
 		4707A5622A21692600E0B517 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = 4707A5612A21692600E0B517 /* Vapor */; };
 		4707A5642A21699900E0B517 /* httpserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5632A21699900E0B517 /* httpserver.swift */; };
 		4707A5662A22A09200E0B517 /* log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5652A22A09200E0B517 /* log.swift */; };
-		470D4C2A2A326EFF0057B58E /* vlvirtualmachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470D4C292A326EFF0057B58E /* vlvirtualmachine.swift */; };
 		470D4C2D2A3276C20057B58E /* vRFBConvertKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470D4C2C2A3276C20057B58E /* vRFBConvertKey.swift */; };
 		476083922A260F0200A93368 /* nsimage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476083912A260F0200A93368 /* nsimage.swift */; };
+		47A78B4C2A350181007C8FB8 /* vVMStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A78B4B2A350181007C8FB8 /* vVMStructs.swift */; };
+		47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A78B4D2A351B38007C8FB8 /* vVirtualMachine.swift */; };
 		47D62A252A1E72C4006FFE2A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A242A1E72C4006FFE2A /* main.swift */; };
 		47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2B2A1E7366006FFE2A /* vz.swift */; };
 		47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2E2A1EB00A006FFE2A /* utils.swift */; };
 		47D62A352A210095006FFE2A /* manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A342A210095006FFE2A /* manager.swift */; };
 		50394E2E2A2CC48B006A7CB4 /* vRFBServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E2D2A2CC48B006A7CB4 /* vRFBServer.swift */; };
-		50394E312A2CC64C006A7CB4 /* Socket in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E302A2CC64C006A7CB4 /* Socket */; };
 		50394E342A2CC9BF006A7CB4 /* vRFBUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */; };
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */; };
+		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
 /* End PBXBuildFile section */
 
@@ -41,9 +42,10 @@
 /* Begin PBXFileReference section */
 		4707A5632A21699900E0B517 /* httpserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = httpserver.swift; sourceTree = "<group>"; };
 		4707A5652A22A09200E0B517 /* log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = log.swift; sourceTree = "<group>"; };
-		470D4C292A326EFF0057B58E /* vlvirtualmachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vlvirtualmachine.swift; sourceTree = "<group>"; };
 		470D4C2C2A3276C20057B58E /* vRFBConvertKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vRFBConvertKey.swift; sourceTree = "<group>"; };
 		476083912A260F0200A93368 /* nsimage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nsimage.swift; sourceTree = "<group>"; };
+		47A78B4B2A350181007C8FB8 /* vVMStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vVMStructs.swift; sourceTree = "<group>"; };
+		47A78B4D2A351B38007C8FB8 /* vVirtualMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vVirtualMachine.swift; sourceTree = "<group>"; };
 		47D62A212A1E72C4006FFE2A /* velocity */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = velocity; sourceTree = BUILT_PRODUCTS_DIR; };
 		47D62A242A1E72C4006FFE2A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		47D62A2B2A1E7366006FFE2A /* vz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vz.swift; sourceTree = "<group>"; };
@@ -54,7 +56,7 @@
 		50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBUtil.swift; sourceTree = "<group>"; };
 		50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBStructs.swift; sourceTree = "<group>"; };
 		50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBSession.swift; sourceTree = "<group>"; };
-		504601342A346B0F003FF29A /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
+		5075244D2A37A2810072B094 /* vNWConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vNWConnection.swift; sourceTree = "<group>"; };
 		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -64,7 +66,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4707A5622A21692600E0B517 /* Vapor in Frameworks */,
-				50394E312A2CC64C006A7CB4 /* Socket in Frameworks */,
 				50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,7 +78,8 @@
 			children = (
 				509AB0EE2A346FAC00F4DD2C /* vwindow.swift */,
 				47D62A2B2A1E7366006FFE2A /* vz.swift */,
-				470D4C292A326EFF0057B58E /* vlvirtualmachine.swift */,
+				47A78B4B2A350181007C8FB8 /* vVMStructs.swift */,
+				47A78B4D2A351B38007C8FB8 /* vVirtualMachine.swift */,
 			);
 			path = virtualization;
 			sourceTree = "<group>";
@@ -101,6 +103,7 @@
 		47D62A232A1E72C4006FFE2A /* velocity */ = {
 			isa = PBXGroup;
 			children = (
+				5075244C2A37A26A0072B094 /* network */,
 				47D62A2D2A1E744D006FFE2A /* velocity.entitlements */,
 				47D62A242A1E72C4006FFE2A /* main.swift */,
 				47D62A2E2A1EB00A006FFE2A /* utils.swift */,
@@ -126,6 +129,14 @@
 			path = vrfb;
 			sourceTree = "<group>";
 		};
+		5075244C2A37A26A0072B094 /* network */ = {
+			isa = PBXGroup;
+			children = (
+				5075244D2A37A2810072B094 /* vNWConnection.swift */,
+			);
+			path = network;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -144,7 +155,6 @@
 			name = velocity;
 			packageProductDependencies = (
 				4707A5612A21692600E0B517 /* Vapor */,
-				50394E302A2CC64C006A7CB4 /* Socket */,
 				50394E4D2A2CD160006A7CB4 /* Atomics */,
 			);
 			productName = velocity;
@@ -177,7 +187,6 @@
 			mainGroup = 47D62A182A1E72C4006FFE2A;
 			packageReferences = (
 				4707A5602A21692600E0B517 /* XCRemoteSwiftPackageReference "vapor" */,
-				50394E2F2A2CC64C006A7CB4 /* XCRemoteSwiftPackageReference "BlueSocket" */,
 				50394E4C2A2CD160006A7CB4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 			);
 			productRefGroup = 47D62A222A1E72C4006FFE2A /* Products */;
@@ -196,16 +205,18 @@
 			files = (
 				509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */,
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
+				47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */,
 				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
 				47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
 				4707A5662A22A09200E0B517 /* log.swift in Sources */,
+				5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */,
+				47A78B4C2A350181007C8FB8 /* vVMStructs.swift in Sources */,
 				50394E342A2CC9BF006A7CB4 /* vRFBUtil.swift in Sources */,
 				50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */,
 				50394E2E2A2CC48B006A7CB4 /* vRFBServer.swift in Sources */,
-				470D4C2A2A326EFF0057B58E /* vlvirtualmachine.swift in Sources */,
 				50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */,
 				470D4C2D2A3276C20057B58E /* vRFBConvertKey.swift in Sources */,
 			);
@@ -385,14 +396,6 @@
 				minimumVersion = 4.0.0;
 			};
 		};
-		50394E2F2A2CC64C006A7CB4 /* XCRemoteSwiftPackageReference "BlueSocket" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Kitura/BlueSocket.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
 		50394E4C2A2CD160006A7CB4 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-atomics.git";
@@ -408,11 +411,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4707A5602A21692600E0B517 /* XCRemoteSwiftPackageReference "vapor" */;
 			productName = Vapor;
-		};
-		50394E302A2CC64C006A7CB4 /* Socket */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 50394E2F2A2CC64C006A7CB4 /* XCRemoteSwiftPackageReference "BlueSocket" */;
-			productName = Socket;
 		};
 		50394E4D2A2CD160006A7CB4 /* Atomics */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Socket
 import CoreGraphics
 import Atomics
 
@@ -28,9 +27,9 @@ internal struct VRFBHandshakeError: Error, LocalizedError {
 
 class VRFBSession : Loggable {
     let server: VRFBServer;
-    let socket: Socket;
+    let connection: VNWConnection;
     let name: String;
-    let vm: VLVirtualMachine;
+    let vm: vVirtualMachine;
     var pixel_format: VRFBPixelFormat;
     var security: VRFBSecurityType = VRFBSecurityType.None;
     var cur_fb_update: VRFBFBUpdateRequest? = nil;
@@ -38,62 +37,64 @@ class VRFBSession : Loggable {
 
     /// Established a new RFB session using the supplied socket by performing the RFB handshake
     /// - Parameter socket: The socket to use for communication
-    init(_ server: VRFBServer, vm: VLVirtualMachine, socket: Socket) throws {
+    init(_ server: VRFBServer, vm: vVirtualMachine, connection: VNWConnection) throws {
         self.server = server;
-        self.socket = socket;
-        self.name = "Velocity - \(vm.vm_info.name)";
+        self.connection = connection;
+        self.name = "Velocity - \(vm.name)";
         self.vm = vm;
         self.pixel_format = server.preferred_pixelformat;
-        self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.RFBSessionHandler\(self.socket.describe())");
+        self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.RFBSession.\(connection.describe())");
 
-        super.init(context: "[RFBS][\(self.socket.describe())]");
+        super.init(context: "[RFBS][\(connection.describe())]");
 
-        try handshake();
-
-        let queue = DispatchQueue(label: "eu.zimsneexh.Velocity.RFBSession\(self.socket.describe())");
-
-        queue.async { [self] in
+        self.connection.cb_on_ready = {
             var shouldKeepRunning = true
 
-            do {
-                repeat {
-                    var message = try self.socket.read_arr();
-                    VTrace("Received client message \(message)");
+            self.queue.async {
+                do {
+                    try self.handshake();
 
-                    if message.count > 0 {
-                        while message.count > 0 {
-                            try self.queue.sync {
+                    // Add this session to the according window
+                    self.vm.window?.rfb_sessions.append(self);
+                    self.VTrace("Handshake complete - added session to vm window");
+
+                    repeat {
+                        var message = try self.connection.receive_arr();
+                        self.VTrace("Received client message \(message)");
+
+                        if message.count > 0 {
+                            while message.count > 0 {
                                 try self.handle_message(message: &message);
                             }
+                        } else {
+                            shouldKeepRunning = false
+                            break
                         }
-                    } else {
-                        shouldKeepRunning = false
-                        break
-                    }
 
-                } while shouldKeepRunning
+                    } while shouldKeepRunning
 
-            } catch let error {
-                guard let _ = error as? Socket.Error else {
-                    print("Unexpected error by connection at \(socket.remoteHostname):\(socket.remotePort)...")
-                    return
+                } catch let error {
+                    self.VErr("Error while processing / receiving message: \(error)");
                 }
-                VErr("Socket error: \(error)");
+
+                // Clean up the window's reference to this session
+                let description = self.connection.describe();
+                self.vm.window?.rfb_sessions.removeAll(where: { x in
+                    return description == x.connection.describe();
+                });
+                self.VDebug("Finished teardown of connection");
             }
 
-            vm.window.rfb_sessions.removeAll(where: { e in
-                return e.socket == self.socket;
-            })
-            VInfo("Connection closed, \(vm.window.rfb_sessions.count) active RFB sessions for vm '\(vm.vm_info.name)' remaining");
-            socket.close()
-            return;
+            return true;
         }
+
+        self.connection.start();
     }
 
     /// A callback for the `VWIndow` to notify this session that the frame has updated
     /// - Parameter frame: The new and updated frame
     func frame_changed(frame: CGImage) throws {
-        try self.queue.sync {
+        try self.connection.user_queue.sync {
             try self.update_fb(image: frame);
         }
     }
@@ -179,7 +180,7 @@ class VRFBSession : Loggable {
             return;
         }
 
-        VInfo("Client advertised \(count_encodings) available encodings");
+        VDebug("Client advertised \(count_encodings) available encodings");
         message.removeFirst(Int(required_bytes));
     }
 
@@ -202,12 +203,12 @@ class VRFBSession : Loggable {
             VDebug("Client requested full frame update");
             // If a non-incremental frame is requested, snapshot the screen contents and respond immediately
             let cur_frame = DispatchQueue.main.sync {
-                self.vm.window.capture_window();
+                self.vm.window?.capture_window();
             }!;
             try self.update_fb(image: cur_frame);
         }
 
-        VDebug("Received FBUpdateRequest: \(request)");
+        VTrace("Received FBUpdateRequest: \(request)");
         message.removeFirst(10);
     }
 
@@ -247,7 +248,7 @@ class VRFBSession : Loggable {
 
         data.append(contentsOf: r);
 
-        try self.socket.write_arr(data);
+        try self.connection.send_arr(data);
         self.cur_fb_update = nil;
     }
 
@@ -268,9 +269,9 @@ class VRFBSession : Loggable {
 
     /// Perform the version handshake. This negotiates and enforces the server's version
     func version_handshake() throws {
-        try self.socket.write_arr(Array<UInt8>("\(self.server.serverVersion)\n".utf8));
+        try self.connection.send_arr(Array<UInt8>("\(self.server.serverVersion)\n".utf8));
 
-        let version_response = try self.socket.read_arr();
+        let version_response = try self.connection.receive_arr();
         if version_response.count != 12 {
             VErr("Handshake failed: Expected 12 bytes for version, got \(version_response.count)");
             throw VRFBHandshakeError("Handshake failed: Expected 12 bytes for version, got \(version_response.count)");
@@ -288,8 +289,8 @@ class VRFBSession : Loggable {
 
         // Propose the supported security types
         VDebug("Proposing following security types: \(self.server.security_types)");
-        try self.socket.write_arr(security_proposal);
-        let response = try self.socket.read_arr();
+        try self.connection.send_arr(security_proposal);
+        let response = try self.connection.receive_arr();
         if response.count != 1 {
             VErr("Security proposal response isn't 1 byte long");
             throw VRFBHandshakeError("Security proposal response isn't 1 byte long");
@@ -306,7 +307,7 @@ class VRFBSession : Loggable {
             VErr("Client responded with unsupported security type \(new_security)");
 
             // Inform the client that this its choice is invalid
-            try self.socket.write_arr(pack_u32(VRFBConstants.SECURITY_RESULT_FAILED));
+            try self.connection.send_arr(pack_u32(VRFBConstants.SECURITY_RESULT_FAILED));
 
             throw VRFBHandshakeError("Client responded with unsupported security type \(new_security)");
         }
@@ -314,11 +315,11 @@ class VRFBSession : Loggable {
 
         // Acknowledge the security handshake
         VDebug("Negotiated security type to '\(self.security)'");
-        try self.socket.write_arr(pack_u32(VRFBConstants.SECURITY_RESULT_OK));
+        try self.connection.send_arr(pack_u32(VRFBConstants.SECURITY_RESULT_OK));
     }
 
     func client_init_handshake() throws {
-        let client_init = try self.socket.read_arr();
+        let client_init = try self.connection.receive_arr();
         if client_init.count != 1 {
             VErr("ClientInit message isn't 1 byte long");
             throw VRFBHandshakeError("ClientInit message isn't 1 byte long");
@@ -331,8 +332,8 @@ class VRFBSession : Loggable {
         var server_init = Array<UInt8>();
 
         // The screen size
-        server_init.append(contentsOf: pack_u16(UInt16(self.vm.vm_info.screen_size.width)));
-        server_init.append(contentsOf: pack_u16(UInt16(self.vm.vm_info.screen_size.height)));
+        server_init.append(contentsOf: pack_u16(UInt16(self.vm.screen_size.width)));
+        server_init.append(contentsOf: pack_u16(UInt16(self.vm.screen_size.height)));
 
         // The native pixel format
         server_init.append(contentsOf: self.pixel_format.pack());
@@ -341,7 +342,7 @@ class VRFBSession : Loggable {
         server_init.append(contentsOf: pack_u32(UInt32(self.name.count)));
         server_init.append(contentsOf: self.name.utf8);
 
-        try self.socket.write_arr(server_init);
+        try self.connection.send_arr(server_init);
         VDebug("Sent \(server_init.count) bytes of server init");
     }
 }
