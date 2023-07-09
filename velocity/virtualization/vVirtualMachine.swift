@@ -22,7 +22,7 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
     let window: VWindow?;
     var specific: (vMacOptions?, vEFIOptions?);
 
-    init(vc: VelocityConfig, name: String, cpu_count: UInt, memory_size: UInt, screen_size: NSSize, autostart: Bool, disks: [vDisk], specific: (vMacOptions?, vEFIOptions?)) throws {
+    init(name: String, cpu_count: UInt, memory_size: UInt, screen_size: NSSize, autostart: Bool, disks: [vDisk], specific: (vMacOptions?, vEFIOptions?)) throws {
 
         for vm in Manager.virtual_machines {
             if vm.name == name {
@@ -56,8 +56,8 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
 
         // Check if the Filesystem already contains this VM
         // and all required files
-        VTrace("Checking Bundle and creating if needed..")
-        let bundle_path = vc.velocity_bundle_dir.appendingPathComponent("/\(self.name).bundle/")
+        VTrace("Checking for Bundle and creating if needed..")
+        let bundle_path = VelocityConfig.velocity_bundle_dir.appendingPathComponent("/\(self.name).bundle/")
         if !FileManager.default.fileExists(atPath: bundle_path.absoluteString) {
             if(!create_directory_safely(path: bundle_path.absoluteString)) {
                 throw VelocityVZError("Could not create VM bundle directory.")
@@ -248,12 +248,12 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
         return self.specific
     }
 
-    public static func from_storage_format(vc: VelocityConfig, storage_format: vVMStorageFormat) throws -> vVirtualMachine? {
+    public static func from_storage_format(storage_format: vVMStorageFormat) throws -> vVirtualMachine? {
 
         // VM is a mac
         if let specific = storage_format.mac_specific {
             do {
-                let vm = try vVirtualMachine(vc: vc, name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (specific, nil))
+                let vm = try vVirtualMachine(name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (specific, nil))
                 return vm;
             } catch {
                 throw VelocityVZError(error.localizedDescription)
@@ -264,7 +264,7 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
         // VM is EFI
         if let specific = storage_format.efi_specific {
             do {
-                let vm = try vVirtualMachine(vc: vc, name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (nil, specific))
+                let vm = try vVirtualMachine(name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (nil, specific))
 
                 return vm;
             } catch {
@@ -415,7 +415,7 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
     }
 
     /// Install macOS if the mac_specific member variable is set
-    func install_macos(velocity_config: VelocityConfig) {
+    func install_macos() {
         if let mac_specific = self.specific.0 {
 
             // add a new operation
@@ -425,7 +425,7 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
             // MARK:  This is not thread-safe, since a new element could have been added
             let index = Manager.operations.count - 1;
 
-            let ipsw_path_absolute = URL(fileURLWithPath: velocity_config.velocity_ipsw_dir.appendingPathComponent(mac_specific.ipsw_path).absoluteString)
+            let ipsw_path_absolute = URL(fileURLWithPath: VelocityConfig.velocity_ipsw_dir.appendingPathComponent(mac_specific.ipsw_path).absoluteString)
 
             VZMacOSRestoreImage.load(from: ipsw_path_absolute, completionHandler: { [self](result: Result<VZMacOSRestoreImage, Error>) in
                 switch result {

@@ -24,7 +24,7 @@ struct Message: Codable {
     }
 }
 
-public func start_web_server(velocity_config: VelocityConfig) throws {
+public func start_web_server() throws {
 
 
     let app: Application?
@@ -176,7 +176,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
 
-        if !MacOSFetcher.download_installer(vc: velocity_config, buildid: buildid) {
+        if !MacOSFetcher.download_installer(buildid: buildid) {
             return try! Response(status: .notFound, headers: headers, body: .init(data: encoder.encode(Message("No such build available."))))
         }
 
@@ -208,7 +208,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         let res = DispatchQueue.main.sync {
             do {
                 let storage_format = try req.content.decode(vVMStorageFormat.self)
-                let vm = try vVirtualMachine.from_storage_format(vc: velocity_config, storage_format: storage_format)
+                let vm = try vVirtualMachine.from_storage_format(storage_format: storage_format)
 
                 guard let vm = vm else {
                     return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Could not unwrap VirtualMachine"))))
@@ -309,7 +309,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         }
         
         VLog("Receiving ISO file named '\(file_name)'..")
-        let file_path = velocity_config.velocity_iso_dir.appendingPathComponent(file_name).absoluteString
+        let file_path = VelocityConfig.velocity_iso_dir.appendingPathComponent(file_name).absoluteString
         FileManager.default.createFile(atPath: file_path, contents: nil, attributes: nil)
         
         let io = req.application.fileio
@@ -338,7 +338,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
             let json_data = try! encoder.encode(Message("File upload completed."))
 
             do {
-                try Manager.index_iso_storage(velocity_config: velocity_config)
+                try Manager.index_iso_storage()
             } catch {
                 VWarn("Could not index iso storage, ignoring.")
             }
