@@ -18,13 +18,18 @@ public struct VelocityConfig {
     var velocity_root: URL;
     var velocity_bundle_dir: URL;
     var velocity_iso_dir: URL;
-    
+    var velocity_ipsw_dir: URL;
+    var velocity_dl_cache: URL;
+
     //MARK: Add Velocity Port and BindAddr
     
     init() {
         self.velocity_root = self.home_directory.appendingPathComponent("Velocity")
+        //self.velocity_root = URL(string: "/Volumes/T7/Velocity/")!
         self.velocity_bundle_dir = self.velocity_root.appendingPathComponent("VMBundles")
         self.velocity_iso_dir = self.velocity_root.appendingPathComponent("ISOs")
+        self.velocity_ipsw_dir = self.velocity_root.appendingPathComponent("IPSWs")
+        self.velocity_dl_cache = self.velocity_root.appendingPathComponent("DLCache")
     }
     
     // Check if required directories exist
@@ -39,6 +44,14 @@ public struct VelocityConfig {
         }
         
         if(!create_directory_safely(path: self.velocity_iso_dir.absoluteString)) {
+            return false;
+        }
+
+        if(!create_directory_safely(path: self.velocity_ipsw_dir.absoluteString)) {
+            return false;
+        }
+
+        if(!create_directory_safely(path: self.velocity_dl_cache.absoluteString)) {
             return false;
         }
         
@@ -61,12 +74,24 @@ public func main() {
     }
 
     // Index local storage
+    VInfo("Indexing local storage..")
     do {
         try Manager.index_iso_storage(velocity_config: velocity_config)
+        try Manager.index_ipsw_storage(velocity_config: velocity_config)
+
+        // Once IPSW models are fetched, we can continue starting up.
+        VLog("Waiting for local IPSW model fetching..")
+        MacOSFetcher.dispatch_group.wait();
+        VLog("IPSW model fetching completed. Continuing")
+
         try Manager.index_storage(velocity_config: velocity_config)
     } catch {
-        fatalError("Could not index local storage.")
+        VErr("Could not index local storage: \(error)")
+        return;
     }
+
+    VInfo("Fetching available macOS installers from ipsw.me..")
+    MacOSFetcher.fetch_list()
 
     // Need to dispatch webserver as a background thread, because
     // the UI needs the main thread to render
