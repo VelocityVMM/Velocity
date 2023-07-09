@@ -38,12 +38,12 @@ struct Manager {
     static var operations: [vOperation] = [ ]
 
     /// Indexes the ISO image storage
-    static func index_iso_storage(velocity_config: VelocityConfig) throws {
+    static func index_iso_storage() throws {
         Manager.iso_images = [ ]
         VInfo("[Index] Indexing ISO Storage")
 
         // Index ISO image
-        let iso_dir_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_iso_dir.absoluteString)
+        let iso_dir_content = try FileManager.default.contentsOfDirectory(atPath: VelocityConfig.velocity_iso_dir.absoluteString)
 
         for url in iso_dir_content {
             VTrace("Adding ISO: \(url)")
@@ -52,39 +52,39 @@ struct Manager {
     }
 
     /// Indexes the IPSW storage
-    static func index_ipsw_storage(velocity_config: VelocityConfig) throws {
+    static func index_ipsw_storage() throws {
         Manager.ipsws = [ ]
         VInfo("[Index] Indexing IPSW Storage")
 
         // Index ISO image
-        let ipsw_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_ipsw_dir.absoluteString)
+        let ipsw_content = try FileManager.default.contentsOfDirectory(atPath: VelocityConfig.velocity_ipsw_dir.absoluteString)
 
         for url in ipsw_content {
             VTrace("Adding IPSW: \(url)")
             Manager.ipsws.append(url)
             VTrace("Fetching hardwareModel for \(url)")
-            determine_for_ipsw(velocity_config: velocity_config, file: url)
+            determine_for_ipsw(file: url)
         }
     }
 
     /// Indexes the local VM storage on startup
     /// and starts autostart VMs
-    static func index_storage(velocity_config: VelocityConfig) throws {
+    static func index_storage() throws {
         self.iso_images = [ ]
         self.virtual_machines = [ ]
 
         VInfo("[Index] Indexing local bundles..")
-        let directory_content = try FileManager.default.contentsOfDirectory(atPath: velocity_config.velocity_bundle_dir.absoluteString)
+        let directory_content = try FileManager.default.contentsOfDirectory(atPath: VelocityConfig.velocity_bundle_dir.absoluteString)
         
         for bundle_path in directory_content {
 
             // Check if the directory contains a vVM file
-            let vm_path = velocity_config.velocity_bundle_dir.appendingPathComponent( bundle_path).appendingPathComponent("vVM.json")
+            let vm_path = VelocityConfig.velocity_bundle_dir.appendingPathComponent( bundle_path).appendingPathComponent("vVM.json")
 
             if FileManager.default.fileExists(atPath: vm_path.absoluteString) {
 
                 do {
-                    guard let vm = try vVirtualMachine.from_storage_format(vc: velocity_config, storage_format: try vVMStorageFormat.from_file(path: vm_path.absoluteString)) else {
+                    guard let vm = try vVirtualMachine.from_storage_format(storage_format: try vVMStorageFormat.from_file(path: vm_path.absoluteString)) else {
                         throw VelocityVMMError("No such VirtualMachine.")
                     }
 

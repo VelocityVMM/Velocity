@@ -46,7 +46,7 @@ class MacOSFetcher {
     }
 
     // Downloads an Installer with given buildid
-    static func download_installer(vc: VelocityConfig, buildid: String) -> Bool {
+    static func download_installer(buildid: String) -> Bool {
         guard let firmwares = MacOSFetcher.Firmwares else {
             return false;
         }
@@ -69,8 +69,8 @@ class MacOSFetcher {
 
             let file_name = file_url.lastPathComponent
 
-            let destination = vc.velocity_dl_cache.appendingPathComponent(file_name)
-            let completed_target = vc.velocity_ipsw_dir.appendingPathComponent(file_name)
+            let destination = VelocityConfig.velocity_dl_cache.appendingPathComponent(file_name)
+            let completed_target = VelocityConfig.velocity_ipsw_dir.appendingPathComponent(file_name)
 
 
             let dl_op = vOperation(name: "Downloading macOS installer..", description: "Downloading requested macOS installer: \(file_name). This will take some time.", progress: 0)
@@ -78,16 +78,16 @@ class MacOSFetcher {
 
             let index = Manager.operations.count - 1
 
-            let downloader = IPSWDownloader(vc: vc, url: file_url, destination_url: destination, completed_target: completed_target, total_size: Float(firmware_to_dl.filesize), operation_index: index)
+            let downloader = IPSWDownloader(url: file_url, destination_url: destination, completed_target: completed_target, total_size: Float(firmware_to_dl.filesize), operation_index: index)
             downloader.start_download()
         }
         return true;
     }
 }
 
-public func determine_for_ipsw(velocity_config: VelocityConfig, file: String) {
+public func determine_for_ipsw(file: String) {
     MacOSFetcher.dispatch_group.enter();
-    let file_url = URL(fileURLWithPath: velocity_config.velocity_ipsw_dir.appendingPathComponent(file).absoluteString)
+    let file_url = URL(fileURLWithPath: VelocityConfig.velocity_ipsw_dir.appendingPathComponent(file).absoluteString)
 
     VLog("Loading IPSW: \(file)")
     VZMacOSRestoreImage.load(from: file_url, completionHandler: { (result: Result<VZMacOSRestoreImage, Error>) in
