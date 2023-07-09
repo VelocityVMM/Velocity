@@ -14,6 +14,7 @@
 		476083922A260F0200A93368 /* nsimage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476083912A260F0200A93368 /* nsimage.swift */; };
 		47A78B4C2A350181007C8FB8 /* vVMStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A78B4B2A350181007C8FB8 /* vVMStructs.swift */; };
 		47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A78B4D2A351B38007C8FB8 /* vVirtualMachine.swift */; };
+		47A78B502A36DE89007C8FB8 /* vMacOSUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A78B4F2A36DE89007C8FB8 /* vMacOSUtils.swift */; };
 		47D62A252A1E72C4006FFE2A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A242A1E72C4006FFE2A /* main.swift */; };
 		47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2B2A1E7366006FFE2A /* vz.swift */; };
 		47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2E2A1EB00A006FFE2A /* utils.swift */; };
@@ -47,6 +48,7 @@
 		476083912A260F0200A93368 /* nsimage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nsimage.swift; sourceTree = "<group>"; };
 		47A78B4B2A350181007C8FB8 /* vVMStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vVMStructs.swift; sourceTree = "<group>"; };
 		47A78B4D2A351B38007C8FB8 /* vVirtualMachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vVirtualMachine.swift; sourceTree = "<group>"; };
+		47A78B4F2A36DE89007C8FB8 /* vMacOSUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vMacOSUtils.swift; sourceTree = "<group>"; };
 		47D62A212A1E72C4006FFE2A /* velocity */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = velocity; sourceTree = BUILT_PRODUCTS_DIR; };
 		47D62A242A1E72C4006FFE2A /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		47D62A2B2A1E7366006FFE2A /* vz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vz.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 				47D62A2B2A1E7366006FFE2A /* vz.swift */,
 				47A78B4B2A350181007C8FB8 /* vVMStructs.swift */,
 				47A78B4D2A351B38007C8FB8 /* vVirtualMachine.swift */,
+				47A78B4F2A36DE89007C8FB8 /* vMacOSUtils.swift */,
 			);
 			path = virtualization;
 			sourceTree = "<group>";
@@ -208,6 +211,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47A78B502A36DE89007C8FB8 /* vMacOSUtils.swift in Sources */,
 				509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */,
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
 				47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */,

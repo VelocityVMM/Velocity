@@ -23,6 +23,13 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
     var specific: (vMacOptions?, vEFIOptions?);
 
     init(vc: VelocityConfig, name: String, cpu_count: UInt, memory_size: UInt, screen_size: NSSize, autostart: Bool, disks: [vDisk], specific: (vMacOptions?, vEFIOptions?)) throws {
+
+        for vm in Manager.virtual_machines {
+            if vm.name == name {
+                throw VelocityVZError("Could not add VirtualMachine, because the requested name is in use.")
+            }
+        }
+
         self.name = name
         self.cpu_count = cpu_count
         self.memory_size = memory_size
@@ -84,8 +91,22 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
 
         // Mac specific devices
         if let _ = specific.0 {
-            self.config.platform = VZMacPlatformConfiguration()
+            self.config.platform = VZMacPlatformConfiguration();
 
+            let graphics_device = VZMacGraphicsDeviceConfiguration();
+            graphics_device.displays = [
+                VZMacGraphicsDisplayConfiguration(widthInPixels: Int(self.screen_size.width), heightInPixels: Int(self.screen_size.height), pixelsPerInch: 64)
+            ]
+
+            self.config.graphicsDevices = [ graphics_device ]
+            self.config.bootLoader = VZMacOSBootLoader()
+            self.config.pointingDevices = [ VZMacTrackpadConfiguration() ]
+            self.config.keyboards = [ VZUSBKeyboardConfiguration() ]
+
+            VDebug("Adding Virtio Networking (Type NAT)")
+            let network_device = VZVirtioNetworkDeviceConfiguration()
+            network_device.attachment = VZNATNetworkDeviceAttachment()
+            self.config.networkDevices = [ network_device ]
         }
 
         // EFI specific devices
@@ -165,6 +186,38 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
 
         self.config.storageDevices = disks
 
+        // Mount IPSW if the machine is a Mac, needs to happen after super.init() because closure.
+        if let mac_specific = self.specific.0 {
+            self.config.platform = VZMacPlatformConfiguration()
+
+            VInfo("Setting platform..")
+
+            guard let hw_model = Manager.ipsw_hardwaremodel[mac_specific.ipsw_path] else {
+                throw VelocityVZError("Could not determine Hardwaremodel for requested IPSW. The ipsw is likely corrupted.")
+            }
+            (self.config.platform as! VZMacPlatformConfiguration).hardwareModel = hw_model
+
+            VInfo("Attaching Auxiliary storage.")
+
+
+            let auxiliary_storage_url = URL(fileURLWithPath: bundle_path.appendingPathComponent("AuxiliaryStorage").absoluteString)
+
+            // load AuxiliaryStorage
+            if FileManager.default.fileExists(atPath: bundle_path.appendingPathComponent("AuxiliaryStorage").absoluteString) {
+                (self.config.platform as! VZMacPlatformConfiguration).auxiliaryStorage = VZMacAuxiliaryStorage(url: auxiliary_storage_url)
+
+            // Create new AuxiliaryStorage
+            } else {
+                do {
+                    (self.config.platform as! VZMacPlatformConfiguration).auxiliaryStorage = try VZMacAuxiliaryStorage(creatingStorageAt: auxiliary_storage_url, hardwareModel: hw_model, options: [])
+                } catch {
+                    throw VelocityVZError("Could not create AuxiliaryStorage: \(error.localizedDescription)")
+                }
+            }
+
+            (self.config.platform as! VZMacPlatformConfiguration).machineIdentifier = VZMacMachineIdentifier()
+        }
+
         // Call super constructor
         super.init(configuration: self.config, queue: DispatchQueue.main);
 
@@ -176,8 +229,6 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
 
         // Self as vm_view's VM
         vm_view.virtualMachine = self;
-
-        try self.config.validate()
 
         // Write to Disk
         try? self.get_storageformat().write(atPath: bundle_path.appendingPathComponent("vVM.json").absoluteString)
@@ -197,20 +248,28 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
         return self.specific
     }
 
-    public static func from_storage_format(vc: VelocityConfig, storage_format: vVMStorageFormat) -> vVirtualMachine? {
+    public static func from_storage_format(vc: VelocityConfig, storage_format: vVMStorageFormat) throws -> vVirtualMachine? {
 
         // VM is a mac
         if let specific = storage_format.mac_specific {
-            let vm = try! vVirtualMachine(vc: vc, name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (specific, nil))
+            do {
+                let vm = try vVirtualMachine(vc: vc, name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (specific, nil))
+                return vm;
+            } catch {
+                throw VelocityVZError(error.localizedDescription)
+            }
 
-            return vm;
         }
 
         // VM is EFI
         if let specific = storage_format.efi_specific {
-            let vm = try! vVirtualMachine(vc: vc, name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (nil, specific))
+            do {
+                let vm = try vVirtualMachine(vc: vc, name: storage_format.name, cpu_count: storage_format.cpu_count, memory_size: storage_format.memory_size, screen_size: storage_format.screen_size, autostart: storage_format.autostart, disks: storage_format.disks, specific: (nil, specific))
 
-            return vm;
+                return vm;
+            } catch {
+                throw VelocityVZError(error.localizedDescription)
+            }
         }
 
         return nil;
@@ -352,6 +411,65 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
         self.stop { (result) in
             VInfo("'\(self.name)': State changed to: STOPPED.")
             self.vstate = vVMState.STOPPED
+        }
+    }
+
+    /// Install macOS if the mac_specific member variable is set
+    func install_macos(velocity_config: VelocityConfig) {
+        if let mac_specific = self.specific.0 {
+
+            // add a new operation
+            let operation = vOperation(name: "Installing macOS on \(self.name)..", description: "Installing macOS will take some time.", progress: 0)
+            Manager.operations.append(operation)
+
+            // MARK:  This is not thread-safe, since a new element could have been added
+            let index = Manager.operations.count - 1;
+
+            let ipsw_path_absolute = URL(fileURLWithPath: velocity_config.velocity_ipsw_dir.appendingPathComponent(mac_specific.ipsw_path).absoluteString)
+
+            VZMacOSRestoreImage.load(from: ipsw_path_absolute, completionHandler: { [self](result: Result<VZMacOSRestoreImage, Error>) in
+                switch result {
+                    case .failure(_):
+                    Manager.operations[index].description = "Could not load requested ipsw."
+                    Manager.operations[index].completed = true;
+
+                    case let .success(restoreImage):
+                        guard let macOSConfiguration = restoreImage.mostFeaturefulSupportedConfiguration else {
+                            Manager.operations[index].description = "No supported macOS configuration is available."
+                            Manager.operations[index].completed = true;
+                            return;
+                        }
+
+                        if !macOSConfiguration.hardwareModel.isSupported {
+                            Manager.operations[index].description = "No supported macOS configuration is available."
+                            Manager.operations[index].completed = true;
+                            return;
+                        }
+
+                        DispatchQueue.main.async { [self] in
+                            let installer = VZMacOSInstaller(virtualMachine: self, restoringFromImageAt: ipsw_path_absolute)
+
+                            VLog("Starting installation for macOS VM \(self.name).")
+                            installer.install(completionHandler: { (result: Result<Void, Error>) in
+                                print("result: \(result)")
+                                if case let .failure(error) = result {
+                                    Manager.operations[index].description = "Could not install macOS: \(error.localizedDescription)"
+                                    Manager.operations[index].completed = true;
+                                } else {
+                                    Manager.operations[index].description = "Installation succeeded \(self.name)."
+                                    Manager.operations[index].completed = true;
+                                }
+                            })
+
+                            // Observe installation progress.
+                            _ = installer.progress.observe(\.fractionCompleted, options: [.initial, .new]) { (progress, change) in
+                                Manager.operations[index].progress = Float(change.newValue!)
+                            }
+                        }
+                    }
+                })
+        } else {
+            VWarn("install_macos() called on an EFI machine. Ignored.")
         }
     }
 

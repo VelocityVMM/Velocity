@@ -6,9 +6,77 @@
 //
 
 import Foundation
+import Virtualization
 
+class IPSWDownloader: NSObject, URLSessionDataDelegate {
+    let url: URL
+    let destination_url: URL
+    var completed_target: URL
+    var total_size: Float
+    var fileHandle: FileHandle?
+    var fetched_size = 0
+    var operation_index: Int;
+    var velocity_config: VelocityConfig;
+
+    init(vc: VelocityConfig, url: URL, destination_url: URL, completed_target: URL, total_size: Float, operation_index: Int) {
+        self.url = url
+        self.destination_url = destination_url
+        self.total_size = total_size
+        self.completed_target = completed_target
+        self.operation_index = operation_index
+        self.velocity_config = vc
+    }
+
+    func start_download() {
+        let sessionConfiguration = URLSessionConfiguration.default
+        let session = URLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
+        let task = session.dataTask(with: url)
+        task.resume()
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        do {
+            FileManager.default.createFile(atPath: destination_url.path, contents: nil, attributes: nil)
+            fileHandle = try FileHandle(forWritingTo: destination_url)
+        } catch {
+            VErr("Error creating file: \(error)")
+            completionHandler(.cancel)
+            return
+        }
+        completionHandler(.allow)
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        self.fetched_size += data.count
+        Manager.operations[self.operation_index].progress = Float(self.fetched_size) / Float(self.total_size)
+        fileHandle?.write(data)
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if let error = error {
+            VErr("Download task completed with error: \(error)")
+            Manager.operations[self.operation_index].description = "Downloading IPSW failed: \(error)";
+        } else {
+            VInfo("Download task completed successfully. Moving to ipsw cache..")
+            Manager.operations[self.operation_index].description = "macOS download completed."
+            do {
+                try FileManager.default.moveItem(atPath: self.destination_url.absoluteString, toPath: self.completed_target.absoluteString)
+            } catch {
+                VErr("Could not move from DLCache to IPSW Storage..")
+                Manager.operations[self.operation_index].description = "Could not move IPSW to Storage: \(error)";
+            }
+        }
+        Manager.operations[self.operation_index].completed = true;
+        fileHandle?.closeFile()
+        VLog("Determining model for downloaded IPSW..")
+        determine_for_ipsw(velocity_config: self.velocity_config, file: self.completed_target.absoluteString)
+    }
+}
+
+//
+// Information about the Host
+//
 struct HostInfo: Codable {
-    
     var model_name: String
     var cpu_name: String
     var uptime: String
@@ -23,6 +91,7 @@ struct HostInfo: Codable {
     
 }
 
+/// System uptime
 func get_system_uptime() -> Int {
     var boottime = timeval()
     var mib: [Int32] = [CTL_KERN, KERN_BOOTTIME]
@@ -38,6 +107,7 @@ func get_system_uptime() -> Int {
     return uptime / 3600
 }
 
+/// Available disk space on /
 func get_available_disk_space() -> Int {
     let path = NSTemporaryDirectory()
     let url = URL(fileURLWithPath: path)
@@ -55,6 +125,7 @@ func get_available_disk_space() -> Int {
     return 0
 }
 
+/// HW model name
 func get_model_name() -> String {
     var size = 0
     sysctlbyname("hw.model", nil, &size, nil, 0)
@@ -63,6 +134,7 @@ func get_model_name() -> String {
     return String(cString: model)
 }
 
+/// CPU model name
 func get_cpu_name() -> String {
     var size = 0
     sysctlbyname("machdep.cpu.brand_string", nil, &size, nil, 0)
@@ -71,12 +143,13 @@ func get_cpu_name() -> String {
     return String(cString: model)
 }
 
+/// Create a directory safely
 public func create_directory_safely(path: String) -> Bool {
     if(!FileManager.default.fileExists(atPath: path)) {
         do {
             try FileManager.default.createDirectory(atPath: path, withIntermediateDirectories: false)
         } catch {
-            VErr("Could not create directory: \(path)")
+            VErr("Could not create directory: \(path), \(error.localizedDescription)")
             return false;
         }
     }

@@ -143,7 +143,8 @@ struct vVMInfo: Codable {
 }
 
 struct vMacOptions: Codable {
-    // MARK: Todo
+    var ipsw_path: String;
+    var installed: Bool;
 
     func as_json() throws  -> String {
         let encoder = JSONEncoder()
