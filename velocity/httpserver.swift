@@ -68,7 +68,9 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         return Response(status: .ok, headers: headers, body: .init(data: jsonData))
     }
 
-
+    //
+    // Get a VM by name
+    //
     app.get("getVM") { req -> Response in
         // badRequest if name query param is missing
         guard let vm_name = req.query[String.self, at: "name"] else {
@@ -119,6 +121,21 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
     }
 
     //
+    // Get all available macOS installers available for Download
+    //
+    app.get("listMacInstallers") { req in
+        let jsonData: Data
+        do {
+            jsonData = try encoder.encode(MacOSFetcher.Firmwares)
+        } catch {
+            throw VelocityWebError("Could not decode as JSON")
+        }
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        return Response(status: .ok, headers: headers, body: .init(data: jsonData))
+    }
+
+    //
     // Get a list of ISO images on the server
     //
     app.get("listISOs") { req -> Response in
@@ -133,6 +150,53 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         return Response(status: .ok, headers: headers, body: .init(data: jsonData))
     }
 
+    //
+    // Get a list of ISPW images on the server
+    //
+    app.get("listIPSWs") { req -> Response in
+        let jsonData: Data
+        do {
+            jsonData = try encoder.encode(Manager.ipsws)
+        } catch {
+            throw VelocityWebError("Could not decode as JSON")
+        }
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        return Response(status: .ok, headers: headers, body: .init(data: jsonData))
+    }
+
+    //
+    // fetch a given macOS Installer from Apple
+    //
+    app.get("fetchMacOSInstaller") { req -> Response in
+        guard let buildid = req.query[String.self, at: "buildid"] else {
+            throw Abort(.badRequest)
+        }
+
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+
+        if !MacOSFetcher.download_installer(vc: velocity_config, buildid: buildid) {
+            return try! Response(status: .notFound, headers: headers, body: .init(data: encoder.encode(Message("No such build available."))))
+        }
+
+        return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Download started."))))
+    }
+
+    //
+    // View all currently pending downloads
+    //
+    app.get("listAllOperations") { req -> Response in
+        let jsonData: Data
+        do {
+            jsonData = try encoder.encode(Manager.operations)
+        } catch {
+            throw VelocityWebError("Could not decode as JSON")
+        }
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+        return Response(status: .ok, headers: headers, body: .init(data: jsonData))
+    }
 
     //
     // Create a new virtual machine
@@ -144,7 +208,7 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         let res = DispatchQueue.main.sync {
             do {
                 let storage_format = try req.content.decode(vVMStorageFormat.self)
-                let vm = vVirtualMachine.from_storage_format(vc: velocity_config, storage_format: storage_format)
+                let vm = try vVirtualMachine.from_storage_format(vc: velocity_config, storage_format: storage_format)
 
                 guard let vm = vm else {
                     return try! Response(status: .ok, headers: headers, body: .init(data: encoder.encode(Message("Could not unwrap VirtualMachine"))))
@@ -235,7 +299,6 @@ public func start_web_server(velocity_config: VelocityConfig) throws {
         headers.add(name: .contentType, value: "image/png")
         return Response(status: .ok, headers: headers, body: .init(data: png))
     }
-
 
     //
     // Upload an ISO file to the server.
