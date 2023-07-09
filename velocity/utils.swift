@@ -16,15 +16,13 @@ class IPSWDownloader: NSObject, URLSessionDataDelegate {
     var fileHandle: FileHandle?
     var fetched_size = 0
     var operation_index: Int;
-    var velocity_config: VelocityConfig;
 
-    init(vc: VelocityConfig, url: URL, destination_url: URL, completed_target: URL, total_size: Float, operation_index: Int) {
+    init(url: URL, destination_url: URL, completed_target: URL, total_size: Float, operation_index: Int) {
         self.url = url
         self.destination_url = destination_url
         self.total_size = total_size
         self.completed_target = completed_target
         self.operation_index = operation_index
-        self.velocity_config = vc
     }
 
     func start_download() {
@@ -69,7 +67,7 @@ class IPSWDownloader: NSObject, URLSessionDataDelegate {
         Manager.operations[self.operation_index].completed = true;
         fileHandle?.closeFile()
         VLog("Determining model for downloaded IPSW..")
-        determine_for_ipsw(velocity_config: self.velocity_config, file: self.completed_target.absoluteString)
+        determine_for_ipsw(file: self.completed_target.absoluteString)
     }
 }
 
