@@ -45,7 +45,7 @@ public func main() {
     VLog("Starting webserver..")
     DispatchQueue.global().async {
         do {
-            try start_web_server(velocity_config: velocity_config)
+            try start_web_server()
         } catch {
             fatalError("Could not start webserver: \(error.localizedDescription)")
         }
