@@ -4,9 +4,18 @@ This is a proposal for the `1.0` version of the Velocity API specification.
 
 The Velocity API uses `JSON` as its language.
 
+### Hirarchy
+
+Velocity manages virtual machines and resources seperately.
+
+For resources, velocity uses so-called "pools" and virtual machines are managed in "catalogs".
+
 The API is divided into several namespaces:
 
 - [`/u`](#namespace-u): User and group management
+- [`/r`](#namespace-r): Resource management
+- [`/c`](#namespace-c): Catalog management
+- [`/v`](#namespace-v): Virtual machine management
 
 ### Errors
 
@@ -14,7 +23,8 @@ If the API enconters some kind of error, it will respond with a http-response co
 
 ```json
 {
-    "error": "<Some error message>"
+    "code": "<Error code>",
+    "message": "<Some error message (optional)>"
 }
 ```
 
@@ -26,7 +36,9 @@ Some http-response codes are fixed:
 
 - `403 - Forbidden`: The request is missing the `authkey` for privileged actions
 
-# Users and Groups: `/u` <a name="namespace-u"></a>
+- `500 - Internal Server Error`: The server encountered an error while processing the request
+
+# User and group management: `/u` <a name="namespace-u"></a>
 
 Velocity's concept of users and groups is similar to that of Unix. Everything is UUID-based to randomize the user- and group-ids to minimize attack vectors by guessing other users user-ids. Permissions, vm and data pools are always connected to groups due to them being able to be shared across users with a fair amount of granularity.
 
@@ -44,21 +56,35 @@ Velocity works with groups. There are some special groups with specific privileg
 
 - `usermanager`: Users that are in this group have the permission to create new users and groups and assign users to groups except `root`.
 
+- `catalogmanager`: Can create and remove catalogs.
+
+- `poolmanager`: Can create and manage resource pools.
+
 ### Available endpoints
 
-- [POST `/u/login`](#post-u-login): Authenticate as a user
+Authentication:
 
-- [POST `/u/logout`](#post-u-logout): Log out the current user
+- [`/u/auth` - POST](#post-u-auth): Authenticate as a user
 
-- [POST `/u/reauth`](#post-u-reauth): Reauthenticate
+- [`/u/auth` - DELETE](#delete-u-auth): Log out the current user
 
-- [PUT `/u/user`](#put-u-user): Create a new user
+- [`/u/auth` - PATCH](#patch-u-auth): Reauthenticate
 
-- [PUT `/u/group`](#put-u-group): Create a new group
+User and group management:
 
-- [PUT `/u/group/assign`](#put-u-group-assign): Assign a user to a group
+- [`/u/user` - PUT](#put-u-user): Create a new user
 
-## POST `/u/login` <a name="post-u-login"></a>
+- [`/u/user` - DELETE](#delete-u-user): Remove a user
+
+- [`/u/group` - PUT](#put-u-group): Create a new group
+
+- [`/u/group` - DELETE](#delete-u-group): Remove a group
+
+- [`/u/group/assign` - PUT](#put-u-group-assign): Assign a user to a group
+
+- [`/u/group/assign` - DELETE](#delete-u-group-assign): Remove group membership
+
+## `/u/auth` - POST <a name="post-u-auth"></a>
 
 Velocity's authentication model works using so-called 'authkeys'. Every user that is currently authenticated gets such a key that has a certain validity window. Every privileged action that requires authentication requires this authkey to be sent with the request. To obtain such an authkey, a user can issue an authentication to this endpoint.
 
@@ -77,19 +103,18 @@ The password and username get transmitted in plaintext. It is assumed that the c
 
 - `200`: Authenticated
 
-- `403 - Forbidden`: Authentication failed - username or password do not match
-
 ```json
-200
 {
     "authkey": "<authkey>",
     "expires": "<unix timestamp>"
 }
 ```
 
+- `403 - Forbidden`: Authentication failed - username or password do not match
+
 Every authkey has an expiration date that is transmitted in the unix timestamp format. The key has to be renewed before this date is passed for the key to stay valid.
 
-## POST `/u/logout` <a name="post-u-logout"></a>
+## `/u/auth` - DELETE <a name="delete-u-auth"></a>
 
 If a user desires to drop the current `authkey` immediately, this endpoint can be used for that.
 
@@ -109,7 +134,7 @@ If a user desires to drop the current `authkey` immediately, this endpoint can b
 > 
 > For security reasons, dropping a non-existing authkey does still result in a `200` response code.
 
-## POST `/u/reauth` <a name="post-u-reauth"></a>
+## `/u/auth` - PATCH <a name="patch-u-auth"></a>
 
 If an authkey lease is about to expire, this call can be used to create a new authkey using the expiring key.
 
@@ -129,17 +154,16 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 - `200`: Authkey refreshed
 
-- `403`: Tried to renew a non-existing / expired authkey
-
 ```json
-200
 {
     "authkey": "<new authkey>",
     "expires": "<unix timestamp>"
 }
 ```
 
-## PUT `/u/user` <a name="put-u-user"></a>
+- `403`: Tried to renew a non-existing / expired authkey
+
+## `/u/user` - PUT <a name="put-u-user"></a>
 
 > **Note**
 > 
@@ -164,12 +188,7 @@ The groups field can be an empty array.
 
 - `200`: User created
 
-- `401 - Unauthorized`: The current user is not allowed to create new users
-
-- `409 - Conflict`: A user with the supplied `username` does already exist
-
 ```json
-200
 {
     "uid": "<UID>",
     "username": "<username>",
@@ -225,19 +244,41 @@ This call removes the user with the supplied `UID`. This also removes the user's
 
 - `200`: Group created
 
-- `401 - Unauthorized`: The current user is not allowed to create new groups
-
-- `409 - Conflict`: A group with the supplied `groupname` does already exist
-
 ```json
-200
 {
     "gid": "<GID>",
     "groupname": "<groupname>"
 }
 ```
 
-## PUT `/u/group/assign` <a id="put-u-group-assign"></a>
+- `401 - Unauthorized`: The current user is not allowed to create new groups
+
+- `409 - Conflict`: A group with the supplied `groupname` does already exist
+
+## `/u/group` - DELETE <a name="delete-u-group"></a>
+
+> **Note**
+> 
+> Only users that are in the `usermanager` group can remove groups
+
+This call removes all the VMs and images owned by this group.
+
+**Request:**
+
+```json
+{
+    "authkey": "<authkey>",
+    "uid": "<UID>"
+}
+```
+
+**Response:**
+
+- `200`: Group removed
+
+- `401 - Unauthorized`: The current user is not allowed to remove users
+
+## `/u/group/assign` - PUT <a id="put-u-group-assign"></a>
 
 Assign a user to groups:
 
@@ -257,14 +298,9 @@ Assign a user to groups:
 
 **Response:**
 
-- `200`: Group created
-
-- `401 - Unauthorized`: The current user is not allowed to create new groups
-
-- `403 - Forbidden`: A user in `usermanager` tried to assign to `administrator` group
+- `200`: Groups added
 
 ```json
-200
 {
     "uid": "<UID>",
     "groups": ["<GID>"]
