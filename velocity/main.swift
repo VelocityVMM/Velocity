@@ -16,7 +16,22 @@ public func main() {
     print("Velocity \(VELOCITY_VERSION) (\(VELOCITY_CODENAME)) - VMManager for Apple's Virtualization.framework")
     print("Copyright (c) 2023 zimsneexh (https://zsxh.eu)")
     print("")
-    
+
+    // Register a Signal Source
+    let signal_source = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
+    signal_source.setEventHandler {
+        VInfo("Caught SIGINT")
+        signal_source.cancel()
+
+        VInfo("Shutting down webserver..")
+        WebServer.ws?.shutdown()
+        exit(0)
+    }
+
+    // Ignore SIGINT by default
+    signal(SIGINT, SIG_IGN)
+    signal_source.resume()
+
     VInfo("Starting up..")
     VelocityConfig.setup()
 
@@ -42,16 +57,18 @@ public func main() {
 
     // Need to dispatch webserver as a background thread, because
     // the UI needs the main thread to render
-    VLog("Starting webserver..")
+    VInfo("Starting webserver..")
     DispatchQueue.global().async {
         do {
             try start_web_server()
         } catch {
-            fatalError("Could not start webserver: \(error.localizedDescription)")
+            VErr("Could not start webserver: \(error.localizedDescription)")
+            exit(1)
         }
     }
 
     // Start the RFB server
+    VInfo("Starting RFB Server..")
     do {
         let rfb_server = try VRFBServer(port: 1337);
         rfb_server.start();
@@ -60,8 +77,7 @@ public func main() {
         return;
     }
 
-
-    RunLoop.main.run(until: Date.distantFuture)
+    RunLoop.main.run()
 }
 
 main();
