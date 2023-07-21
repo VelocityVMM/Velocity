@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		4707A5622A21692600E0B517 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = 4707A5612A21692600E0B517 /* Vapor */; };
+		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
+		50394E312A2CC64C006A7CB4 /* Socket in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E302A2CC64C006A7CB4 /* Socket */; };
+		50BAC2862A6A609B00DE0F95 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 50BAC2852A6A609B00DE0F95 /* SQLite */; };
 		4707A5642A21699900E0B517 /* httpserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5632A21699900E0B517 /* httpserver.swift */; };
 		4707A5662A22A09200E0B517 /* log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5652A22A09200E0B517 /* log.swift */; };
 		470D4C2D2A3276C20057B58E /* vRFBConvertKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470D4C2C2A3276C20057B58E /* vRFBConvertKey.swift */; };
@@ -23,7 +26,6 @@
 		50394E2E2A2CC48B006A7CB4 /* vRFBServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E2D2A2CC48B006A7CB4 /* vRFBServer.swift */; };
 		50394E342A2CC9BF006A7CB4 /* vRFBUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */; };
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
-		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */; };
 		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
@@ -69,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50BAC2862A6A609B00DE0F95 /* SQLite in Frameworks */,
 				4707A5622A21692600E0B517 /* Vapor in Frameworks */,
 				50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */,
 			);
@@ -162,6 +165,7 @@
 			packageProductDependencies = (
 				4707A5612A21692600E0B517 /* Vapor */,
 				50394E4D2A2CD160006A7CB4 /* Atomics */,
+				50BAC2852A6A609B00DE0F95 /* SQLite */,
 			);
 			productName = velocity;
 			productReference = 47D62A212A1E72C4006FFE2A /* velocity */;
@@ -194,6 +198,7 @@
 			packageReferences = (
 				4707A5602A21692600E0B517 /* XCRemoteSwiftPackageReference "vapor" */,
 				50394E4C2A2CD160006A7CB4 /* XCRemoteSwiftPackageReference "swift-atomics" */,
+				50BAC2842A6A609B00DE0F95 /* XCRemoteSwiftPackageReference "SQLite" */,
 			);
 			productRefGroup = 47D62A222A1E72C4006FFE2A /* Products */;
 			projectDirPath = "";
@@ -414,6 +419,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		50BAC2842A6A609B00DE0F95 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.14.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -426,6 +439,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 50394E4C2A2CD160006A7CB4 /* XCRemoteSwiftPackageReference "swift-atomics" */;
 			productName = Atomics;
+		};
+		50BAC2852A6A609B00DE0F95 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50BAC2842A6A609B00DE0F95 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
