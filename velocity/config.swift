@@ -31,18 +31,21 @@ public struct VelocityConfig {
             return velocity_root.appendingPathComponent("DLCache")
         }
     }
-
-    //static var velocity_http_port: Int;
-    //static var velocity_vnc_port: Int;
+    static var velocity_http_port: Int = 8080
+    static var velocity_vnc_port: Int = 1337
 
     // Parse command line arguments x=y into Key->Value pair
     static func setup() {
+        // no args
+        if CommandLine.arguments.count == 1 {
+            return;
+        }
+
         for argument in CommandLine.arguments {
             let split = argument.split(separator: "=")
 
             // Skip unknown arguments
             if split.count != 2 {
-                VWarn("Unrecognized commandline argument: \(argument)")
                 continue;
             }
 
@@ -51,15 +54,50 @@ public struct VelocityConfig {
 
             case "-R":
                 VLog("Setting VelocityRoot to \(value)")
-                VelocityConfig.velocity_root = URL(filePath: value)
+                let user_path = URL(string: value)
+
+                if user_path == nil {
+                    VErr("Invalid VelocityRoot specified. Aborting.")
+                    exit(1)
+                }
+
+                VelocityConfig.velocity_root = user_path!
                 break
 
             // Port for HTTP
             case "-P":
+                let port = Int(value)
+
+                guard let port = port else {
+                    VErr("Invalid integer specified for port.")
+                    exit(1)
+                }
+
+                if port > 65535 || port <= 0 {
+                    VErr("Invalid integer specified for port.")
+                    exit(1)
+                }
+
+                VInfo("Setting VelocityHTTP Port to \(port)")
+                VelocityConfig.velocity_http_port = port
                 break
 
             // Port for VNC
             case "-V":
+                let port = Int(value)
+
+                guard let port = port else {
+                    VErr("Invalid integer specified for port.")
+                    exit(1)
+                }
+
+                if port > 65535 || port <= 0 {
+                    VErr("Invalid integer specified for port.")
+                    exit(1)
+                }
+
+                VInfo("Setting VelocityVNC Port to \(port)")
+                VelocityConfig.velocity_vnc_port = port
                 break
 
             // Help
@@ -70,11 +108,6 @@ public struct VelocityConfig {
                 VWarn("Unrecognized commandline argument: \(argument)")
                 break;
             }
-        }
-
-        if !check_directory() {
-            VErr("Could not setup required Velocity directories. Cannot continue.")
-            exit(-1)
         }
     }
 

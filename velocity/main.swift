@@ -35,6 +35,11 @@ public func main() {
     VInfo("Starting up..")
     VelocityConfig.setup()
 
+    if !VelocityConfig.check_directory() {
+        VErr("Could not create all required directories.")
+        return
+    }
+
     // Index local storage
     VInfo("Indexing local storage..")
     do {
@@ -60,9 +65,10 @@ public func main() {
     VInfo("Starting webserver..")
     DispatchQueue.global().async {
         do {
-            try start_web_server()
+            try start_web_server(VelocityConfig.velocity_http_port)
         } catch {
             VErr("Could not start webserver: \(error.localizedDescription)")
+            print(error)
             exit(1)
         }
     }
@@ -70,7 +76,7 @@ public func main() {
     // Start the RFB server
     VInfo("Starting RFB Server..")
     do {
-        let rfb_server = try VRFBServer(port: 1337);
+        let rfb_server = try VRFBServer(port: UInt16(VelocityConfig.velocity_vnc_port));
         rfb_server.start();
     } catch let e {
         VErr("Failed to create RFB server: \(e)");
