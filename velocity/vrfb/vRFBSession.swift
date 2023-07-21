@@ -35,6 +35,8 @@ class VRFBSession : Loggable {
     var cur_fb_update: VRFBFBUpdateRequest? = nil;
     let queue: DispatchQueue;
 
+    let context: String;
+
     /// Established a new RFB session using the supplied socket by performing the RFB handshake
     /// - Parameter socket: The socket to use for communication
     init(_ server: VRFBServer, vm: vVirtualMachine, connection: VNWConnection) throws {
@@ -45,7 +47,7 @@ class VRFBSession : Loggable {
         self.pixel_format = server.preferred_pixelformat;
         self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.RFBSession.\(connection.describe())");
 
-        super.init(context: "[RFBS][\(connection.describe())]");
+        self.context = "[RFBS][\(connection.describe())]";
 
         self.connection.cb_on_ready = {
             var shouldKeepRunning = true
