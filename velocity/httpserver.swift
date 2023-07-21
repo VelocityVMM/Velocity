@@ -24,23 +24,19 @@ struct Message: Codable {
     }
 }
 
-public func start_web_server() throws {
+struct WebServer {
+    static var ws: Application? = nil;
+}
 
+public func start_web_server(_ http_port: Int) throws {
+    //MARK: Stupid workaround for Vapor
+    /// By default Vapor parses command line arguments and blows up
+    /// with "Operation could not be completed" with Velocitys arguments.
+    let env = Environment(name: "development", arguments: ["vapor"])
 
-    let app: Application?
-    do {
-        app = try Application(.detect())
-    } catch {
-        throw VelocityWebError("Could not setup WS: \(error.localizedDescription)")
-    }
-    
-    guard let app = app else {
-        throw VelocityWebError("Could not unwrap WebServer..")
-    }
-    
+    let app = Application(env)
     app.logger.logLevel = Logger.Level.error;
 
-    
     // CORS headers
     let corsConfiguration = CORSMiddleware.Configuration(
         allowedOrigin: .all,
@@ -350,13 +346,15 @@ public func start_web_server() throws {
             }
         }
     }
-    
+
+    VDebug("Setting Vapor HTTP port to \(http_port).")
     app.http.server.configuration.hostname = "0.0.0.0"
+    app.http.server.configuration.port = http_port
 
+    WebServer.ws = app;
     do {
-        try app.run()
+        try WebServer.ws!.run()
     } catch {
-        throw VelocityWebError("Could not start WebServer: \(error.localizedDescription)")
+        throw VelocityWebError("\(error.localizedDescription)")
     }
-
 }
