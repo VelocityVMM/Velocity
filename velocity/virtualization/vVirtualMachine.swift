@@ -232,6 +232,13 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
 
         // Write to Disk
         try? self.get_storageformat().write(atPath: bundle_path.appendingPathComponent("vVM.json").absoluteString)
+
+        if let mac = specific.0 {
+            if !mac.installed {
+                VDebug("New macOS VM created, proceeding with install.")
+                self.install_macos(vm_file_path: bundle_path.appendingPathComponent("vVM.json").absoluteString)
+            }
+        }
     }
 
     public func get_vminfo() -> vVMInfo {
@@ -415,7 +422,7 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
     }
 
     /// Install macOS if the mac_specific member variable is set
-    func install_macos() {
+    func install_macos(vm_file_path: String) {
         if let mac_specific = self.specific.0 {
 
             // add a new operation
@@ -458,11 +465,21 @@ class vVirtualMachine: VZVirtualMachine, VZVirtualMachineDelegate {
                                 } else {
                                     Manager.operations[index].description = "Installation succeeded \(self.name)."
                                     Manager.operations[index].completed = true;
+                                    self.specific.0?.installed = true;
+
+                                    // write update to disk
+                                    VDebug("Updating VM storage file after macOS install..")
+                                    do {
+                                        try self.get_storageformat().write(atPath: vm_file_path)
+                                    } catch {
+                                        fatalError("Could not update VM file.")
+                                    }
                                 }
                             })
 
                             // Observe installation progress.
                             _ = installer.progress.observe(\.fractionCompleted, options: [.initial, .new]) { (progress, change) in
+                                print("val: \(change.newValue!)")
                                 Manager.operations[index].progress = Float(change.newValue!)
                             }
                         }
