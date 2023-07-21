@@ -19,9 +19,11 @@ class VRFBServer : Loggable {
     var active_connections = [VNWConnection]();
     let socketLockQueue = DispatchQueue(label: "eu.zimsneexh.Velocity.socketLockQueue");
 
+    let context: String;
+
     init(port: UInt16) throws {
         self.listener = try NWListener(using: NWParameters(tls: nil, tcp: NWProtocolTCP.Options()), on: NWEndpoint.Port(rawValue: port)!);
-        super.init(context: "[RFB(\(port))]");
+        self.context = "[RFB(\(port))]";
     }
 
     deinit {

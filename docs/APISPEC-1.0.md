@@ -40,11 +40,11 @@ Some http-response codes are fixed:
 
 # User and group management: `/u` <a name="namespace-u"></a>
 
-Velocity's concept of users and groups is similar to that of Unix. Everything is UUID-based to randomize the user- and group-ids to minimize attack vectors by guessing other users user-ids. Permissions, vm and data pools are always connected to groups due to them being able to be shared across users with a fair amount of granularity.
+Velocity's concept of users and groups is similar to that of Unix. The user- and group-ids are randomized to minimize attack vectors by guessing other users user-ids. Permissions, vm and data pools are always connected to groups due to them being able to be shared across users with a fair amount of granularity.
 
 ### User
 
-Each user is identified by its unique UUID, its username and password.
+Each user is identified by its unique `UID`, its username and password.
 
 Every user automatically gets assigned to a group using the users `username`. Note that the `gid` of that group won't always be the same as the `uid`.
 

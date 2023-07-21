@@ -16,17 +16,13 @@ enum Loglevel: Int {
     case Trace
 }
 
-/// A class mainly meant for extending to provide convenient access to context.
-/// This will hold an internal variable `context` that represents the current context.
-/// The best use of this class is by extending another class from this and calling `init()` to set the context correctly.
-class Loggable {
-    /// The current context in string form
-    var context: String;
+/// A protocol to have a context that allows for the V* logging functions to be called on the object
+/// and provide context when logging
+protocol Loggable {
+    var context: String { get };
+}
 
-    init(context: String) {
-        self.context = context;
-    }
-
+extension Loggable {
     /// Log the specified message under the `Err` loglevel using the context of this class
     /// - Parameter message: The message to print
     func VErr(_ message: String) {
