@@ -34,7 +34,7 @@ Some http-response codes are fixed:
 
 - `400 - Bad Request`: The request is missing fields
 
-- `403 - Forbidden`: The request is missing the `authkey` for privileged actions
+- `401 - Unauthorized`: The request is missing the `authkey` for privileged actions
 
 - `500 - Internal Server Error`: The server encountered an error while processing the request
 
@@ -163,7 +163,7 @@ If an authkey lease is about to expire, this call can be used to create a new au
 }
 ```
 
-- `403`: Tried to renew a non-existing / expired authkey
+- `403 - Forbidden`: Tried to renew a non-existing / expired authkey
 
 ## `/u/user` - PUT <a name="put-u-user"></a>
 
@@ -253,7 +253,7 @@ This call removes the user with the supplied `UID`. This also removes the user's
 }
 ```
 
-- `401 - Unauthorized`: The current user is not allowed to create new groups
+- `403 - Forbidden`: The current user is not allowed to create new groups
 
 - `409 - Conflict`: A group with the supplied `groupname` does already exist
 
@@ -278,7 +278,7 @@ This call removes all the VMs and images owned by this group.
 
 - `200`: Group removed
 
-- `401 - Unauthorized`: The current user is not allowed to remove users
+- `403 - Forbidden`: The current user is not allowed to remove users
 
 ## `/u/group/assign` - PUT <a id="put-u-group-assign"></a>
 

@@ -32,3 +32,12 @@ class VDB : Loggable {
         self.db = db;
     }
 }
+
+extension Connection {
+    /// Queries the database if the count of the query is not `0`
+    /// - Parameter table: The table to search in
+    /// - Parameter predicate: The predicate to use for searching
+    func exists(_ table: Table, _ predicate: Expression<Bool>) throws -> Bool {
+        try self.scalar(table.filter(predicate).count) > 0;
+    }
+}
