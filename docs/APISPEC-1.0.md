@@ -40,7 +40,9 @@ Some http-response codes are fixed:
 
 # User and group management: `/u` <a name="namespace-u"></a>
 
-Velocity's concept of users and groups is similar to that of Unix. The user- and group-ids are randomized to minimize attack vectors by guessing other users user-ids. Permissions, vm and data pools are always connected to groups due to them being able to be shared across users with a fair amount of granularity.
+Velocity's concept of users and groups is similar to that of Unix. Permissions, vm and data pools are always connected to groups due to them being able to be shared across users with a fair amount of granularity.
+
+There is one special group and user with the `UID` / `GID` set to `0`. These are the super user / group that have full access to everything.
 
 ### User
 
