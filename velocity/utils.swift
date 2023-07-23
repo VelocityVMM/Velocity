@@ -153,3 +153,41 @@ public func create_directory_safely(path: String) -> Bool {
     }
     return true;
 }
+
+import CommonCrypto
+
+extension String {
+    /// Generates a SHA256 hash from the string
+    func sha256() -> String {
+        let data = self.data(using:.utf8)!;
+        var hash = Data(count: Int(CC_SHA256_DIGEST_LENGTH));
+
+        _ = hash.withUnsafeMutableBytes { hashBytes -> UInt8 in
+            data.withUnsafeBytes { dataBytes -> UInt8 in
+                if let messageBytesBaseAddress = dataBytes.baseAddress, let digestBytesBlindMemory = hashBytes.bindMemory(to: UInt8.self).baseAddress {
+                    let len = CC_LONG(data.count);
+                    CC_SHA256(messageBytesBaseAddress, len, digestBytesBlindMemory);
+                }
+                return 0;
+            }
+        }
+        return hash.map { String(format: "%02hhx", $0) }.joined();
+    }
+
+    /// Generates a SHA512 hash from the string
+    func sha512() -> String {
+        let data = self.data(using:.utf8)!;
+        var hash = Data(count: Int(CC_SHA256_DIGEST_LENGTH));
+
+        _ = hash.withUnsafeMutableBytes { hashBytes -> UInt8 in
+            data.withUnsafeBytes { dataBytes -> UInt8 in
+                if let messageBytesBaseAddress = dataBytes.baseAddress, let digestBytesBlindMemory = hashBytes.bindMemory(to: UInt8.self).baseAddress {
+                    let len = CC_LONG(data.count);
+                    CC_SHA512(messageBytesBaseAddress, len, digestBytesBlindMemory);
+                }
+                return 0;
+            }
+        }
+        return hash.map { String(format: "%02hhx", $0) }.joined();
+    }
+}
