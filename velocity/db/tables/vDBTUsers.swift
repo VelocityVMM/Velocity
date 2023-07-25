@@ -19,6 +19,7 @@ extension VDB {
         let password = Expression<String>("password");
 
         init (db: Connection) throws {
+            VDebug("Ensuring 'users' table...");
             try db.run(self.table.create(ifNotExists: true) {t in
                 t.column(self.uid, primaryKey: .autoincrement);
                 t.column(self.username, unique: true);
