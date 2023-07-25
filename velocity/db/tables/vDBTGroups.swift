@@ -18,6 +18,7 @@ extension VDB {
         let name = Expression<String>("name");
 
         init(db: Connection) throws {
+            VDebug("Ensuring 'groups' table...");
             // Setup the table
             try db.run(self.table.create(ifNotExists: true) {t in
                 t.column(self.gid, primaryKey: .autoincrement);
