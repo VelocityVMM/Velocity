@@ -14,22 +14,30 @@ class VDB : Loggable {
     /// The database connection to work with
     let db: Connection;
 
+    /// The users table
+    let t_users: Users;
+
+    /// The groups table
+    let t_groups: Groups;
+
     /// Opens a new database connection at the specified location
     /// - Parameter location: The location to open the database at
     convenience init(_ location: Connection.Location = Connection.Location.inMemory) throws {
-        try self.init(db: try Connection(location), context: "[vDB \(location)]");
+        try self.init(db: try Connection(location), context: "[vDB]");
     }
 
     /// Opens a new database connection at the specified location
     /// - Parameter location: The location to the database in the filesystem
     convenience init(_ location: String) throws {
-        try self.init(db: try Connection(location), context: "[vDB \(location)]");
+        try self.init(db: try Connection(location), context: "[vDB]");
     }
 
     /// Initializes the internal database connection to a well-known state
     internal init(db: Connection, context: String) throws {
         self.context = context;
         self.db = db;
+        self.t_users = try Users(db: self.db);
+        self.t_groups = try Groups(db: self.db);
     }
 }
 
