@@ -42,6 +42,8 @@ class VDB : Loggable {
         self.t_users = try Users(db: self.db);
         self.t_groups = try Groups(db: self.db);
         self.t_usergroups = try UserGroups(db: self.db, users: self.t_users, groups: self.t_groups);
+
+        try self.db.execute("PRAGMA foreign_keys = ON;");
     }
 }
 
