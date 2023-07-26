@@ -57,6 +57,65 @@ extension VDB {
             try self.db.db.run(query);
         }
 
+        /// Joins a group
+        /// - Parameter group: The group to join
+        /// - Returns: `false` is the group does not exist in the database, else `true`
+        @discardableResult
+        func join_group(group: Group) throws -> Bool {
+            VDebug("Joining \(group.info())");
+            return try self.join_group(gid: group.gid);
+        }
+
+        /// Joins a group with the supplied gid
+        /// - Parameter gid: The group to join
+        /// - Returns: `false` is the group does not exist in the database, else `true`
+        @discardableResult
+        func join_group(gid: Int64) throws -> Bool {
+            VDebug("Joining group {\(gid)}");
+
+            // Check if the group exists
+            if (try !self.db.db.exists(self.db.t_groups.table, self.db.t_groups.gid == gid)) {
+                VDebug("Group id {\(gid)} does not exist");
+                return false;
+            }
+
+            let query = self.db.t_usergroups.table.insert(or: .replace,
+                                                          self.db.t_usergroups.uid <- self.uid,
+                                                          self.db.t_usergroups.gid <- gid);
+
+            try self.db.db.run(query);
+            return true;
+        }
+
+        /// Leaves a group
+        /// - Parameter group: The group to leave
+        /// - Returns: `false` is the group does not exist in the database, else `true`
+        @discardableResult
+        func leave_group(group: Group) throws -> Bool {
+            VDebug("Leaving \(group.info())");
+            return try self.leave_group(gid: group.gid);
+        }
+
+        /// Leaves a group with the supplied gid
+        /// - Parameter gid: The group to leave
+        /// - Returns: `false` is the group does not exist in the database, else `true`
+        @discardableResult
+        func leave_group(gid: Int64) throws -> Bool {
+            VDebug("Leaving group {\(gid)}");
+
+            // Check if the group exists
+            if (try !self.db.db.exists(self.db.t_groups.table, self.db.t_groups.gid == gid)) {
+                VDebug("Group id {\(gid)} does not exist");
+                return false;
+            }
+
+            let query = self.db.t_usergroups.table.filter(self.db.t_usergroups.uid == self.uid &&
+                                                          self.db.t_usergroups.gid == gid).delete();
+
+            try self.db.db.run(query);
+            return true;
+        }
+
         /// Creates a new user in the database
         /// - Parameter db: The database to use
         /// - Parameter username: The new username to use

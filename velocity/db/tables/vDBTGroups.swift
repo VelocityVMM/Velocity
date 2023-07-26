@@ -54,6 +54,65 @@ extension VDB {
             try self.db.db.run(query);
         }
 
+        /// Assigns a user to this group
+        /// - Parameter user: The user to assign
+        /// - Returns: `false` is the user does not exist in the database, else `true`
+        @discardableResult
+        func assign_user(user: User) throws -> Bool {
+            VDebug("Assigning \(user.info())");
+            return try self.assign_user(uid: user.uid);
+        }
+
+        /// Assigns a user id to this group
+        /// - Parameter uid: The user id to assign to this group
+        /// - Returns: `false` is the user does not exist in the database, else `true`
+        @discardableResult
+        func assign_user(uid: Int64) throws -> Bool {
+            VDebug("Assigning user with id {\(uid)}");
+
+            // Check if the user exists
+            if (try !self.db.db.exists(self.db.t_users.table, self.db.t_users.uid == uid)) {
+                VDebug("User id {\(uid)} does not exist");
+                return false;
+            }
+
+            let query = self.db.t_usergroups.table.insert(or: .replace,
+                                                          self.db.t_usergroups.uid <- uid,
+                                                          self.db.t_usergroups.gid <- self.gid);
+
+            try self.db.db.run(query);
+            return true;
+        }
+
+        /// Removes a user from this group
+        /// - Parameter user: The user to remove
+        /// - Returns: `false` is the user does not exist in the database, else `true`
+        @discardableResult
+        func remove_user(user: User) throws -> Bool{
+            VDebug("Removing \(user.info())");
+            return try self.remove_user(uid: user.uid);
+        }
+
+        /// Removes a user id from this group
+        /// - Parameter uid: The user id to remove from this group
+        /// - Returns: `false` is the user does not exist in the database, else `true`
+        @discardableResult
+        func remove_user(uid: Int64) throws -> Bool {
+            VDebug("Removing user with id {\(uid)}");
+
+            // Check if the user exists
+            if (try !self.db.db.exists(self.db.t_users.table, self.db.t_users.uid == uid)) {
+                VDebug("User id {\(uid)} does not exist");
+                return false;
+            }
+
+            let query = self.db.t_usergroups.table.filter(self.db.t_usergroups.uid == uid &&
+                                                          self.db.t_usergroups.gid == self.gid).delete();
+
+            try self.db.db.run(query);
+            return true;
+        }
+
         /// Creates a new group in the database
         /// - Parameter db: The database to use
         /// - Parameter groupname: The new `groupname` to use
