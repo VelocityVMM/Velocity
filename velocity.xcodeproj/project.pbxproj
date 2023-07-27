@@ -25,8 +25,8 @@
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */; };
-		509804A22A274729009DAAFF /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509804A12A274729009DAAFF /* vwindow.swift */; };
 		509804A62A286FEE009DAAFF /* vlvirtualmachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */; };
+		5056EC7B2A72411700D93422 /* vAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056EC7A2A72411700D93422 /* vAPI.swift */; };
 		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
 		5051AAA92A6AB7E4006FF899 /* vDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5051AAA82A6AB7E4006FF899 /* vDB.swift */; };
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
@@ -70,6 +70,7 @@
 		509804A12A274729009DAAFF /* vwindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
 		509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vlvirtualmachine.swift; sourceTree = "<group>"; };
 		5051AAA82A6AB7E4006FF899 /* vDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDB.swift; sourceTree = "<group>"; };
+		5056EC7A2A72411700D93422 /* vAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI.swift; sourceTree = "<group>"; };
 		5075244D2A37A2810072B094 /* vNWConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vNWConnection.swift; sourceTree = "<group>"; };
 		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
 		50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTUsers.swift; sourceTree = "<group>"; };
@@ -122,6 +123,7 @@
 		47D62A232A1E72C4006FFE2A /* velocity */ = {
 			isa = PBXGroup;
 			children = (
+				5056EC772A72409D00D93422 /* api */,
 				5051AAA72A6AB7DB006FF899 /* db */,
 				5075244C2A37A26A0072B094 /* network */,
 				47D62A2D2A1E744D006FFE2A /* velocity.entitlements */,
@@ -159,6 +161,14 @@
 				50B7A4092A6FA11800083BE8 /* tables */,
 			);
 			path = db;
+			sourceTree = "<group>";
+		};
+		5056EC772A72409D00D93422 /* api */ = {
+			isa = PBXGroup;
+			children = (
+				5056EC7A2A72411700D93422 /* vAPI.swift */,
+			);
+			path = api;
 			sourceTree = "<group>";
 		};
 		5075244C2A37A26A0072B094 /* network */ = {
@@ -261,6 +271,7 @@
 				479DE7EB2A2A881900B190C9 /* vwindow.swift in Sources */,
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
 				47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */,
+				5056EC7B2A72411700D93422 /* vAPI.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
 				50B7A4082A6EB8B100083BE8 /* vDBTGroups.swift in Sources */,
 				4707A5662A22A09200E0B517 /* log.swift in Sources */,
