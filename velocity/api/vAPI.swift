@@ -19,6 +19,8 @@ class VAPI : Loggable {
     let db: VDB
     /// JSON encoder
     let encoder: JSONEncoder
+    /// The currently registered authkeys. Can contain expired keys
+    var authkeys: Dictionary<String, Authkey> = Dictionary()
 
     /// Starts the VAPI on the supplied port using the supplied database
     /// - Parameter db: The VDB connection to use for this api
@@ -65,5 +67,62 @@ class VAPI : Loggable {
     /// Groups the request and response structures for every API endpoint
     internal struct Structs {
 
+    }
+
+    /// A key that identifies a user and has a certain validity timeframe
+    struct Authkey {
+        /// The lifetime of an authkey in seconds
+        static var key_lifetime: UInt64 = 60
+
+        /// The `user` this key authenticates
+        let user: VDB.User
+        /// The key UUID
+        let key: UUID
+        /// The timestamp the key has been created
+        let creation_date: Date
+
+        /// Generates a new authkey identifying the supplied user
+        /// - Parameter user: The user to authenticate
+        init(user: VDB.User) {
+            self.user = user
+            self.key = UUID()
+            self.creation_date = Date.now
+        }
+
+        /// The date this key will expire
+        func expiration_date() -> Date {
+            return self.creation_date.addingTimeInterval(Double(Authkey.key_lifetime))
+        }
+
+        /// The date this key will expire in unix seconds
+        func expiration_datetime() -> UInt64 {
+            return UInt64(self.creation_date.timeIntervalSince1970)
+        }
+
+        /// Check if the key is already expired
+        /// - Parameter date: (optional) A specific date to use, else use the current from `Date.now`
+        func is_expired(date: Date? = nil) -> Bool {
+            guard let date = date else {
+                return self.expiration_date() <= Date.now
+            }
+            return self.expiration_date() <= date
+        }
+
+        /// Provide some information about the authkey
+        func info() -> String {
+            return "Authkey (\(self.key.uuidString), valid until: \(self.expiration_date()))"
+        }
+    }
+
+    /// Generates a new authkey identifying the user and stores in this API instance
+    /// - Parameter user: The user to associate with this authkey
+    func generate_authkey(user: VDB.User) -> Authkey {
+        let key = Authkey(user: user)
+
+        self.authkeys[key.key.uuidString] = key
+
+        VTrace("New authkey for \(user.info()): \(key.key.uuidString), valid until: \(key.expiration_date()), \(self.authkeys.count) active keys")
+
+        return key
     }
 }
