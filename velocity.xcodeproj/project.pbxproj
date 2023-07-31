@@ -74,6 +74,7 @@
 		5056EC7A2A72411700D93422 /* vAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI.swift; sourceTree = "<group>"; };
 		5056EC7D2A778D1A00D93422 /* vAPI_U.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_U.swift; sourceTree = "<group>"; };
 		5075244D2A37A2810072B094 /* vNWConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vNWConnection.swift; sourceTree = "<group>"; };
+		508BEF142A78507D007D276A /* APITest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = APITest.py; sourceTree = "<group>"; };
 		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
 		50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTUsers.swift; sourceTree = "<group>"; };
 		50B7A4072A6EB8B100083BE8 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
@@ -168,6 +169,7 @@
 		5056EC772A72409D00D93422 /* api */ = {
 			isa = PBXGroup;
 			children = (
+				508BEF142A78507D007D276A /* APITest.py */,
 				5056EC7A2A72411700D93422 /* vAPI.swift */,
 				5056EC7C2A778CFA00D93422 /* namespaces */,
 			);
