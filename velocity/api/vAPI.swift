@@ -51,6 +51,8 @@ class VAPI : Loggable {
 
         self.encoder = JSONEncoder()
 
+        self.register_endpoints_u()
+
         // Setup server properties
         app.http.server.configuration.hostname = hostname
         app.http.server.configuration.port = port
@@ -122,6 +124,25 @@ class VAPI : Loggable {
         self.authkeys[key.key.uuidString] = key
 
         VTrace("New authkey for \(user.info()): \(key.key.uuidString), valid until: \(key.expiration_date()), \(self.authkeys.count) active keys")
+
+        return key
+    }
+
+    /// Searches for an authkey and checks if it isn't expired
+    /// - Parameter authkey: The authkey's uuid string handed out to the client
+    /// - Parameter date: (optional) A specific date to use, else use the current from `Date.now`
+    /// - Returns: The authkey if it is still valid, else `nil`
+    func get_authkey(authkey: String, date: Date? = nil) -> Authkey? {
+        // Search for the key
+        guard let key = self.authkeys[authkey] else {
+            return nil
+        }
+
+        if (key.is_expired(date: date)) {
+            // If the key is expired, remove it from the active keys
+            self.authkeys.removeValue(forKey: authkey)
+            return nil
+        }
 
         return key
     }
