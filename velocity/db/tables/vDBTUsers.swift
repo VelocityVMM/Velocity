@@ -57,6 +57,43 @@ extension VDB {
             try self.db.db.run(query);
         }
 
+        /// Returns an array of the groups this user is a member of
+        func get_groups() throws -> [Group] {
+            let query = self.db.t_groups.table
+                .select(distinct: self.db.t_groups.table[self.db.t_groups.gid], self.db.t_groups.name)
+                .join(self.db.t_usergroups.table, on: self.db.t_usergroups.table[self.db.t_usergroups.gid] == self.db.t_groups.table[self.db.t_groups.gid])
+
+            var groups: [Group] = []
+            for group in try self.db.db.prepare(query) {
+                let group = Group(db: self.db, groupname: group[self.db.t_groups.name], gid: group[self.db.t_groups.gid])
+                groups.append(group)
+            }
+
+            return groups
+        }
+
+        /// Checks if the user is a member of the supplied group
+        /// - Parameter group: The group to check for
+        func is_member_of(group: Group) throws -> Bool {
+            return try self.is_member_of(gid: group.gid)
+        }
+
+        /// Checks if the user is a member of the supplied group
+        /// - Parameter gid: The group id of the group to check for
+        func is_member_of(gid: Int64) throws -> Bool {
+            return try self.db.db.exists(self.db.t_usergroups.table, self.db.t_usergroups.uid == self.uid && self.db.t_usergroups.gid == gid)
+        }
+
+        /// Checks if the user is a member of the supplied group
+        /// - Parameter groupname: The name of the group to check for
+        func is_member_of(groupname: String) throws -> Bool {
+            guard let grp = try self.db.group_select(groupname: groupname) else {
+                return false
+            }
+
+            return try self.db.db.exists(self.db.t_usergroups.table, self.db.t_usergroups.uid == self.uid && self.db.t_usergroups.gid == grp.gid)
+        }
+
         /// Joins a group
         /// - Parameter group: The group to join
         /// - Returns: `false` is the group does not exist in the database, else `true`

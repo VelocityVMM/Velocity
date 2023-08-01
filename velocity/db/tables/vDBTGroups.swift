@@ -54,6 +54,21 @@ extension VDB {
             try self.db.db.run(query);
         }
 
+        /// Returns an array of the users that are part of this group
+        func get_users() throws -> [User] {
+            let query = self.db.t_users.table
+                .select(distinct: self.db.t_users.table[self.db.t_users.uid], self.db.t_users.username, self.db.t_users.password)
+                .join(self.db.t_usergroups.table, on: self.db.t_usergroups.table[self.db.t_usergroups.uid] == self.db.t_users.table[self.db.t_users.uid])
+
+            var users: [User] = []
+            for user in try self.db.db.prepare(query) {
+                let user = User(db: self.db, username: user[self.db.t_users.username], pwhash: user[self.db.t_users.password], uid: user[self.db.t_users.uid])
+                users.append(user)
+            }
+
+            return users
+        }
+
         /// Assigns a user to this group
         /// - Parameter user: The user to assign
         /// - Returns: `false` is the user does not exist in the database, else `true`
