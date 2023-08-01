@@ -17,6 +17,13 @@ public func main() {
     print("Copyright (c) 2023 zimsneexh (https://zsxh.eu)")
     print("")
 
+    if ProcessInfo.processInfo.environment["TERM"] != nil {
+        VLogEnableEscapeCodes = true
+        VInfo("Running in Terminal, enabling escape sequences")
+    } else {
+        VInfo("Running in XCode, no escape codes")
+    }
+
     // Register a Signal Source
     let signal_source = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
     signal_source.setEventHandler {
