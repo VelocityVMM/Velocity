@@ -34,6 +34,12 @@ public func main() {
 
     VInfo("Starting up..")
     VelocityConfig.setup()
+    let db = try! VDB("\(VelocityConfig.velocity_root)/db.sqlite");
+
+    let api_queue = DispatchQueue(label: "VAPI")
+    api_queue.async {
+        let _ = try! VAPI(db: db, port: 8090);
+    }
 
     if !VelocityConfig.check_directory() {
         VErr("Could not create all required directories.")
