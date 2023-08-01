@@ -9,7 +9,17 @@ import Foundation
 import Vapor
 
 extension VAPI {
-    func register_endpoints_u() {
+    func register_endpoints_u() throws {
+        VDebug("Ensuring API base...")
+
+        // Ensure the root user and group
+        let u_root = try self.db.user_ensure(username: "root", password: "root", uid: 0).get()
+        let g_root = try self.db.group_ensure(groupname: "root", gid: 0).get()
+        try u_root.join_group(group: g_root)
+
+        // Ensure special groups
+        let _ = try self.db.group_ensure(groupname: "usermanager").get()
+
         VDebug("Registering /u endpoints...")
 
         //

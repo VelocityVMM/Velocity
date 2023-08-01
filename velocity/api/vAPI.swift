@@ -51,7 +51,7 @@ class VAPI : Loggable {
 
         self.encoder = JSONEncoder()
 
-        self.register_endpoints_u()
+        try self.register_endpoints_u()
 
         // Setup server properties
         app.http.server.configuration.hostname = hostname
