@@ -308,3 +308,22 @@ if (delete("u/group", {"authkey": user_authkey, "gid": gid2}).status_code == 200
     pn_ok("OK ({})".format(last_resp.status_code))
 else:
     pn_err("FAIL: {}, expected 200".format(last_resp.status_code))
+
+p("Removing user {} from group 'usermanager' as 'root'...".format(username))
+if (delete("u/group/assign", {"authkey": root_authkey, "uid": uid, "groups": [1]}).status_code == 200):
+    p_ok("OK ({})".format(last_resp.status_code))
+    pn(" - groups: {}".format(last_json["groups"]))
+else:
+    pn_err("FAIL: {}, expected 200".format(last_resp.status_code))
+
+p("Not allowing creation of new user '{}' as user '{}' after removal...".format(username, username))
+if (put("u/user", {"authkey": user_authkey, "username": username, "password": password, "groups": []}).status_code == 403):
+    pn_ok("OK ({})".format(last_resp.status_code))
+else:
+    pn_err("FAIL: {}, expected 403".format(last_resp.status_code))
+
+p("Not allowing creation of new group '{}' as user '{}' after removal...".format(groupname2, username))
+if (put("u/group", {"authkey": user_authkey, "groupname": groupname2}).status_code == 403):
+    pn_ok("OK ({})".format(last_resp.status_code))
+else:
+    pn_err("FAIL: {}, expected 403".format(last_resp.status_code))

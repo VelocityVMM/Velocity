@@ -239,6 +239,86 @@ extension VAPI {
 
             return Response(status: .ok)
         }
+
+        //
+        // MARK: Group membership /u/group/assign
+        //
+
+        self.app.put("u", "group", "assign") { req in
+            let request: Structs.U.GROUP.ASSIGN.PUT.Req = try req.content.decode(Structs.U.GROUP.ASSIGN.PUT.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let req_user = key.user
+
+            // The user has to either be a member of group 0 (root) or "usermanager"
+            if (try !req_user.is_member_of(gid: 0) && !req_user.is_member_of(groupname: "usermanager")) {
+                self.VDebug("\(req_user.info()) has no permission to assign to groups")
+                return Response(status: .forbidden)
+            }
+
+            // Get the user to assign
+            guard let user = try self.db.user_select(uid: request.uid) else {
+                return Response(status: .notFound)
+            }
+
+            for gid in request.groups {
+                // Only users in group 0 (root) can assign to that group
+                if try gid == 0 && !req_user.is_member_of(gid: 0) {
+                    self.VDebug("\(req_user.info()) tried to assign to 'root' {0}")
+                    return Response(status: .notAcceptable)
+                }
+
+                self.VDebug("Assigning \(user.info()) to gid {\(gid)}")
+                try user.join_group(gid: gid)
+            }
+
+            var headers = HTTPHeaders()
+            headers.add(name: .contentType, value: "application/json")
+
+            let response = Structs.U.GROUP.ASSIGN.PUT.Res(uid: user.uid, groups: try user.get_group_ids())
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+        }
+
+        self.app.delete("u", "group", "assign") { req in
+            let request: Structs.U.GROUP.ASSIGN.DELETE.Req = try req.content.decode(Structs.U.GROUP.ASSIGN.DELETE.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let req_user = key.user
+
+            // The user has to either be a member of group 0 (root) or "usermanager"
+            if (try !req_user.is_member_of(gid: 0) && !req_user.is_member_of(groupname: "usermanager")) {
+                self.VDebug("\(req_user.info()) has no permission to remove from groups")
+                return Response(status: .forbidden)
+            }
+
+            // Get the user to assign
+            guard let user = try self.db.user_select(uid: request.uid) else {
+                return Response(status: .notFound)
+            }
+
+            for gid in request.groups {
+                // Only users in group 0 (root) can remove from that group
+                if try gid == 0 && !req_user.is_member_of(gid: 0) {
+                    self.VDebug("\(req_user.info()) tried to remove from 'root' {0}")
+                    return Response(status: .notAcceptable)
+                }
+
+                self.VDebug("Removing \(user.info()) from gid {\(gid)}")
+                try user.leave_group(gid: gid)
+            }
+
+            var headers = HTTPHeaders()
+            headers.add(name: .contentType, value: "application/json")
+
+            let response = Structs.U.GROUP.ASSIGN.DELETE.Res(uid: user.uid, groups: try user.get_group_ids())
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+        }
     }
 }
 
@@ -319,6 +399,33 @@ extension VAPI.Structs {
                 struct Req : Codable {
                     let authkey: String
                     let gid: Int64
+                }
+            }
+            /// `/u/group/assign`
+            struct ASSIGN {
+                /// `/u/group/assign` - PUT
+                struct PUT {
+                    struct Req : Codable {
+                        let authkey: String
+                        let uid: Int64
+                        let groups: [Int64]
+                    }
+                    struct Res : Codable {
+                        let uid: Int64
+                        let groups: [Int64]
+                    }
+                }
+                /// `/u/group/assign` - DELETE
+                struct DELETE {
+                    struct Req : Codable {
+                        let authkey: String
+                        let uid: Int64
+                        let groups: [Int64]
+                    }
+                    struct Res : Codable {
+                        let uid: Int64
+                        let groups: [Int64]
+                    }
                 }
             }
         }
