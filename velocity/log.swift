@@ -57,11 +57,20 @@ extension Loggable {
 /// The current loglevel to use
 var VLoglevel: Loglevel = Loglevel.Debug;
 
+/// If the logging should use colors and escape codes
+var VLogEnableEscapeCodes: Bool = false
+
 /// Log the specified message to the log
 /// - Parameter message: The message to print
 /// - Parameter context: The context to print for the message (optional)
 /// - Parameter level: The loglevel to use (optional) if `nil`, this will always print
 func VLog(_ message: String, _ context: String? = nil, level: Loglevel? = nil) {
+    var prefix = "[Velocity]"
+
+    if VLogEnableEscapeCodes {
+        prefix = "\u{001B}[96m[Velocity]"
+    }
+
     if let level = level {
         //Early return if the loglevel is too low
         if VLoglevel.rawValue < level.rawValue {
@@ -78,20 +87,20 @@ func VLog(_ message: String, _ context: String? = nil, level: Loglevel? = nil) {
         case Loglevel.Trace: c = "T"
         }
 
-        var prefix = "[Velocity][\(c)]";
-        if let context = context {
-            prefix += context;
-        }
-
-        NSLog("\(prefix) \(message)");
+        prefix += "[\(c)]"
     } else {
-        var prefix = "[Velocity][_]";
-        if let context = context {
-            prefix += context;
-        }
-
-        NSLog("\(prefix) \(message)");
+        prefix += "[_]"
     }
+
+    if let context = context {
+        prefix += context;
+    }
+
+    if VLogEnableEscapeCodes {
+        prefix += "\u{001B}[0m"
+    }
+
+    NSLog("\(prefix) \(message)")
 }
 
 /// Log the specified message under the `Err` loglevel
