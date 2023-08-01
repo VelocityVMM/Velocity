@@ -72,6 +72,20 @@ extension VDB {
             return groups
         }
 
+        /// Returns an array of the group ids this user is a member of
+        func get_group_ids() throws -> [Int64] {
+            let query = self.db.t_usergroups.table
+                .select(distinct: self.db.t_usergroups.table[self.db.t_usergroups.gid])
+                .where(self.db.t_usergroups.table[self.db.t_usergroups.uid] == self.uid)
+
+            var groups: [Int64] = []
+            for group in try self.db.db.prepare(query) {
+                groups.append(group[self.db.t_groups.gid])
+            }
+
+            return groups
+        }
+
         /// Checks if the user is a member of the supplied group
         /// - Parameter group: The group to check for
         func is_member_of(group: Group) throws -> Bool {
