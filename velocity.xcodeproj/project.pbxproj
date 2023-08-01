@@ -25,11 +25,10 @@
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */; };
-		509804A62A286FEE009DAAFF /* vlvirtualmachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */; };
+		5051AAA92A6AB7E4006FF899 /* vDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5051AAA82A6AB7E4006FF899 /* vDB.swift */; };
 		5056EC7B2A72411700D93422 /* vAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056EC7A2A72411700D93422 /* vAPI.swift */; };
 		5056EC7E2A778D1A00D93422 /* vAPI_U.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056EC7D2A778D1A00D93422 /* vAPI_U.swift */; };
 		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
-		5051AAA92A6AB7E4006FF899 /* vDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5051AAA82A6AB7E4006FF899 /* vDB.swift */; };
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
 		50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */; };
 		50B7A4082A6EB8B100083BE8 /* vDBTGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B7A4072A6EB8B100083BE8 /* vDBTGroups.swift */; };
@@ -68,8 +67,6 @@
 		50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBUtil.swift; sourceTree = "<group>"; };
 		50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBStructs.swift; sourceTree = "<group>"; };
 		50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBSession.swift; sourceTree = "<group>"; };
-		509804A12A274729009DAAFF /* vwindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
-		509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vlvirtualmachine.swift; sourceTree = "<group>"; };
 		5051AAA82A6AB7E4006FF899 /* vDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDB.swift; sourceTree = "<group>"; };
 		5056EC7A2A72411700D93422 /* vAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI.swift; sourceTree = "<group>"; };
 		5056EC7D2A778D1A00D93422 /* vAPI_U.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_U.swift; sourceTree = "<group>"; };
@@ -139,8 +136,6 @@
 				476083912A260F0200A93368 /* nsimage.swift */,
 				470D4C282A326ED10057B58E /* virtualization */,
 				50394E322A2CC962006A7CB4 /* vrfb */,
-				509804A12A274729009DAAFF /* vwindow.swift */,
-				509804A52A286FEE009DAAFF /* vlvirtualmachine.swift */,
 			);
 			path = velocity;
 			sourceTree = "<group>";
@@ -278,10 +273,7 @@
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
 				47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */,
 				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
-				509804A62A286FEE009DAAFF /* vlvirtualmachine.swift in Sources */,
-				509804A22A274729009DAAFF /* vwindow.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
-				479DE7EB2A2A881900B190C9 /* vwindow.swift in Sources */,
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
 				47D62A2C2A1E7366006FFE2A /* vz.swift in Sources */,
 				5056EC7B2A72411700D93422 /* vAPI.swift in Sources */,
@@ -297,7 +289,6 @@
 				50394E2E2A2CC48B006A7CB4 /* vRFBServer.swift in Sources */,
 				50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */,
 				470D4C2D2A3276C20057B58E /* vRFBConvertKey.swift in Sources */,
-				479DE7EA2A2A881900B190C9 /* vlvirtualmachine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
