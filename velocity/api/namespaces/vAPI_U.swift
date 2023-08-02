@@ -181,6 +181,42 @@ extension VAPI {
             return Response(status: .ok)
         }
 
+        app.get("u", "user", "groups") { req in
+            let request: Structs.U.USER.GROUPS.GET.Req = try req.content.decode(Structs.U.USER.GROUPS.GET.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let user = key.user
+
+            var headers = HTTPHeaders()
+            headers.add(name: .contentType, value: "application/json")
+
+            var processed_user = user
+            // If there is a specific uid requested
+            if let uid = request.uid {
+                // Check if the requested uid is notthe user's uid
+                if uid != user.uid {
+                    // Check for permission
+                    if (try !user.is_member_of(gid: 0) && !user.is_member_of(groupname: "usermanager")) {
+                        self.VDebug("\(user.info()) has no permission to retrieve other user's group information")
+                        return Response(status: .forbidden)
+                    }
+
+                    processed_user = try self.db.user_select(uid: uid)!
+                }
+            }
+
+            var groups: [Structs.U.USER.GROUPS.GET.Res.RGroup] = []
+            for group in try processed_user.get_groups() {
+                groups.append(Structs.U.USER.GROUPS.GET.Res.RGroup(gid: group.gid, groupname: group.groupname))
+            }
+
+            let response = Structs.U.USER.GROUPS.GET.Res(uid: processed_user.uid, groups: groups)
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+        }
+
         //
         // MARK: Group management /u/group
         //
@@ -377,6 +413,26 @@ extension VAPI.Structs {
                 struct Req : Codable {
                     let authkey: String
                     let uid: Int64
+                }
+            }
+
+            /// `/u/user/groups`
+            struct GROUPS {
+                /// `/u/user/groups` - GET
+                struct GET {
+                    struct Req : Codable {
+                        let authkey: String
+                        let uid: Int64?
+                    }
+                    struct Res : Codable {
+                        struct RGroup : Codable {
+                            let gid: Int64
+                            let groupname: String
+                        }
+
+                        let uid: Int64
+                        let groups: [RGroup]
+                    }
                 }
             }
         }

@@ -78,6 +78,8 @@ User and group management:
 
 - [`/u/user` - DELETE](#delete-u-user): Remove a user
 
+- [`/u/user/groups` - GET](#get-u-user-groups): Get the groups the user is a member of
+
 - [`/u/group` - PUT](#put-u-group): Create a new group
 
 - [`/u/group` - DELETE](#delete-u-group): Remove a group
@@ -224,6 +226,41 @@ This call removes the user with the supplied `UID`. This also removes the user's
 - `200`: User removed
 
 - `403 - Forbidden`: The current user is not allowed to remove users
+
+- `404 - Not Found`: No user with the supplied `uid` has been found
+
+## `/u/user/groups` - GET <a id="get-u-user-groups"></a>
+
+Retrieve the groups a user is member of. The `authkey` is used to infer the user. A user that is member of the `usermanager` group can specify the `uid` field and retrieve group membership information of other users.
+
+**Request:**
+
+```json
+{
+    "authkey": "<authkey>"
+    "uid": "<UID>"
+}
+```
+
+The `uid` field is optional and allows `usermanager` to look up group membership of other users
+
+**Response:**
+
+- `200`
+
+```json
+{
+    "uid": "<UID>",
+    "groups": [
+        {
+            "gid": "<GID>",
+            "groupname": "<groupname>"
+        }
+    ]
+}
+```
+
+- `403 - Forbidden`: The current user is not allowed to see other users group membership (`usermanager`)
 
 - `404 - Not Found`: No user with the supplied `uid` has been found
 
