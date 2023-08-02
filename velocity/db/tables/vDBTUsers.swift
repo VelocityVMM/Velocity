@@ -62,6 +62,7 @@ extension VDB {
             let query = self.db.t_groups.table
                 .select(distinct: self.db.t_groups.table[self.db.t_groups.gid], self.db.t_groups.name)
                 .join(self.db.t_usergroups.table, on: self.db.t_usergroups.table[self.db.t_usergroups.gid] == self.db.t_groups.table[self.db.t_groups.gid])
+                .where(self.db.t_usergroups.table[self.db.t_usergroups.uid] == self.uid)
 
             var groups: [Group] = []
             for group in try self.db.db.prepare(query) {
