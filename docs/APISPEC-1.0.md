@@ -48,19 +48,25 @@ There is one special group and user with the `UID` / `GID` set to `0`. These are
 
 Each user is identified by its unique `UID`, its username and password.
 
-Every user automatically gets assigned to a group using the users `username`. Note that the `gid` of that group won't always be the same as the `uid`.
+Every user automatically gets assigned to a group using the users `username` and the `gid = uid`. This limits the `uid` to a specific range from `0` to something fixed in the server's configuration.
 
 ### Group
 
-Velocity works with groups. There are some special groups with specific privileges:
+There are 2 types of groups:
 
-- `root`: Has permission to do everything, users in this group are superusers (`gid = 0`).
+- User groups
 
-- `usermanager`: Users that are in this group have the permission to create new users and groups and assign users to groups except `root`.
+- General groups
 
-- `catalogmanager`: Can create and remove catalogs.
+**User groups**
 
-- `poolmanager`: Can create and manage resource pools.
+These groups are the ones that get created upon user creation and reach from `0` to a fixed limit (here called `MAX_UID`). This limit can not be surpassed and thus limits the user count for a Velocity instance.
+
+**General groups**
+
+There are other groups that are not tied to a specific user. These group ids start from `MAX_UID+1` and go up to the maximum value of the used data type.
+
+Each group has a parent group. There is one notable exception: `supergroups`. They don't have a parent group and can only be created by the `root` group with `gid = 0`. This allows building a hierarchy in the userbase. Each group cannot surpass the quotas of the parent group which allows users to create groups within their groups to split VMs.
 
 ### Available endpoints
 
@@ -171,9 +177,9 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 > **Note**
 > 
-> Only users that are in the `usermanager` group can create users
+> Only users that have the `usermanager` permission for the group can create new users in a group.
 
-This call automatically creates a new group with the groupname set to `<username>` and assigns the new user to that.
+This call automatically creates a new group with the groupname set to `<username>` and assigns the new user to that. The `parentgroup` field indicates the parent group's `gid` for the user's group, which cannot be `null`. User groups can't be `supergroups`.
 
 **Request:**
 
@@ -182,11 +188,9 @@ This call automatically creates a new group with the groupname set to `<username
     "authkey": "<authkey>",
     "username": "<username>",
     "password": "<password>",
-    "groups": ["<GID>"]
+    "parentgroup": "<GID>"
 }
 ```
-
-The groups field can be an empty array.
 
 **Response:**
 
@@ -196,11 +200,12 @@ The groups field can be an empty array.
 {
     "uid": "<UID>",
     "username": "<username>",
-    "groups": ["<GID>"]
 }
 ```
 
 - `403 - Forbidden`: The current user is not allowed to create new users
+
+- `406 Not Acceptable`: The user creation process tried to create a `supergroup`.
 
 - `409 - Conflict`: A user with the supplied `username` does already exist
 
@@ -208,7 +213,7 @@ The groups field can be an empty array.
 
 > **Note**
 > 
-> Only users that are in the `usermanager` group can remove users
+> Only users that have the `usermanager` permission for the user's parent group can remove users.
 
 This call removes the user with the supplied `UID`. This also removes the user's group that is named the same as the user and all of its VMs and images.
 
@@ -231,7 +236,7 @@ This call removes the user with the supplied `UID`. This also removes the user's
 
 ## `/u/user/groups` - GET <a id="get-u-user-groups"></a>
 
-Retrieve the groups a user is member of. The `authkey` is used to infer the user. A user that is member of the `usermanager` group can specify the `uid` field and retrieve group membership information of other users.
+Retrieve the groups a user is member of. The `authkey` is used to infer the user. A user that has the `usermanager` permission on a parent group can specify the `uid` field and retrieve group membership information of other users.
 
 **Request:**
 
@@ -242,7 +247,7 @@ Retrieve the groups a user is member of. The `authkey` is used to infer the user
 }
 ```
 
-The `uid` field is optional and allows `usermanager` to look up group membership of other users
+The `uid` field is optional and allows `usermanagers` to look up group membership of other users
 
 **Response:**
 
@@ -254,7 +259,8 @@ The `uid` field is optional and allows `usermanager` to look up group membership
     "groups": [
         {
             "gid": "<GID>",
-            "groupname": "<groupname>"
+            "groupname": "<groupname>",
+            "parentgroup": "<GID>"
         }
     ]
 }
@@ -268,14 +274,15 @@ The `uid` field is optional and allows `usermanager` to look up group membership
 
 > **Note**
 > 
-> Only users that are in the `usermanager` group can create groups
+> Only users that are in the `root {0}` group can create `supergroups`
 
 **Request:**
 
 ```json
 {
     "authkey": "<authkey>",
-    "groupname": "<groupname>"
+    "groupname": "<groupname>",
+    "parentgroup": "<GID>"
 }
 ```
 
@@ -286,11 +293,12 @@ The `uid` field is optional and allows `usermanager` to look up group membership
 ```json
 {
     "gid": "<GID>",
-    "groupname": "<groupname>"
+    "groupname": "<groupname>",
+    "parentgroup": "<GID>"
 }
 ```
 
-- `403 - Forbidden`: The current user is not allowed to create new groups
+- `403 - Forbidden`: The current user is not allowed to create `supergroups` (`gid = 0` required)
 
 - `409 - Conflict`: A group with the supplied `groupname` does already exist
 
@@ -298,7 +306,7 @@ The `uid` field is optional and allows `usermanager` to look up group membership
 
 > **Note**
 > 
-> Only users that are in the `usermanager` group can remove groups
+> Only users that are in the `root {0}` group can remove `supergroups`
 
 This call removes all the VMs and images owned by this group.
 
@@ -307,7 +315,7 @@ This call removes all the VMs and images owned by this group.
 ```json
 {
     "authkey": "<authkey>",
-    "uid": "<UID>"
+    "gid": "<GID>"
 }
 ```
 
@@ -315,7 +323,7 @@ This call removes all the VMs and images owned by this group.
 
 - `200`: Group removed
 
-- `403 - Forbidden`: The current user is not allowed to remove users
+- `403 - Forbidden`: The current user is not allowed to remove `supergroups`
 
 ## `/u/group/assign` - PUT <a id="put-u-group-assign"></a>
 
@@ -323,7 +331,7 @@ Assign a user to groups:
 
 > **Note**
 > 
-> Only users that are in the `usermanager` group can assign users to groups
+> A user cannot assign other users to higher groups than its own. He needs the `usermanager` permission for the group to assign to.
 
 **Request:**
 
@@ -331,36 +339,36 @@ Assign a user to groups:
 {
     "authkey": "<authkey>",
     "uid": "<UID>",
-    "groups": ["<GID>"]
+    "group": "<GID>",
+    "usermanager": true
 }
 ```
 
 **Response:**
 
-- `200`: Groups added
+- `200`: Group membership added
 
 ```json
 {
     "uid": "<UID>",
-    "groups": ["<GID>"]
+    "group": "<GID>",
+    "usermanager": true
 }
 ```
 
 The response lets the caller know which groups the user now belongs to.
 
-- `403 - Forbidden`: The current user is not allowed to assignto groups
+- `403 - Forbidden`: The user tried to assign to a higher group or does not have the required permissions
 
 - `404 - Not Found`: The `uid` of the user to assign has not been found
 
-- `406 - Not Acceptable`: A user in `usermanager` tried to assign to `root` group
-
 ## `/u/group/assign` - DELETE <a name="delete-u-group-assign"></a>
 
-Remove a user from groups:
+Remove a user from a group
 
 > **Note**
 > 
-> Only users that are in the `usermanager` group can remove users from groups
+> Only users that have the `usermanager` permission for the target groups can do this
 
 **Request:**
 
@@ -368,13 +376,13 @@ Remove a user from groups:
 {
     "authkey": "<authkey>",
     "uid": "<UID>",
-    "groups": ["<GID>"]
+    "group": "<GID>"
 }
 ```
 
 **Response:**
 
-- `200`: User removed from groups
+- `200`: User removed from group
 
 ```json
 {
@@ -385,11 +393,9 @@ Remove a user from groups:
 
 The response lets the caller know which groups the user now belongs to.
 
-- `403 - Forbidden`: The current user is not allowed to remove from groups
+- `403 - Forbidden`: The current user is not allowed to remove from groups (`usermanager` permission)
 
 - `404 - Not Found`: The `uid` of the user to remove has not been found
-
-- `406 - Not Acceptable`: A user in `usermanager` tried to remove from `root` group
 
 # Resource management: `/r` <a name="namespace-r"></a>
 
