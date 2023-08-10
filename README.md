@@ -4,6 +4,10 @@ Velocity is a Proxmox-VE like virtualization platform that leverages the power o
 
 Velocity exposes an API that allows interfacing with the Velocity daemon. This allows Velocity to run completely headless and use only a  [web interface](https://github.com/zimsneexh/VelocityUI) for interaction and management. Users can also automate the process of creating and managing VMs through this API.
 
+## API
+
+Velocity can be controlled using an API exposed from the hypervisor. You can read more in the [APISPEC](docs/APISPEC/README.md).
+
 ## Building
 
 Velocity is by no means in a stable state and experiences heavy development and frequent breaking changes. If you are interested in trying out Velocity, you can clone the repo, open the XCode project, adjust the signing process for your needs and build it.
