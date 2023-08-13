@@ -34,3 +34,34 @@ Some http-response codes are fixed:
 - `401 - Unauthorized`: The request is missing the `authkey` for privileged actions
 
 - `500 - Internal Server Error`: The server encountered an error while processing the request
+
+# Entity hierarchy
+
+Velocity's main work horse are groups. Each Virtual machine is owned by a group, wich is owned by another parent group. All the way up to the `root` group (`0`).
+
+Each user can be assigned to a group with permissions. These permissions for groups persist for all subgroups. This allows a user that has a permission in a parent group to use it in subgroups. This allows for building a structured and manageable entity and user tree.
+
+For permissions, read the [PERMISSIONS](permissions.md) article.
+
+```mermaid
+classDiagram
+    Group <|-- Group: Subgroup
+    Pool <|-- Pool: Subpool
+    Group <|-- User: Has permissions on
+    Group --|> Pool: Has permissions on
+    Pool <|-- Media: Is part of
+    Group: gid
+    Group: name
+
+    User: uid
+    User: name
+    User: password
+
+    Pool: pid
+    Pool: name
+    Pool: quota_mib
+
+    Media: mid
+    Media: name
+    Media: size_mib
+```
