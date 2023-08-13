@@ -2,31 +2,15 @@
 
 Velocity's concept of users and groups is similar to that of Unix. Permissions, vm and data pools are always connected to groups due to them being able to be shared across users with a fair amount of granularity.
 
-There is one special group and user with the `UID` / `GID` set to `0`. These are the super user / group that have full access to everything.
+There is one special group  `GID` set to `0`. This is the supergroup that has full access to everything. All other groups descend from that group and get delegated. This group's parent gid is set to `0`, creating a recursion to signal the root group.
 
 ### User
 
 Each user is identified by its unique `UID`, its username and password.
 
-Every user automatically gets assigned to a group using the users `username` and the `gid = uid`. This limits the `uid` to a specific range from `0` to something fixed in the server's configuration.
-
 ### Group
 
-There are 2 types of groups:
-
-- User groups
-
-- General groups
-
-**User groups**
-
-These groups are the ones that get created upon user creation and reach from `0` to a fixed limit (here called `MAX_UID`). This limit can not be surpassed and thus limits the user count for a Velocity instance.
-
-**General groups**
-
-There are other groups that are not tied to a specific user. These group ids start from `MAX_UID+1` and go up to the maximum value of the used data type.
-
-Each group has a parent group. There is one notable exception: `supergroups`. They don't have a parent group and can only be created by other supergroups. This allows building a hierarchy in the userbase. Each group cannot surpass the quotas of the parent group which allows users to create groups within their groups to split VMs.
+Each group has a parent group and can inherit some of the parent group's quotas, but never surpass them.
 
 ### Available endpoints
 
@@ -44,15 +28,15 @@ User and group management:
 
 - [`/u/user` - DELETE](#delete-u-user): Remove a user
 
-- [`/u/user/groups` - GET](#get-u-user-groups): Get the groups the user is a member of
+- [`/u/user/groups` - GET](#get-u-user-groups): Get the groups and their permissions the user is a member of
 
 - [`/u/group` - PUT](#put-u-group): Create a new group
 
 - [`/u/group` - DELETE](#delete-u-group): Remove a group
 
-- [`/u/group/assign` - PUT](#put-u-group-assign): Assign a user to a group
+- [`/u/group/assign` - PUT](#put-u-group-assign): Assign a user to a group / add permissions
 
-- [`/u/group/assign` - DELETE](#delete-u-group-assign): Remove group membership
+- [`/u/group/assign` - DELETE](#delete-u-group-assign): Remove group membership / remove permissions
 
 ## `/u/auth` - POST <a name="post-u-auth"></a>
 
@@ -62,7 +46,7 @@ Velocity's authentication model works using so-called 'authkeys'. Every user tha
 
 ```json
 {
-  "username": "<username>",
+  "name": "<username>",
   "password": "<password>"
 }
 ```
@@ -110,7 +94,7 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 > **Note**
 > 
-> This will immediately drop the old authkey in favor of the newly generated one.
+> This will immediately drop the old authkey in favor of the newly generated one
 
 **Request:**
 
@@ -135,20 +119,19 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 ## `/u/user` - PUT <a name="put-u-user"></a>
 
+Create a new user
+
 > **Note**
 > 
-> Only users that have the `usermanager` permission for the group can create new users in a group.
-
-This call automatically creates a new group with the groupname set to `<username>` and assigns the new user to that. The `parentgroup` field indicates the parent group's `gid` for the user's group, which cannot be `null`. User groups can't be `supergroups`.
+> Only users that have the `velocity.user.create` permission
 
 **Request:**
 
 ```json
 {
   "authkey": "<authkey>",
-  "username": "<username>",
-  "password": "<password>",
-  "parentgroup": "<GID>"
+  "name": "<username>",
+  "password": "<password>"
 }
 ```
 
@@ -159,13 +142,11 @@ This call automatically creates a new group with the groupname set to `<username
 ```json
 {
   "uid": "<UID>",
-  "username": "<username>"
+  "name": "<username>"
 }
 ```
 
 - `403 - Forbidden`: The current user is not allowed to create new users
-
-- `406 Not Acceptable`: The user creation process tried to create a `supergroup`.
 
 - `409 - Conflict`: A user with the supplied `username` does already exist
 
@@ -173,7 +154,7 @@ This call automatically creates a new group with the groupname set to `<username
 
 > **Note**
 > 
-> Only users that have the `usermanager` permission for the user's parent group can remove users.
+> Only users that have the `velocity.user.remove` permission for the user's parent group can remove users
 
 This call removes the user with the supplied `UID`. This also removes the user's group that is named the same as the user and all of its VMs and images.
 
@@ -196,18 +177,15 @@ This call removes the user with the supplied `UID`. This also removes the user's
 
 ## `/u/user/groups` - GET <a id="get-u-user-groups"></a>
 
-Retrieve the groups a user is member of. The `authkey` is used to infer the user. A user that has the `usermanager` permission on a parent group can specify the `uid` field and retrieve group membership information of other users.
+Retrieve the groups a user is member of. The `authkey` is used to infer the user. There is no possibility to retrieve information about other users group membership.
 
 **Request:**
 
 ```json
 {
     "authkey": "<authkey>"
-    "uid": "<UID>"
 }
 ```
-
-The `uid` field is optional and allows `usermanagers` to look up group membership of other users
 
 **Response:**
 
@@ -219,30 +197,29 @@ The `uid` field is optional and allows `usermanagers` to look up group membershi
   "groups": [
     {
       "gid": "<GID>",
-      "groupname": "<groupname>",
-      "parentgroup": "<GID>"
+      "name": "<groupname>",
+      "permissions": ["<permission>"],
+      "parent_gid": "<GID>"
     }
   ]
 }
 ```
 
-- `403 - Forbidden`: The current user is not allowed to see other users group membership (`usermanager`)
-
-- `404 - Not Found`: No user with the supplied `uid` has been found
-
 ## `/u/group` - PUT <a id="put-u-group"></a>
+
+Create a new group. There cannot be duplicate group names in a parent group.
 
 > **Note**
 > 
-> Only users that are in another supergroup can create `supergroups`
+> The user needs the `velocity.group.create` permission on the parent group
 
 **Request:**
 
 ```json
 {
   "authkey": "<authkey>",
-  "groupname": "<groupname>",
-  "parentgroup": "<GID>"
+  "name": "<groupname>",
+  "parent_gid": "<GID>"
 }
 ```
 
@@ -253,20 +230,22 @@ The `uid` field is optional and allows `usermanagers` to look up group membershi
 ```json
 {
   "gid": "<GID>",
-  "groupname": "<groupname>",
-  "parentgroup": "<GID>"
+  "name": "<groupname>",
+  "parent_gid": "<GID>"
 }
 ```
 
-- `403 - Forbidden`: The current user is not allowed to create `supergroups` (`gid = 0` required)
+- `403 - Forbidden`: The calling user lacks permissions
 
-- `409 - Conflict`: A group with the supplied `groupname` does already exist
+- `409 - Conflict`: A group with the supplied `groupname` within the parent group does already exist
 
 ## `/u/group` - DELETE <a name="delete-u-group"></a>
 
+Remove a group from a parent group
+
 > **Note**
 > 
-> Only users that are in the another supergroup can remove `supergroups`
+> The user needs the `velocity.group.remove` permission on the parent group
 
 This call removes all the VMs and images owned by this group.
 
@@ -283,15 +262,19 @@ This call removes all the VMs and images owned by this group.
 
 - `200`: Group removed
 
-- `403 - Forbidden`: The current user is not allowed to remove `supergroups`
+- `403 - Forbidden`: The calling user lacks permissions
 
 ## `/u/group/assign` - PUT <a id="put-u-group-assign"></a>
 
-Assign a user to groups:
+Assign a user to groups or add permissions.
 
 > **Note**
 > 
-> A user cannot assign other users to higher groups than its own. He needs the `usermanager` permission for the group to assign to.
+> A user cannot assign other users to higher groups than its own. He needs the `velocity.user.assign` permission for the group to assign to
+
+> **Note**
+> 
+> A user can only forward permissions itself has. If the user tries to give permissions to another user that it doesn't have, this call will fail
 
 **Request:**
 
@@ -300,9 +283,11 @@ Assign a user to groups:
   "authkey": "<authkey>",
   "uid": "<UID>",
   "group": "<GID>",
-  "usermanager": true
+  "permissions": ["<permission>"]
 }
 ```
+
+The permissions array lists the permissions that the user should receive.
 
 **Response:**
 
@@ -312,13 +297,13 @@ Assign a user to groups:
 {
   "uid": "<UID>",
   "group": "<GID>",
-  "usermanager": true
+  "permissions": ["<permission>"]
 }
 ```
 
 The response lets the caller know which groups the user now belongs to.
 
-- `403 - Forbidden`: The user tried to assign to a higher group or does not have the required permissions
+- `403 - Forbidden`: The user tried to assign to a higher group, higher permissions or does not have the required permissions
 
 - `404 - Not Found`: The `uid` of the user to assign has not been found
 
@@ -328,7 +313,7 @@ Remove a user from a group
 
 > **Note**
 > 
-> Only users that have the `usermanager` permission for the target group can do this
+> Only users that have the `velocity.user.revoke` permission for the target group can do this
 
 **Request:**
 
@@ -336,9 +321,12 @@ Remove a user from a group
 {
   "authkey": "<authkey>",
   "uid": "<UID>",
-  "group": "<GID>"
+  "group": "<GID>",
+  "permissions": ["<permission>"]
 }
 ```
+
+The `permissions` field is optional. If it is set, this will remove the listed permissions on the target group if available. If this field is omitted, this will remove the user completely, revoking all permissions.
 
 **Response:**
 
@@ -347,11 +335,8 @@ Remove a user from a group
 ```json
 {
   "uid": "<UID>",
-  "groups": ["<GID>"]
 }
 ```
-
-The response lets the caller know which groups the user now belongs to.
 
 - `403 - Forbidden`: The current user is not allowed to remove from groups (`usermanager` permission)
 
