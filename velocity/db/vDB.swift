@@ -17,12 +17,6 @@ class VDB : Loggable {
     /// The `users` table
     let t_users: Users;
 
-    /// The `groups` table
-    let t_groups: Groups;
-
-    /// The `usergroups` table
-    let t_usergroups: UserGroups;
-
     /// Opens a new database connection at the specified location
     /// - Parameter location: The location to open the database at
     convenience init(_ location: Connection.Location = Connection.Location.inMemory) throws {
@@ -40,8 +34,6 @@ class VDB : Loggable {
         self.context = context;
         self.db = db;
         self.t_users = try Users(db: self.db);
-        self.t_groups = try Groups(db: self.db);
-        self.t_usergroups = try UserGroups(db: self.db, users: self.t_users, groups: self.t_groups);
 
         try self.db.execute("PRAGMA foreign_keys = ON;");
     }
