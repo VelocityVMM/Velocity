@@ -53,7 +53,7 @@ extension VAPI {
 
             let key = self.generate_authkey(user: user)
 
-            self.VDebug("Authenticated \(user.info()) until \(key.expiration_date())")
+            self.VDebug("Authenticated \(user.info()) until \(key.expiration_date().description(with: .current))")
             let response = Structs.U.AUTH.POST.Res(authkey: key.key.uuidString, expires: key.expiration_datetime())
             return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
         }
@@ -94,7 +94,7 @@ extension VAPI {
 
             let key = self.generate_authkey(user: old_key.user)
 
-            self.VDebug("Refreshed key for \(key.user.info()), valid until: \(key.expiration_date()), \(self.authkeys.count) active keys")
+            self.VDebug("Refreshed key for \(key.user.info()), valid until: \(key.expiration_date().description(with: .current)), \(self.authkeys.count) active keys")
             let response = Structs.U.AUTH.PATCH.Res(authkey: key.key.uuidString, expires: key.expiration_datetime())
             return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
         }

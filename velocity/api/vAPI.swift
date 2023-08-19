@@ -98,7 +98,7 @@ class VAPI : Loggable {
 
         /// The date this key will expire in unix seconds
         func expiration_datetime() -> UInt64 {
-            return UInt64(self.creation_date.timeIntervalSince1970)
+            return UInt64(self.expiration_date().timeIntervalSince1970)
         }
 
         /// Check if the key is already expired
@@ -112,7 +112,7 @@ class VAPI : Loggable {
 
         /// Provide some information about the authkey
         func info() -> String {
-            return "Authkey (\(self.key.uuidString), valid until: \(self.expiration_date()))"
+            return "Authkey (\(self.key.uuidString), valid until: \(self.expiration_date().description(with: .current)))"
         }
     }
 
