@@ -62,6 +62,11 @@ extension VDB {
             return "Permission (pid: \(self.pid), name: '\(self.name)' description: '\(self.description)')"
         }
 
+        /// Provides short information about this permission
+        func s_info() -> String {
+            return "Permission (pid: \(self.pid), name: '\(self.name)')"
+        }
+
         /// Commits the current state of this permission to the database
         ///
         /// The `pid` remains and is used as the primary key
