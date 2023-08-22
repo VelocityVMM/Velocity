@@ -18,6 +18,8 @@ class VDB : Loggable {
     let t_users: Users;
     /// The `groups` table
     let t_groups: Groups
+    /// The `permissions` table
+    let t_permissions: Permissions
 
     /// Opens a new database connection at the specified location
     /// - Parameter location: The location to open the database at
@@ -37,6 +39,7 @@ class VDB : Loggable {
         self.db = db;
         self.t_users = try Users(db: self.db);
         self.t_groups = try Groups(db: self.db)
+        self.t_permissions = try Permissions(db: self.db)
 
         try self.db.execute("PRAGMA foreign_keys = ON;");
     }
