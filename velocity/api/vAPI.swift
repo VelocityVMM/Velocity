@@ -146,4 +146,25 @@ class VAPI : Loggable {
 
         return key
     }
+
+    /// All the available permissions for this api
+    static let available_permissions: [VDB.PermissionTemplate] = [
+        // velocity.user
+        VDB.PermissionTemplate("velocity.user.create", "Create new users"),
+        VDB.PermissionTemplate("velocity.user.remove", "Remove users that are in the group from the system"),
+        VDB.PermissionTemplate("velocity.user.assign", "Assign new users to the group"),
+        VDB.PermissionTemplate("velocity.user.revoke", "Remove users from the group"),
+
+        // velocity.group
+        VDB.PermissionTemplate("velocity.group.create", "Create a new subgroup to the group"),
+        VDB.PermissionTemplate("velocity.group.remove", "Remove a subgroup"),
+
+        // velocity.vm
+        VDB.PermissionTemplate("velocity.vm.create", "Create a new virtual machine in the group"),
+        VDB.PermissionTemplate("velocity.vm.remove", "Remove a virtual machine from the group"),
+        VDB.PermissionTemplate("velocity.vm.alter", "Alter a virtual machine parameters (CPU, RAM...)"),
+        VDB.PermissionTemplate("velocity.vm.view", "View statistics for a virtual machine"),
+        VDB.PermissionTemplate("velocity.vm.interact", "Interact with a virtual machine (RFB, Serial...)"),
+        VDB.PermissionTemplate("velocity.vm.state", "Alter the virtual machine state (start, stop, pause...)"),
+    ]
 }

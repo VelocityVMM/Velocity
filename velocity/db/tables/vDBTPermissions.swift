@@ -178,6 +178,19 @@ extension VDB {
         }
     }
 
+    /// A template for permission creation
+    class PermissionTemplate {
+        /// The `name` for the permission
+        let name: String
+        /// The `description` for the new permission
+        let description: String
+
+        init(_ name: String, _ description: String) {
+            self.name = name
+            self.description = description
+        }
+    }
+
     /// The `permissions` table
     class Permissions : Loggable {
         /// The logging context
