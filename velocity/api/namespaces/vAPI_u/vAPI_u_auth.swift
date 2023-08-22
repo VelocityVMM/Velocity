@@ -1,28 +1,34 @@
 //
-//  vAPI_U.swift
-//  velocity
+// MIT License
 //
-//  Created by Max Kofler on 31/07/23.
+// Copyright (c) 2023 zimsneexh
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 //
 
 import Foundation
 import Vapor
 
 extension VAPI {
-    func register_endpoints_u() throws {
-        VDebug("Ensuring API base...")
-
-        // Ensure the root user and group
-        let u_root = try self.db.user_ensure(username: "root", password: "root", uid: 0).get()
-        let g_root = try self.db.group_ensure(name: "root", parent_gid: 0, gid: 0).get()
-
-        VDebug("Ensuring permissions...")
-        for permission in VAPI.available_permissions {
-            let permission = try self.db.permission_ensure(name: permission.name, description: permission.description)
-            try u_root.add_permission(group: g_root, permission: permission)
-        }
-
-        VDebug("Registering /u endpoints...")
+    /// Registers all endpoints withing the namespace `/u/auth`
+    func register_endpoints_u_auth() throws {
+        VDebug("Registering /u/auth endpoints...")
 
         //
         // MARK: Authentication /u/auth
@@ -108,37 +114,34 @@ extension VAPI {
     }
 }
 
-extension VAPI.Structs {
-    /// `/u`
-    struct U {
-        /// `/u/auth`
-        struct AUTH {
-            /// `/u/auth` - POST
-            struct POST {
-                struct Req : Codable {
-                    let username: String
-                    let password: String
-                }
-                struct Res : Codable {
-                    let authkey: String
-                    let expires: UInt64
-                }
+extension VAPI.Structs.U {
+    /// `/u/auth`
+    struct AUTH {
+        /// `/u/auth` - POST
+        struct POST {
+            struct Req : Codable {
+                let username: String
+                let password: String
             }
-            /// `/u/auth` - DELETE
-            struct DELETE {
-                struct Req : Codable {
-                    let authkey: String
-                }
+            struct Res : Codable {
+                let authkey: String
+                let expires: UInt64
             }
-            /// `/u/auth` - PATCH
-            struct PATCH {
-                struct Req : Codable {
-                    let authkey: String
-                }
-                struct Res : Codable {
-                    let authkey: String
-                    let expires: UInt64
-                }
+        }
+        /// `/u/auth` - DELETE
+        struct DELETE {
+            struct Req : Codable {
+                let authkey: String
+            }
+        }
+        /// `/u/auth` - PATCH
+        struct PATCH {
+            struct Req : Codable {
+                let authkey: String
+            }
+            struct Res : Codable {
+                let authkey: String
+                let expires: UInt64
             }
         }
     }
