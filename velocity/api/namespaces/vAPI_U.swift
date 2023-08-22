@@ -14,6 +14,13 @@ extension VAPI {
 
         // Ensure the root user and group
         let u_root = try self.db.user_ensure(username: "root", password: "root", uid: 0).get()
+        let g_root = try self.db.group_ensure(name: "root", parent_gid: 0, gid: 0).get()
+
+        VDebug("Ensuring permissions...")
+        for permission in VAPI.available_permissions {
+            let permission = try self.db.permission_ensure(name: permission.name, description: permission.description)
+            try u_root.add_permission(group: g_root, permission: permission)
+        }
 
         VDebug("Registering /u endpoints...")
 
