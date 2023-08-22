@@ -132,7 +132,7 @@ extension VDB {
     }
 
     /// The `groups` table
-    struct Groups : Loggable {
+    class Groups : Loggable {
         /// The logging context
         let context = "[vDB::Groups]"
         /// The `groups` table

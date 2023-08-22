@@ -127,7 +127,7 @@ extension VDB {
     }
 
     /// The `users` table
-    struct Users : Loggable{
+    class Users : Loggable{
         let context = "[vDB::Users]";
         let table = Table("users");
         let uid = Expression<Int64>("uid");
