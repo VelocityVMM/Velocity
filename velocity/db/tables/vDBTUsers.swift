@@ -57,6 +57,71 @@ extension VDB {
             try self.db.db.run(query);
         }
 
+        /// Returns if this user has the permissino on the group
+        /// - Parameter permission: The permission to search for
+        /// - Parameter group: The group the user has the permission on (`nil` for anything)
+        ///
+        /// If the `group` parameter is `nil`, this will check if the user has the permission anywhere
+        func has_permission(permission: Permission, group: Group?) throws -> Bool {
+            let tm = self.db.t_memberships
+
+            guard let group = group else {
+                return try self.db.db.exists(tm.table, tm.pid == permission.pid && tm.uid == self.uid)
+            }
+
+            return try self.db.db.exists(tm.table, tm.pid == permission.pid && tm.gid == group.gid && tm.uid == self.uid)
+        }
+
+        /// Returns if this user has the permissino on the group
+        /// - Parameter permission: The permission string to search for
+        /// - Parameter group: The group the user has the permission on (`nil` for anything)
+        ///
+        /// If the `group` parameter is `nil`, this will check if the user has the permission anywhere
+        func has_permission(permission: String, group: Group?) throws -> Bool {
+            guard let permission = try self.db.permission_select(name: permission) else {
+                VTrace("Permission '\(permission)' does not exist")
+                return false
+            }
+
+            return try self.has_permission(permission: permission, group: group)
+        }
+
+        /// Adds a permission of this user on a group
+        /// - Parameter group: The group the user should have the permission on
+        /// - Parameter permission: The permission to assign
+        func add_permission(group: Group, permission: Permission) throws {
+            VTrace("Adding permission '\(permission.s_info())' on \(group.info())")
+
+            /// Check if the permission doesn't exist already
+            if try self.has_permission(permission: permission, group: group) {
+                VTrace("\(permission.s_info()) does exist on \(group.info())")
+                return
+            }
+
+            let tm = self.db.t_memberships
+
+            let query = tm.table.insert(tm.gid <- group.gid, tm.uid <- self.uid, tm.pid <- permission.pid)
+
+            try self.db.db.run(query)
+
+            VDebug("Added \(permission.s_info()) on \(group.info())")
+        }
+
+        /// Adds a permission of this user on a group
+        /// - Parameter group: The group the user should have the permission on
+        /// - Parameter permission: The permission string to assign
+        /// - Returns: `false` if the permission hasn't been found
+        func add_permission(group: Group, permission: String) throws -> Bool {
+            /// Get the permission
+            guard let permission = try self.db.permission_select(name: permission) else {
+                VTrace("Permission '\(permission)' does not exist")
+                return false
+            }
+
+            try self.add_permission(group: group, permission: permission)
+            return true
+        }
+
         /// Creates a new user in the database
         /// - Parameter db: The database to use
         /// - Parameter username: The new username to use
