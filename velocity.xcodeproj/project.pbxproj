@@ -32,6 +32,7 @@
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
 		50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */; };
 		50BAC2862A6A609B00DE0F95 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 50BAC2852A6A609B00DE0F95 /* SQLite */; };
+		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
 		50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */; };
 /* End PBXBuildFile section */
 
@@ -73,6 +74,7 @@
 		508BEF142A78507D007D276A /* APITest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = APITest.py; sourceTree = "<group>"; };
 		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
 		50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTUsers.swift; sourceTree = "<group>"; };
+		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
 		50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -190,6 +192,7 @@
 			children = (
 				50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */,
 				50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */,
+				50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */,
 			);
 			path = tables;
 			sourceTree = "<group>";
@@ -266,6 +269,7 @@
 				47A78B502A36DE89007C8FB8 /* vMacOSUtils.swift in Sources */,
 				509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */,
 				50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */,
+				50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */,
 				471189072A5AED1A0091EAB3 /* config.swift in Sources */,
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
 				50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */,
