@@ -30,6 +30,7 @@
 		5056EC7E2A778D1A00D93422 /* vAPI_U.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056EC7D2A778D1A00D93422 /* vAPI_U.swift */; };
 		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
+		50A5BD862A9495E700440303 /* vDBTMemberships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A5BD852A9495E700440303 /* vDBTMemberships.swift */; };
 		50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */; };
 		50BAC2862A6A609B00DE0F95 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 50BAC2852A6A609B00DE0F95 /* SQLite */; };
 		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
@@ -73,6 +74,7 @@
 		5075244D2A37A2810072B094 /* vNWConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vNWConnection.swift; sourceTree = "<group>"; };
 		508BEF142A78507D007D276A /* APITest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = APITest.py; sourceTree = "<group>"; };
 		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
+		50A5BD852A9495E700440303 /* vDBTMemberships.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTMemberships.swift; sourceTree = "<group>"; };
 		50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTUsers.swift; sourceTree = "<group>"; };
 		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
 		50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 				50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */,
 				50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */,
 				50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */,
+				50A5BD852A9495E700440303 /* vDBTMemberships.swift */,
 			);
 			path = tables;
 			sourceTree = "<group>";
@@ -273,6 +276,7 @@
 				471189072A5AED1A0091EAB3 /* config.swift in Sources */,
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
 				50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */,
+				50A5BD862A9495E700440303 /* vDBTMemberships.swift in Sources */,
 				47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */,
 				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
