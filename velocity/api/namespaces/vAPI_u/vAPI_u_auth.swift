@@ -27,7 +27,7 @@ import Vapor
 
 extension VAPI {
     /// Registers all endpoints withing the namespace `/u/auth`
-    func register_endpoints_u_auth() throws {
+    func register_endpoints_u_auth(route: RoutesBuilder) throws {
         VDebug("Registering /u/auth endpoints...")
 
         //
@@ -35,7 +35,7 @@ extension VAPI {
         //
 
         // Authenticate for a new authkey
-        self.app.post("u", "auth") { req in
+        route.post() { req in
             let request: Structs.U.AUTH.POST.Req = try req.content.decode(Structs.U.AUTH.POST.Req.self)
 
             var headers = HTTPHeaders()
@@ -72,7 +72,7 @@ extension VAPI {
         }
 
         // Drop an existing authkey to invalidate it
-        self.app.delete("u", "auth") { req in
+        route.delete() { req in
             let request: Structs.U.AUTH.DELETE.Req = try req.content.decode(Structs.U.AUTH.DELETE.Req.self)
 
             // Search for the key
@@ -87,7 +87,7 @@ extension VAPI {
         }
 
         // Refresh an expiring authkey for a new one
-        self.app.patch("u", "auth") { req in
+        route.patch() { req in
             let request: Structs.U.AUTH.PATCH.Req = try req.content.decode(Structs.U.AUTH.PATCH.Req.self)
 
             var headers = HTTPHeaders()
