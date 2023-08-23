@@ -47,12 +47,12 @@ extension VAPI {
                     let user = try self.db.user_select(username: request.username)
 
                     guard let user = user else {
-                        self.VErr("User \(request.username) not found")
+                        self.VDebug("User \(request.username) not found")
                         return nil
                     }
 
                     if user.pwhash != VDB.hash_pw(request.password) {
-                        self.VErr("Password for user \(request.username) does not match")
+                        self.VDebug("Password for user \(request.username) does not match")
                         return nil
                     }
 
