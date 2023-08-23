@@ -23,10 +23,11 @@
 //
 
 import Foundation
+import Vapor
 
 extension VAPI {
     /// Registers all endpoints withing the namespace `/u`
-    func register_endpoints_u() throws {
+    func register_endpoints_u(route: RoutesBuilder) throws {
         // Ensure the root user and group
         let u_root = try self.db.user_ensure(username: "root", password: "root", uid: 0).get()
         let g_root = try self.db.group_ensure(name: "root", parent_gid: 0, gid: 0).get()
@@ -40,6 +41,7 @@ extension VAPI {
 
         // Register sub-endpoints
         try self.register_endpoints_u_auth()
+        try self.register_endpoints_u_user(route: route.grouped("user"))
     }
 }
 
