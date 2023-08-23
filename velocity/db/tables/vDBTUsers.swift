@@ -189,6 +189,20 @@ extension VDB {
             velocity.VTrace("Creating new user (uid = \(String(describing: uid)), name = '\(username)')", "[vDB::User]");
             return try Self.create(db: db, username: username, password: password, uid: uid);
         }
+
+        /// Checks if a user exists in the database
+        /// - Parameter db: The database to consult
+        /// - Parameter username: The `username` to search for
+        static func exists(db: VDB, username: String) throws -> Bool {
+            return try db.db.exists(db.t_users.table, db.t_users.username == username)
+        }
+
+        /// Checks if a user exists in the database
+        /// - Parameter db: The database to consult
+        /// - Parameter uid: The `uid` to search for
+        static func exists(db: VDB, uid: Int64) throws -> Bool {
+            return try db.db.exists(db.t_users.table, db.t_users.uid == uid)
+        }
     }
 
     /// The `users` table
@@ -288,6 +302,18 @@ extension VDB {
     /// - Parameter uid: (optional) The uid to search for / use
     func user_ensure(username: String, password: String, uid: Int64? = nil) throws -> Swift.Result<User, Users.InsertError> {
         return try User.ensure(db: self, username: username, password: password, uid: uid);
+    }
+
+    /// Checks if a user exists in the database
+    /// - Parameter username: The `username` to search for
+    func user_exists(username: String) throws -> Bool {
+        return try User.exists(db: self, username: username)
+    }
+
+    /// Checks if a user exists in the database
+    /// - Parameter uid: The `uid` to search for
+    func user_exists(uid: Int64) throws -> Bool {
+        return try User.exists(db: self, uid: uid)
     }
 
     /// Hashes a password using a hashing algorithm
