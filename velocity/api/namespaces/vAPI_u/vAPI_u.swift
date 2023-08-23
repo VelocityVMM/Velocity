@@ -40,7 +40,7 @@ extension VAPI {
         }
 
         // Register sub-endpoints
-        try self.register_endpoints_u_auth()
+        try self.register_endpoints_u_auth(route: route.grouped("auth"))
         try self.register_endpoints_u_user(route: route.grouped("user"))
     }
 }
