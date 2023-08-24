@@ -29,7 +29,7 @@ extension VDB {
 
     /// A permission in the database
     /// > Warning: Altered member variables do not commit to the database unless `commit()` is called on the object
-    class Permission : Loggable {
+    class Permission : Loggable, Encodable {
         /// The logging context
         internal let context: String
         /// A reference to the database for later use
@@ -41,6 +41,13 @@ extension VDB {
         let name: String
         /// A description of this permission
         let description: String
+
+        /// The encodable keys
+        private enum CodingKeys : CodingKey {
+            case pid
+            case name
+            case description
+        }
 
         /// Create a new Permission object
         /// > Warning: This will not create the permission in the database, for this, one should call creating functions
