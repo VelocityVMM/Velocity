@@ -89,6 +89,22 @@ extension VAPI {
 
             return Response(status: .ok)
         }
+
+        route.get() { req in
+            let request: Structs.U.USER.GET.Req = try req.content.decode(Structs.U.USER.GET.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let user = key.user
+
+            var headers = HTTPHeaders()
+            headers.add(name: .contentType, value: "application/json")
+            self.VDebug("\(user.info()) requested user information")
+
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(user)))
+        }
     }
 }
 
@@ -114,21 +130,10 @@ extension VAPI.Structs.U {
                 let uid: Int64
             }
         }
-        /// `/u/user/groups` - GET
-        struct GROUPS {
+        /// `/u/user` - GET
+        struct GET {
             struct Req : Codable {
                 let authkey: String
-            }
-            struct Res : Codable {
-                let uid: Int64
-                let groups: [GroupInfo]
-
-                struct GroupInfo : Codable {
-                    let gid: Int64
-                    let name: String
-                    let permissions: [String]
-                    let parent_gid: Int64
-                }
             }
         }
     }
