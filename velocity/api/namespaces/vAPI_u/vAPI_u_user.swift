@@ -90,8 +90,8 @@ extension VAPI {
             return Response(status: .ok)
         }
 
-        route.get() { req in
-            let request: Structs.U.USER.GET.Req = try req.content.decode(Structs.U.USER.GET.Req.self)
+        route.post() { req in
+            let request: Structs.U.USER.POST.Req = try req.content.decode(Structs.U.USER.POST.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
                 return Response(status: .unauthorized)
@@ -130,8 +130,8 @@ extension VAPI.Structs.U {
                 let uid: Int64
             }
         }
-        /// `/u/user` - GET
-        struct GET {
+        /// `/u/user` - POST
+        struct POST {
             struct Req : Codable {
                 let authkey: String
             }
