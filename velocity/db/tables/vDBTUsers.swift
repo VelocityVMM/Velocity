@@ -12,7 +12,7 @@ extension VDB {
 
     /// A user in the database
     /// > Warning: Altered member variables do not commit to the database unless `commit()` is called on the object
-    class User : Loggable {
+    class User : Loggable, Encodable {
         /// The logging context
         internal let context: String;
         /// A reference to the database for later use
@@ -24,6 +24,21 @@ extension VDB {
         var username: String;
         /// The password in hashed form
         var pwhash: String;
+
+        /// The encodable keys
+        private enum CodingKeys : CodingKey {
+            case uid
+            case name
+            case memberships
+        }
+
+        /// Provide encoding functionality
+        func encode(to encoder: Encoder) throws {
+            var container  = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.uid, forKey: .uid)
+            try container.encode(self.username, forKey: .name)
+            try container.encode(self.get_memberships(), forKey: .memberships)
+        }
 
         /// Create a new User object.
         /// > Warning: This will not create the user in the database, for this, one should call creating functions
@@ -120,6 +135,43 @@ extension VDB {
 
             try self.add_permission(group: group, permission: permission)
             return true
+        }
+
+        /// Information about a membership
+        struct MembershipInfo : Encodable {
+            let gid: Int64
+            let parent_gid: Int64
+            let name: String
+            let permissions: [Permission]
+        }
+
+        /// Returns all the memberships that apply to this user and give it permissions
+        func get_memberships() throws -> [MembershipInfo] {
+            let t_m = self.db.t_memberships;
+
+            var memberships: [MembershipInfo] = []
+
+            // Iterate over all membership groups
+            let query = t_m.table.filter(t_m.uid == self.uid).select(distinct: t_m.gid)
+            for row_m in try self.db.db.prepare(query) {
+                guard let group = try self.db.group_select(gid: row_m[t_m.gid]) else {
+                    continue
+                }
+
+                var permissions: [Permission] = []
+
+                // Iterate over all permissions on this group
+                let query = t_m.table.filter(t_m.uid == self.uid && t_m.gid == group.gid)
+                for permission in try self.db.db.prepare(query) {
+                    if let permission = try self.db.permission_select(pid: permission[t_m.pid]) {
+                        permissions.append(permission)
+                    }
+                }
+
+                memberships.append(MembershipInfo(gid: group.gid, parent_gid: group.parent_gid, name: group.name, permissions: permissions))
+            }
+
+            return memberships
         }
 
         /// Creates a new user in the database
