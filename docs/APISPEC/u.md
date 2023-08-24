@@ -24,11 +24,11 @@ Authentication:
 
 User and group management:
 
+- [`/u/user` - GET](#get-u-user): Retrieve user information
+
 - [`/u/user` - PUT](#put-u-user): Create a new user
 
 - [`/u/user` - DELETE](#delete-u-user): Remove a user
-
-- [`/u/user/groups` - GET](#get-u-user-groups): Get the groups and their permissions the user is a member of
 
 - [`/u/group` - PUT](#put-u-group): Create a new group
 
@@ -117,6 +117,43 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 - `403 - Forbidden`: Tried to renew a non-existing / expired authkey
 
+## `/u/user` - GET <a name="get-u-user"></a>
+
+Retrieve information about the current user. The `authkey` is used to infer the user. There is no possibility to retrieve information about other users.
+
+**Request:**
+
+```json
+{
+    "authkey": "<authkey>"
+}
+```
+
+**Response:**
+
+- `200`
+
+```json
+{
+    "uid": "<UID>",
+    "name": "<User name>",
+    "memberships": [
+        {
+            "gid": "<GID>",
+            "parent_gid": "<GID>",
+            "name": "<Group name>",
+            "permissions": [
+                {
+                    "pid": "<PID>",
+                    "name": "<Permission name>",
+                    "description": "<Permission description>"
+                }
+            ]
+        }
+    ]
+}
+```
+
 ## `/u/user` - PUT <a name="put-u-user"></a>
 
 Create a new user
@@ -174,36 +211,6 @@ This call removes the user with the supplied `UID`. This also removes the user's
 - `403 - Forbidden`: The current user is not allowed to remove users
 
 - `404 - Not Found`: No user with the supplied `uid` has been found
-
-## `/u/user/groups` - GET <a id="get-u-user-groups"></a>
-
-Retrieve the groups a user is member of. The `authkey` is used to infer the user. There is no possibility to retrieve information about other users group membership.
-
-**Request:**
-
-```json
-{
-    "authkey": "<authkey>"
-}
-```
-
-**Response:**
-
-- `200`
-
-```json
-{
-  "uid": "<UID>",
-  "groups": [
-    {
-      "gid": "<GID>",
-      "name": "<groupname>",
-      "permissions": ["<permission>"],
-      "parent_gid": "<GID>"
-    }
-  ]
-}
-```
 
 ## `/u/group` - PUT <a id="put-u-group"></a>
 
