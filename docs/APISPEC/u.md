@@ -24,7 +24,7 @@ Authentication:
 
 User and group management:
 
-- [`/u/user` - GET](#get-u-user): Retrieve user information
+- [`/u/user` - POST](#post-u-user): Retrieve user information
 
 - [`/u/user` - PUT](#put-u-user): Create a new user
 
@@ -117,7 +117,7 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 - `403 - Forbidden`: Tried to renew a non-existing / expired authkey
 
-## `/u/user` - GET <a name="get-u-user"></a>
+## `/u/user` - POST <a name="post-u-user"></a>
 
 Retrieve information about the current user. The `authkey` is used to infer the user. There is no possibility to retrieve information about other users.
 
