@@ -2,7 +2,7 @@
 
 Velocity's concept of users and groups is similar to that of Unix. Permissions, vm and data pools are always connected to groups due to them being able to be shared across users with a fair amount of granularity.
 
-There is one special group  `GID` set to `0`. This is the supergroup that has full access to everything. All other groups descend from that group and get delegated. This group's parent gid is set to `0`, creating a recursion to signal the root group.
+There is one special group `GID` set to `0`. This is the supergroup that has full access to everything. All other groups descend from that group and get delegated. This group's parent gid is set to `0`, creating a recursion to signal the root group.
 
 ### User
 
@@ -12,9 +12,13 @@ Each user is identified by its unique `UID`, its username and password.
 
 Each group has a parent group and can inherit some of the parent group's quotas, but never surpass them.
 
+### Permission
+
+A user can be assigned to a group with permissions. These permissions will be inherited to subgroups: When a user has a permission on a group, it also applies to all of its subgroups.
+
 ### Available endpoints
 
-Authentication:
+[Authentication](#u-auth)
 
 - [`/u/auth` - POST](#post-u-auth): Authenticate as a user
 
@@ -22,7 +26,7 @@ Authentication:
 
 - [`/u/auth` - PATCH](#patch-u-auth): Reauthenticate
 
-User and group management:
+[User management](#u-user)
 
 - [`/u/user` - POST](#post-u-user): Retrieve user information
 
@@ -30,13 +34,19 @@ User and group management:
 
 - [`/u/user` - DELETE](#delete-u-user): Remove a user
 
+[Permission management](#u-user-permission)
+
+- [`/u/user/permission` - PUT](#put-u-user-permission): Add new permissions to a user
+
+- [`/u/user/permission` - DELETE](#delete-u-user-permission): Revoke permissions from a user
+
+[Group management](#u-group)
+
 - [`/u/group` - PUT](#put-u-group): Create a new group
 
 - [`/u/group` - DELETE](#delete-u-group): Remove a group
 
-- [`/u/group/assign` - PUT](#put-u-group-assign): Assign a user to a group / add permissions
-
-- [`/u/group/assign` - DELETE](#delete-u-group-assign): Remove group membership / remove permissions
+# Authentication <a name="u-auth"></a>
 
 ## `/u/auth` - POST <a name="post-u-auth"></a>
 
@@ -85,7 +95,7 @@ If a user desires to drop the current `authkey` immediately, this endpoint can b
 - `200`: Authkey dropped
 
 > **Note**
-> 
+>
 > For security reasons, dropping a non-existing authkey does still result in a `200` response code.
 
 ## `/u/auth` - PATCH <a name="patch-u-auth"></a>
@@ -93,7 +103,7 @@ If a user desires to drop the current `authkey` immediately, this endpoint can b
 If an authkey lease is about to expire, this call can be used to create a new authkey using the expiring key.
 
 > **Note**
-> 
+>
 > This will immediately drop the old authkey in favor of the newly generated one
 
 **Request:**
@@ -117,6 +127,8 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 - `403 - Forbidden`: Tried to renew a non-existing / expired authkey
 
+# User management <a name="u-user"></a>
+
 ## `/u/user` - POST <a name="post-u-user"></a>
 
 Retrieve information about the current user. The `authkey` is used to infer the user. There is no possibility to retrieve information about other users.
@@ -125,7 +137,7 @@ Retrieve information about the current user. The `authkey` is used to infer the 
 
 ```json
 {
-    "authkey": "<authkey>"
+  "authkey": "<authkey>"
 }
 ```
 
@@ -135,22 +147,22 @@ Retrieve information about the current user. The `authkey` is used to infer the 
 
 ```json
 {
-    "uid": "<UID>",
-    "name": "<User name>",
-    "memberships": [
+  "uid": "<UID>",
+  "name": "<User name>",
+  "memberships": [
+    {
+      "gid": "<GID>",
+      "parent_gid": "<GID>",
+      "name": "<Group name>",
+      "permissions": [
         {
-            "gid": "<GID>",
-            "parent_gid": "<GID>",
-            "name": "<Group name>",
-            "permissions": [
-                {
-                    "pid": "<PID>",
-                    "name": "<Permission name>",
-                    "description": "<Permission description>"
-                }
-            ]
+          "pid": "<PID>",
+          "name": "<Permission name>",
+          "description": "<Permission description>"
         }
-    ]
+      ]
+    }
+  ]
 }
 ```
 
@@ -159,7 +171,7 @@ Retrieve information about the current user. The `authkey` is used to infer the 
 Create a new user
 
 > **Note**
-> 
+>
 > Only users that have the `velocity.user.create` permission
 
 **Request:**
@@ -190,7 +202,7 @@ Create a new user
 ## `/u/user` - DELETE <a name="delete-u-user"></a>
 
 > **Note**
-> 
+>
 > Only users that have the `velocity.user.remove` permission for the user's parent group can remove users
 
 This call removes the user with the supplied `UID`. This also removes the user's group that is named the same as the user and all of its VMs and images.
@@ -212,12 +224,88 @@ This call removes the user with the supplied `UID`. This also removes the user's
 
 - `404 - Not Found`: No user with the supplied `uid` has been found
 
+# Permission management <a name="u-user-permission"></a>
+
+## `/u/user/permission` - PUT <a name="put-u-user-permission"></a>
+
+Put new permissions for a user on a specific group
+
+> **Note**
+>
+> A user cannot assign other users to higher groups than its own. He needs the `velocity.user.assign` permission for the group to assign to
+
+> **Note**
+>
+> A user can only forward permissions itself has. If the user tries to give permissions to another user that it doesn't have, this call will fail
+
+**Request:**
+
+```json
+{
+  "authkey": "<authkey>",
+  "uid": "<UID>",
+  "gid": "<GID>",
+  "permissions": ["<permission>"]
+}
+```
+
+The permissions array lists the permissions that the user should receive.
+
+**Response:**
+
+- `200`: Group membership added
+
+```json
+{
+  "uid": "<UID>",
+  "gid": "<GID>",
+  "permissions": ["<permission>"]
+}
+```
+
+The response lets the caller know which groups the user now belongs to.
+
+- `403 - Forbidden`: The user tried to assign to a higher group, higher permissions or does not have the required permissions
+
+- `404 - Not Found`: The `uid` of the user to assign has not been found
+
+## `/u/user/permission` - DELETE <a name="delete-u-user-permission"></a>
+
+Remove user permissions
+
+> **Note**
+>
+> Only users that have the `velocity.user.revoke` permission for the target group can do this
+
+**Request:**
+
+```json
+{
+  "authkey": "<authkey>",
+  "uid": "<UID>",
+  "gid": "<GID>",
+  "permissions": ["<permission>"]
+}
+```
+
+The `permissions` field is optional. If it is set, this will remove the listed permissions on the target group if available. If this field is omitted, this will remove the user completely, revoking all permissions.
+
+**Response:**
+
+- `200`: Permission removed
+
+- `403 - Forbidden`: The current user is not allowed to remove from groups (`velocity.user.revoke` permission)
+
+- `404 - Not Found`: The `uid` of the user to remove has not been found
+
+# Group management <a name="u-group"></a>
+
 ## `/u/group` - PUT <a id="put-u-group"></a>
 
 Create a new group. There cannot be duplicate group names in a parent group.
 
 > **Note**
-> 
+>
 > The user needs the `velocity.group.create` permission on the parent group
 
 **Request:**
@@ -244,6 +332,8 @@ Create a new group. There cannot be duplicate group names in a parent group.
 
 - `403 - Forbidden`: The calling user lacks permissions
 
+- `404 - Not Found`: The `parent_gid` does not exist
+
 - `409 - Conflict`: A group with the supplied `groupname` within the parent group does already exist
 
 ## `/u/group` - DELETE <a name="delete-u-group"></a>
@@ -251,7 +341,7 @@ Create a new group. There cannot be duplicate group names in a parent group.
 Remove a group from a parent group
 
 > **Note**
-> 
+>
 > The user needs the `velocity.group.remove` permission on the parent group
 
 This call removes all the VMs and images owned by this group.
@@ -271,80 +361,4 @@ This call removes all the VMs and images owned by this group.
 
 - `403 - Forbidden`: The calling user lacks permissions
 
-## `/u/group/assign` - PUT <a id="put-u-group-assign"></a>
-
-Assign a user to groups or add permissions.
-
-> **Note**
-> 
-> A user cannot assign other users to higher groups than its own. He needs the `velocity.user.assign` permission for the group to assign to
-
-> **Note**
-> 
-> A user can only forward permissions itself has. If the user tries to give permissions to another user that it doesn't have, this call will fail
-
-**Request:**
-
-```json
-{
-  "authkey": "<authkey>",
-  "uid": "<UID>",
-  "group": "<GID>",
-  "permissions": ["<permission>"]
-}
-```
-
-The permissions array lists the permissions that the user should receive.
-
-**Response:**
-
-- `200`: Group membership added
-
-```json
-{
-  "uid": "<UID>",
-  "group": "<GID>",
-  "permissions": ["<permission>"]
-}
-```
-
-The response lets the caller know which groups the user now belongs to.
-
-- `403 - Forbidden`: The user tried to assign to a higher group, higher permissions or does not have the required permissions
-
-- `404 - Not Found`: The `uid` of the user to assign has not been found
-
-## `/u/group/assign` - DELETE <a name="delete-u-group-assign"></a>
-
-Remove a user from a group
-
-> **Note**
-> 
-> Only users that have the `velocity.user.revoke` permission for the target group can do this
-
-**Request:**
-
-```json
-{
-  "authkey": "<authkey>",
-  "uid": "<UID>",
-  "group": "<GID>",
-  "permissions": ["<permission>"]
-}
-```
-
-The `permissions` field is optional. If it is set, this will remove the listed permissions on the target group if available. If this field is omitted, this will remove the user completely, revoking all permissions.
-
-**Response:**
-
-- `200`: User removed from group
-
-```json
-{
-  "uid": "<UID>",
-}
-```
-
-- `403 - Forbidden`: The current user is not allowed to remove from groups (`usermanager` permission)
-
-- `404 - Not Found`: The `uid` of the user to remove has not been found
+- `404 - Not Found`: The `gid` does not exist
