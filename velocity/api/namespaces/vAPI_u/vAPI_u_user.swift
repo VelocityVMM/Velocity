@@ -105,6 +105,93 @@ extension VAPI {
 
             return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(user)))
         }
+
+        //
+        // MARK: Permission management /u/user/permission
+        //
+
+        let permissions = route.grouped("permission")
+
+        // Add new permissions
+        permissions.put() { req in
+            let request: Structs.U.USER.PERMISSION.PUT.Req = try req.content.decode(Structs.U.USER.PERMISSION.PUT.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let c_user = key.user
+
+            // First check if the user has the permission to assign
+            guard try c_user.has_permission(permission: "velocity.user.assign", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to user \(request.uid) on group \(request.gid): FORBIDDEN")
+                return Response(status: .forbidden)
+            }
+
+            // Select the user
+            guard let user = try self.db.user_select(uid: request.uid) else {
+                self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to user \(request.uid) on group \(request.gid): USER NOT FOUND")
+                return Response(status: .notFound)
+            }
+
+            // Select the group
+            guard let group = try self.db.group_select(gid: request.gid) else {
+                self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to \(user.info()) on group \(request.gid): GROUP NOT FOUND")
+                return Response(status: .notFound)
+            }
+
+            // Select the permission
+            guard let permission = try self.db.permission_select(name: request.permission) else {
+                self.VDebug("\(c_user.info()) tried to assign non-existing permission \(request.permission)")
+                return Response(status: .notFound)
+            }
+
+            // Check if the calling user has the permission
+            guard try c_user.has_permission(permission: request.permission, group: group) else {
+                self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to \(user.info()) on \(group.info()): FORBIDDEN (TOO HIGH)")
+                return Response(status: .forbidden)
+            }
+
+            // Assign the permission
+            try user.add_permission(group: group, permission: permission)
+
+            return Response(status: .ok)
+        }
+
+        // Remove a permission
+        permissions.delete() { req in
+            let request: Structs.U.USER.PERMISSION.DELETE.Req = try req.content.decode(Structs.U.USER.PERMISSION.DELETE.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let c_user = key.user
+
+            // First check if the user has the permission to revoke
+            guard try c_user.has_permission(permission: "velocity.user.revoke", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to revoke permissions from user \(request.uid) on group \(request.gid): FORBIDDEN")
+                return Response(status: .forbidden)
+            }
+
+            // Retrieve the user from the database
+            guard let user = try self.db.user_select(uid: request.uid) else {
+                self.VDebug("\(c_user.info()) tried to revoke permissions from user \(request.uid) on group \(request.gid): USER NOT FOUND")
+                return Response(status: .notFound)
+            }
+
+            // Retrieve the group from the database
+            guard let group = try self.db.group_select(gid: request.gid) else {
+                self.VDebug("\(c_user.info()) tried to revoke permissions from user \(request.uid) on group \(request.gid): GROUP NOT FOUND")
+                return Response(status: .notFound)
+            }
+
+            // Remove the permissions
+            let ok = try user.remove_permission(group: group, permission_name: request.permission)
+
+            return Response(status: ok ? .ok : .notFound)
+        }
+
     }
 }
 
@@ -134,6 +221,28 @@ extension VAPI.Structs.U {
         struct POST {
             struct Req : Codable {
                 let authkey: String
+            }
+        }
+
+        /// `/u/user/permission`
+        struct PERMISSION {
+            /// `/u/user/permission` - PUT
+            struct PUT {
+                struct Req : Codable {
+                    let authkey: String
+                    let uid: Int64
+                    let gid: Int64
+                    let permission: String
+                }
+            }
+            /// `/u/user/permission` - DELETE
+            struct DELETE {
+                struct Req : Decodable {
+                    let authkey: String
+                    let uid: Int64
+                    let gid: Int64
+                    let permission: String?
+                }
             }
         }
     }
