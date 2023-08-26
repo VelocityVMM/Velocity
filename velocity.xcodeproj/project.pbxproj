@@ -28,6 +28,7 @@
 		5051AAA92A6AB7E4006FF899 /* vDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5051AAA82A6AB7E4006FF899 /* vDB.swift */; };
 		5056EC7B2A72411700D93422 /* vAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056EC7A2A72411700D93422 /* vAPI.swift */; };
 		5056EC7E2A778D1A00D93422 /* vAPI_u_auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5056EC7D2A778D1A00D93422 /* vAPI_u_auth.swift */; };
+		506A198C2A97346F00463D79 /* vAPI_u_group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 506A198B2A97346F00463D79 /* vAPI_u_group.swift */; };
 		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
 		509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509AB0EE2A346FAC00F4DD2C /* vwindow.swift */; };
 		50A5BD862A9495E700440303 /* vDBTMemberships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A5BD852A9495E700440303 /* vDBTMemberships.swift */; };
@@ -73,6 +74,7 @@
 		5051AAA82A6AB7E4006FF899 /* vDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDB.swift; sourceTree = "<group>"; };
 		5056EC7A2A72411700D93422 /* vAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI.swift; sourceTree = "<group>"; };
 		5056EC7D2A778D1A00D93422 /* vAPI_u_auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_u_auth.swift; sourceTree = "<group>"; };
+		506A198B2A97346F00463D79 /* vAPI_u_group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_u_group.swift; sourceTree = "<group>"; };
 		5075244D2A37A2810072B094 /* vNWConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vNWConnection.swift; sourceTree = "<group>"; };
 		508BEF142A78507D007D276A /* APITest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = APITest.py; sourceTree = "<group>"; };
 		509AB0EE2A346FAC00F4DD2C /* vwindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vwindow.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 				5056EC7D2A778D1A00D93422 /* vAPI_u_auth.swift */,
 				50A5BD882A95471800440303 /* vAPI_u.swift */,
 				50A5BD8A2A95495200440303 /* vAPI_u_user.swift */,
+				506A198B2A97346F00463D79 /* vAPI_u_group.swift */,
 			);
 			path = vAPI_u;
 			sourceTree = "<group>";
@@ -283,6 +286,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5051AAA92A6AB7E4006FF899 /* vDB.swift in Sources */,
+				506A198C2A97346F00463D79 /* vAPI_u_group.swift in Sources */,
 				47A78B502A36DE89007C8FB8 /* vMacOSUtils.swift in Sources */,
 				509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */,
 				50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */,
