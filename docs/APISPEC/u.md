@@ -245,7 +245,7 @@ Put new permissions for a user on a specific group
   "authkey": "<authkey>",
   "uid": "<UID>",
   "gid": "<GID>",
-  "permissions": ["<permission>"]
+  "permission": "<permission identifier>"
 }
 ```
 
@@ -253,21 +253,11 @@ The permissions array lists the permissions that the user should receive.
 
 **Response:**
 
-- `200`: Group membership added
-
-```json
-{
-  "uid": "<UID>",
-  "gid": "<GID>",
-  "permissions": ["<permission>"]
-}
-```
-
-The response lets the caller know which groups the user now belongs to.
+- `200`: Permission added
 
 - `403 - Forbidden`: The user tried to assign to a higher group, higher permissions or does not have the required permissions
 
-- `404 - Not Found`: The `uid` of the user to assign has not been found
+- `404 - Not Found`: The `uid` or `gid` or permission name has not been found
 
 ## `/u/user/permission` - DELETE <a name="delete-u-user-permission"></a>
 
@@ -284,23 +274,19 @@ Remove user permissions
   "authkey": "<authkey>",
   "uid": "<UID>",
   "gid": "<GID>",
-  "permissions": ["<permission>"]
+  "permission": "<permission>"
 }
 ```
 
-The `permissions` field is optional. If it is set, this will remove the listed permissions on the target group if available. If this field is omitted, this will remove the user completely, revoking all permissions.
+The `permission` field is optional. If it is set, this will remove the listed permissions on the target group if available. If this field is omitted, this will remove the user completely, revoking all permissions.
 
 **Response:**
 
-- `200`: Permissions removed
+- `200`: Permission remove
 
-> **Note**
-> 
-> If there are permissions that do not exist or can't be removed by the calling user, this will still result in `200`
+- `403 - Forbidden`: The current user is not allowed to remove from groups (`velocity.user.revoke` permission) or does not have the removed permission
 
-- `403 - Forbidden`: The current user is not allowed to remove from groups (`velocity.user.revoke` permission)
-
-- `404 - Not Found`: The `uid` of the user to remove has not been found
+- `404 - Not Found`: The `uid`, `gid` or permission name has not been found
 
 # Group management <a name="u-group"></a>
 
