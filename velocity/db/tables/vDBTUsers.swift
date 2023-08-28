@@ -72,19 +72,82 @@ extension VDB {
             try self.db.db.run(query);
         }
 
-        /// Returns if this user has the permissino on the group
+        /// Returns all the permissions a user has on a group
+        /// - Parameter group: The group to check for permissions
+        func get_permissions(group: Group) throws -> [Permission] {
+            let tm = self.db.t_memberships
+            let tg = self.db.t_groups
+
+            let stmt_s =
+            """
+            WITH RECURSIVE tree(\(tg.gid), \(tg.parent_gid)) AS (
+                SELECT \(tg.gid), \(tg.parent_gid) FROM groups WHERE \(tg.gid) = \(group.gid)
+                UNION ALL
+                SELECT t.\(tg.gid), t.\(tg.parent_gid) FROM groups t
+                JOIN tree ON tree.parent_gid = t.\(tg.gid)
+                WHERE t.\(tg.parent_gid) != t.\(tg.gid)
+            )
+
+            SELECT DISTINCT \(tm.pid) FROM memberships WHERE
+                (\(tg.gid) IN (SELECT \(tg.gid) FROM tree)
+                OR \(tg.gid) = 0)
+                AND \(tm.uid) = \(self.uid);
+            """
+
+            var permissions: [Permission] = []
+
+            for r in try self.db.db.prepare(stmt_s) {
+                guard let pid = r[0] as? Int64 else {
+                    continue
+                }
+
+                if let permission = try self.db.permission_select(pid: pid) {
+                    permissions.append(permission)
+                }
+            }
+
+            return permissions
+        }
+
+        /// Returns if this user has the permission on the group
         /// - Parameter permission: The permission to search for
         /// - Parameter group: The group the user has the permission on (`nil` for anything)
         ///
         /// If the `group` parameter is `nil`, this will check if the user has the permission anywhere
         func has_permission(permission: Permission, group: Group?) throws -> Bool {
             let tm = self.db.t_memberships
+            let tg = self.db.t_groups
 
             guard let group = group else {
                 return try self.db.db.exists(tm.table, tm.pid == permission.pid && tm.uid == self.uid)
             }
 
-            return try self.db.db.exists(tm.table, tm.pid == permission.pid && tm.gid == group.gid && tm.uid == self.uid)
+            let stmt_s =
+            """
+            WITH RECURSIVE tree(\(tg.gid), \(tg.parent_gid)) AS (
+                SELECT \(tg.gid), \(tg.parent_gid) FROM groups WHERE \(tg.gid) = \(group.gid)
+                UNION ALL
+                SELECT t.\(tg.gid), t.\(tg.parent_gid) FROM groups t
+                JOIN tree ON tree.parent_gid = t.\(tg.gid)
+                WHERE t.\(tg.parent_gid) != t.\(tg.gid)
+            )
+
+            SELECT COUNT(*) FROM memberships WHERE
+                (\(tg.gid) IN (SELECT \(tg.gid) FROM tree)
+                OR \(tg.gid) = 0)
+                AND \(tm.uid) = \(self.uid)
+                AND \(tm.pid) = \(permission.pid);
+            """
+
+            guard let count_permissions = try self.db.db.scalar(stmt_s) else {
+                return false
+            }
+
+            guard let count_permissions = count_permissions as? Int64 else {
+                return false
+            }
+
+            return count_permissions > 0
         }
 
         /// Returns if this user has the permissino on the group
