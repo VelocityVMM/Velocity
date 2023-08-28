@@ -9,3 +9,4 @@ velocity.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
 *.xcuserstate
 *project.xcworkspace/
 xcuserdata/
+xcschememanagement.plist
