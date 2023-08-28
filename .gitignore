@@ -10,3 +10,6 @@ velocity.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
 *project.xcworkspace/
 xcuserdata/
 xcschememanagement.plist
+
+# Build directory
+build/
