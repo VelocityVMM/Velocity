@@ -97,13 +97,57 @@ extension VAPI {
                 return Response(status: .unauthorized)
             }
 
-            let user = key.user
+            var headers = HTTPHeaders()
+            headers.add(name: .contentType, value: "application/json")
+
+            let c_user = key.user
+
+            guard let uid = request.uid else {
+                self.VDebug("\(c_user.info()) requested user information")
+                return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(c_user)))
+            }
+
+            guard try c_user.has_permission(permission: "velocity.user.view", group: nil) else {
+                self.VDebug("\(c_user.info()) requested user information for user \(uid): FORBIDDEN")
+                return Response(status: .forbidden)
+            }
+
+            guard let user = try self.db.user_select(uid: uid) else {
+                self.VDebug("\(c_user.info()) requested user information for user \(uid): NOT FOUND")
+                return Response(status: .notFound)
+            }
+
+            self.VDebug("\(c_user.info()) requested user information for \(user.info())")
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(user)))
+        }
+
+        route.post("list") { req in
+            let request: Structs.U.USER.LIST.POST.Req = try req.content.decode(Structs.U.USER.LIST.POST.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let c_user = key.user
+
+            guard try c_user.has_permission(permission: "velocity.user.list", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to list users: FORBIDDEN")
+                return Response(status: .forbidden)
+            }
+
+            var users: [Structs.U.USER.LIST.POST.UserInfo] = []
+
+            for u in try self.db.user_list() {
+                users.append(Structs.U.USER.LIST.POST.UserInfo(uid: u.uid, name: u.username))
+            }
+
+            let response = Structs.U.USER.LIST.POST.Res(users: users)
 
             var headers = HTTPHeaders()
             headers.add(name: .contentType, value: "application/json")
-            self.VDebug("\(user.info()) requested user information")
 
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(user)))
+            self.VDebug("\(c_user.info()) requested user list")
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
         }
 
         //
@@ -187,6 +231,24 @@ extension VAPI.Structs.U {
         struct POST {
             struct Req : Codable {
                 let authkey: String
+                let uid: Int64?
+            }
+        }
+
+        /// `/u/user/list`
+        struct LIST {
+            /// `/u/user/list` - POST
+            struct POST {
+                struct Req : Decodable {
+                    let authkey: String
+                }
+                struct Res : Encodable {
+                    let users: [UserInfo]
+                }
+                struct UserInfo : Encodable {
+                    let uid: Int64
+                    let name: String
+                }
             }
         }
 

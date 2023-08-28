@@ -154,6 +154,9 @@ class VAPI : Loggable {
         VDB.PermissionTemplate("velocity.user.remove", "Remove users that are in the group from the system"),
         VDB.PermissionTemplate("velocity.user.assign", "Assign new users to the group"),
         VDB.PermissionTemplate("velocity.user.revoke", "Remove users from the group"),
+        VDB.PermissionTemplate("velocity.user.view", "View user permissions"),
+        VDB.PermissionTemplate("velocity.user.list", "List available users"),
+
 
         // velocity.group
         VDB.PermissionTemplate("velocity.group.create", "Create a new subgroup to the group"),
