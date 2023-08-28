@@ -153,6 +153,8 @@ extension VDB {
                 t.column(self.parent_gid)
                 t.column(self.name)
 
+                t.foreignKey(self.parent_gid, references: self.table, self.gid)
+
                 // Create a unique key over parent_gid and name to ensure names are unique within a parent group
                 t.unique(self.parent_gid, self.name)
             })
