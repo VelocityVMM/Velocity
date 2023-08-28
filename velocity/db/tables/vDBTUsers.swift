@@ -255,6 +255,20 @@ extension VDB {
         static func exists(db: VDB, uid: Int64) throws -> Bool {
             return try db.db.exists(db.t_users.table, db.t_users.uid == uid)
         }
+
+        /// List all available users
+        /// - Parameter db: The database to query and to store for later usage
+        static func list(db: VDB) throws -> [User] {
+            var arr: [User] = []
+            let tu = db.t_users
+            let query = tu.table
+
+            for row in try db.db.prepare(query) {
+                arr.append(User(db: db, username: row[tu.username], pwhash: row[tu.password], uid: row[tu.uid]))
+            }
+
+            return arr
+        }
     }
 
     /// The `users` table
@@ -366,6 +380,11 @@ extension VDB {
     /// - Parameter uid: The `uid` to search for
     func user_exists(uid: Int64) throws -> Bool {
         return try User.exists(db: self, uid: uid)
+    }
+
+    /// List back all users available in this database
+    func user_list() throws -> [User] {
+        return try User.list(db: self)
     }
 
     /// Hashes a password using a hashing algorithm
