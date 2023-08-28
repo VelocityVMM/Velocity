@@ -34,6 +34,14 @@ Assign new users to the group
 
 Remove users from the group
 
+## view (`velocity.user.view`)
+
+Get user information about other users
+
+## list (`velocity.user.list`)
+
+List all users of the velocity instance
+
 # group (`velocity.group`)
 
 Group management

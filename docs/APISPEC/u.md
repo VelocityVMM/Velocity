@@ -34,6 +34,8 @@ A user can be assigned to a group with permissions. These permissions will be in
 
 - [`/u/user` - DELETE](#delete-u-user): Remove a user
 
+- [`/u/user/list` - POST](#post-u-user-list): List all users on the velocity system
+
 [Permission management](#u-user-permission)
 
 - [`/u/user/permission` - PUT](#put-u-user-permission): Add new permissions to a user
@@ -131,13 +133,18 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 ## `/u/user` - POST <a name="post-u-user"></a>
 
-Retrieve information about the current user. The `authkey` is used to infer the user. There is no possibility to retrieve information about other users.
+Retrieve information about the current user. The `authkey` is used to infer the user, unless the `uid` field is specified.
+
+> **Note**
+>
+> To query information about other users, the calling user needs the `velocity.user.view` permission
 
 **Request:**
 
 ```json
 {
-  "authkey": "<authkey>"
+  "authkey": "<authkey>",
+  "uid": "<UID (optional)>"
 }
 ```
 
@@ -165,6 +172,9 @@ Retrieve information about the current user. The `authkey` is used to infer the 
   ]
 }
 ```
+
+- `403 - Forbidden`: The calling user lacks permissions to view other user's information
+- `404 - Not Found`: The desired `uid` hasn't been found
 
 ## `/u/user` - PUT <a name="put-u-user"></a>
 
@@ -223,6 +233,39 @@ This call removes the user with the supplied `UID`. This also removes the user's
 - `403 - Forbidden`: The current user is not allowed to remove users
 
 - `404 - Not Found`: No user with the supplied `uid` has been found
+
+## `/u/user/list` - POST <a name="post-u-user-list"></a>
+
+List all users on this velocity instance
+
+> **Note**
+>
+> The calling user needs the `velocity.user.list` permission
+
+**Request:**
+
+```json
+{
+  "authkey": "<authkey>"
+}
+```
+
+**Response:**
+
+- `200`
+
+```json
+{
+  "users": [
+    {
+      "uid": "<UID>",
+      "name": "<username>"
+    }
+  ]
+}
+```
+
+- `403 - Forbidden`: The calling user lacks permissions
 
 # Permission management <a name="u-user-permission"></a>
 
