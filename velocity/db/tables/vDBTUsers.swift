@@ -200,6 +200,50 @@ extension VDB {
             return true
         }
 
+        /// Removes a permission from this user on the specified `group`
+        /// - Parameter group: The group to remove the permission from
+        /// - Parameter permission: The permission to remove - `nil` = all permissions
+        ///
+        /// If the `permission` argument is `nil`, this will remove all permissions of the user on the target group
+        func remove_permission(group: Group, permission: Permission?) throws {
+            let tm = self.db.t_memberships
+
+            // If there is no permission supplied, remove all
+            guard let permission = permission else {
+                VTrace("Removing all permissions on \(group.info())")
+                let query = tm.table.filter(tm.gid == group.gid && tm.uid == self.uid).delete()
+                try self.db.db.run(query)
+                VDebug("Removed all permissions on \(group.info())")
+                return
+            }
+
+            VTrace("Removing permission '\(permission.s_info())' on \(group.info())")
+            let query = tm.table.filter(tm.gid == group.gid && tm.uid == self.uid && tm.pid == permission.pid).delete()
+            try self.db.db.run(query)
+            VDebug("Removed permission '\(permission.s_info())' on \(group.info())")
+        }
+
+        /// Removes a permission from this user on the specified `group`
+        /// - Parameter group: The group to remove the permission from
+        /// - Parameter permission_name: The name of the permission to remove - `nil` = all permissions
+        ///
+        /// If the `permission_name` argument is `nil`, this will remove all permissions of the user on the target group
+        func remove_permission(group: Group, permission_name: String?) throws -> Bool {
+            guard let permission = permission_name else {
+                try self.remove_permission(group: group, permission: nil)
+                return true
+            }
+
+            /// Get the permission
+            guard let permission = try self.db.permission_select(name: permission) else {
+                VTrace("Permission '\(permission)' does not exist")
+                return false
+            }
+
+            try self.remove_permission(group: group, permission: permission)
+            return true
+        }
+
         /// Information about a membership
         struct MembershipInfo : Encodable {
             let gid: Int64
