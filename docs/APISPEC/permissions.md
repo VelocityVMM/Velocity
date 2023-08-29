@@ -54,6 +54,14 @@ Create a new subgroup to the group
 
 Remove a subgroup
 
+## view (`velocity.group.view`)
+
+Retrieve information about the group and all of its members an permissions
+
+## list (`velocity.group.list`)
+
+List all existing groups
+
 # vm (`velocity.vm`)
 
 Virtual machine controls
