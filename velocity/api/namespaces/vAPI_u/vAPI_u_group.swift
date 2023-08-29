@@ -34,6 +34,33 @@ extension VAPI {
         // MARK: Group management /u/group
         //
 
+        // Retrieve group information
+        route.post() { req in
+            let request: Structs.U.GROUP.POST.Req = try req.content.decode(Structs.U.GROUP.POST.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            var headers = HTTPHeaders()
+            headers.add(name: .contentType, value: "application/json")
+
+            let c_user = key.user
+
+            guard try c_user.has_permission(permission: "velocity.group.view", group: nil) else {
+                self.VDebug("\(c_user.info()) requested group information for group \(request.gid): FORBIDDEN")
+                return Response(status: .forbidden)
+            }
+
+            guard let group = try self.db.group_select(gid: request.gid) else {
+                self.VDebug("\(c_user.info()) requested group information for group \(request.gid): NOT FOUND")
+                return Response(status: .notFound)
+            }
+
+            self.VDebug("\(c_user.info()) requested group information for \(group.info())")
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(group)))
+        }
+
         // Create a new group
         route.put() {req in
             let request: Structs.U.GROUP.PUT.Req = try req.content.decode(Structs.U.GROUP.PUT.Req.self)
@@ -93,12 +120,49 @@ extension VAPI {
 
             return Response(status: .ok)
         }
+
+        // List all groups
+        route.post("list") { req in
+            let request: Structs.U.GROUP.LIST.POST.Req = try req.content.decode(Structs.U.GROUP.LIST.POST.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return Response(status: .unauthorized)
+            }
+
+            let c_user = key.user
+
+            guard try c_user.has_permission(permission: "velocity.group.list", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to list groups: FORBIDDEN")
+                return Response(status: .forbidden)
+            }
+
+            var groups: [Structs.U.GROUP.LIST.POST.GroupInfo] = []
+
+            for group in try self.db.group_list() {
+                groups.append(Structs.U.GROUP.LIST.POST.GroupInfo(gid: group.gid, parent_gid: group.parent_gid, name: group.name))
+            }
+
+            let response = Structs.U.GROUP.LIST.POST.Res(groups: groups)
+
+            var headers = HTTPHeaders()
+            headers.add(name: .contentType, value: "application/json")
+
+            self.VDebug("\(c_user.info()) requested group list")
+            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+        }
     }
 }
 
 extension VAPI.Structs.U {
     /// `/u/group`
     struct GROUP {
+        /// `/u/group` - POST
+        struct POST {
+            struct Req : Decodable {
+                let authkey: String
+                let gid: Int64
+            }
+        }
         /// `/u/group` - PUT
         struct PUT {
             struct Req : Codable {
@@ -117,6 +181,24 @@ extension VAPI.Structs.U {
             struct Req : Codable {
                 let authkey: String
                 let gid: Int64
+            }
+        }
+
+        /// `/u/group/list`
+        struct LIST {
+            /// `/u/group/list` - POST
+            struct POST {
+                struct Req : Decodable {
+                    let authkey: String
+                }
+                struct Res : Encodable {
+                    let groups: [GroupInfo]
+                }
+                struct GroupInfo : Encodable {
+                    let gid: Int64
+                    let parent_gid: Int64
+                    let name: String
+                }
             }
         }
     }
