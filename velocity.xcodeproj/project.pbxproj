@@ -36,6 +36,7 @@
 		50A5BD8B2A95495200440303 /* vAPI_u_user.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A5BD8A2A95495200440303 /* vAPI_u_user.swift */; };
 		50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */; };
 		50BAC2862A6A609B00DE0F95 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 50BAC2852A6A609B00DE0F95 /* SQLite */; };
+		50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */; };
 		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
 		50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */; };
 /* End PBXBuildFile section */
@@ -82,6 +83,7 @@
 		50A5BD882A95471800440303 /* vAPI_u.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_u.swift; sourceTree = "<group>"; };
 		50A5BD8A2A95495200440303 /* vAPI_u_user.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_u_user.swift; sourceTree = "<group>"; };
 		50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTUsers.swift; sourceTree = "<group>"; };
+		50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPIError.swift; sourceTree = "<group>"; };
 		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
 		50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -174,6 +176,7 @@
 			children = (
 				508BEF142A78507D007D276A /* APITest.py */,
 				5056EC7A2A72411700D93422 /* vAPI.swift */,
+				50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */,
 				5056EC7C2A778CFA00D93422 /* namespaces */,
 			);
 			path = api;
@@ -296,6 +299,7 @@
 				50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */,
 				50A5BD862A9495E700440303 /* vDBTMemberships.swift in Sources */,
 				50A5BD892A95471800440303 /* vAPI_u.swift in Sources */,
+				50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */,
 				47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */,
 				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
