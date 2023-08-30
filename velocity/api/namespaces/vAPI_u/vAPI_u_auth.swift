@@ -61,7 +61,7 @@ extension VAPI {
                     return nil
                 }
             }() else {
-                return Response(status: .forbidden, headers: headers)
+                return try self.error(code: .U_AUTH_POST_AUTH_FAILED)
             }
 
             let key = self.generate_authkey(user: user)
@@ -96,13 +96,13 @@ extension VAPI {
             // Search for the key
             guard let old_key = self.authkeys.removeValue(forKey: request.authkey) else {
                 self.VDebug("Key \(request.authkey) hasn't been found")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_AUTH_PATCH_KEY_NOT_FOUND)
             }
 
             // Check if the key is still valid
             if (old_key.is_expired()) {
                 self.VDebug("Key \(old_key) has expired")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_AUTH_PATCH_KEY_EXPIRED)
             }
 
             let key = self.generate_authkey(user: old_key.user)
