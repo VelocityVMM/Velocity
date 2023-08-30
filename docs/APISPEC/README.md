@@ -28,6 +28,8 @@ If the API enconters some kind of error, it will respond with a http-response co
 
 Some additional fields may be added to the error response depending on calls but this layout is guaranteed.
 
+For an exhaustive list of available error codes, refer to the [ERRORS](errors.md) article.
+
 Some http-response codes are fixed:
 
 - `400 - Bad Request`: The request is missing fields
