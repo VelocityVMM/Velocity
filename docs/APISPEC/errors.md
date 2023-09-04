@@ -50,4 +50,52 @@ If a route has the error id `12` and wants to indicate a permission error on the
 
 - `102 (403)` - `/u/auth - PATCH`:The old authkey has expired
 
+### `/u/user`
 
+**POST**
+
+- `2100` > `403`: Permission `velocity.user.view` is needed
+
+- `2110` > `404`: User has not been found
+
+**PUT**
+
+- `2200` > `403`: Permission `velocity.user.create` is needed
+
+- `2220` > `409`: A user with the same name exists
+
+**DELETE**
+
+- `2300` > `403`: Permission `velocity.user.remove` is needed
+
+- `2310`> `404`: User has not been found
+
+### `/u/user/list`
+
+**POST**
+
+- `3100` > `403`: Permission `velocity.user.list` is needed
+
+### `/u/user/permission`
+
+**PUT**
+
+- `4200` > `403`: Permission `velocity.user.assign` is needed
+
+- `4210` > `404`: User has not been found
+
+- `4211` > `404`: Group has not been found
+
+- `4212` > `404`: Permission has not been found
+
+- `4220` > `403`: Assigned permission is too high
+
+**DELETE**
+
+- `4300` > `403`: Permission `velocity.user.revoke` is needed
+
+- `4310` > `404`: User has not been found
+
+- `4311` > `404`: Group has not been found
+
+- `4312` > `404`: Permission has not been found

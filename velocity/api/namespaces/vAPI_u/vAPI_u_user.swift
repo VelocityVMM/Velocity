@@ -46,12 +46,12 @@ extension VAPI {
 
             guard try user.has_permission(permission: "velocity.user.create", group: nil) else {
                 self.VDebug("\(user.info()) tried to create new user: FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_USER_PUT_PERMISSION)
             }
 
             guard try !self.db.user_exists(username: request.name) else {
                 self.VDebug("\(user.info()) tried to create duplicate user '\(request.name)'")
-                return Response(status: .conflict)
+                return try self.error(code: .U_USER_PUT_CONFLICT)
             }
 
             let new_user = try self.db.user_create(username: request.name, password: request.password).get()
@@ -75,13 +75,13 @@ extension VAPI {
             let user = key.user
 
             guard try user.has_permission(permission: "velocity.user.remove", group: nil) else {
-                self.VDebug("\(user.info()) tried to create new user: FORBIDDEN")
-                return Response(status: .forbidden)
+                self.VDebug("\(user.info()) tried to remove user: FORBIDDEN")
+                return try self.error(code: .U_USER_DELETE_PERMISSION)
             }
 
             guard let delete_user = try self.db.user_select(uid: request.uid) else {
-                self.VDebug("\(user.info()) tried to create non-existing user {\(request.uid)}")
-                return Response(status: .notFound)
+                self.VDebug("\(user.info()) tried to remove non-existing user {\(request.uid)}")
+                return try self.error(code: .U_USER_DELETE_NOT_FOUND, "uid = \(request.uid)")
             }
 
             try delete_user.delete()
@@ -109,12 +109,12 @@ extension VAPI {
 
             guard try c_user.has_permission(permission: "velocity.user.view", group: nil) else {
                 self.VDebug("\(c_user.info()) requested user information for user \(uid): FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_USER_POST_PERMISSION)
             }
 
             guard let user = try self.db.user_select(uid: uid) else {
                 self.VDebug("\(c_user.info()) requested user information for user \(uid): NOT FOUND")
-                return Response(status: .notFound)
+                return try self.error(code: .U_USER_POST_NOT_FOUND, "uid = \(uid)")
             }
 
             self.VDebug("\(c_user.info()) requested user information for \(user.info())")
@@ -169,31 +169,31 @@ extension VAPI {
             // First check if the user has the permission to assign
             guard try c_user.has_permission(permission: "velocity.user.assign", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to user \(request.uid) on group \(request.gid): FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_USER_PERMISSION_PUT_PERMISSION)
             }
 
             // Select the user
             guard let user = try self.db.user_select(uid: request.uid) else {
                 self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to user \(request.uid) on group \(request.gid): USER NOT FOUND")
-                return Response(status: .notFound)
+                return try self.error(code: .U_USER_PERMISSION_PUT_USER_NOT_FOUND)
             }
 
             // Select the group
             guard let group = try self.db.group_select(gid: request.gid) else {
                 self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to \(user.info()) on group \(request.gid): GROUP NOT FOUND")
-                return Response(status: .notFound)
+                return try self.error(code: .U_USER_PERMISSION_PUT_GROUP_NOT_FOUND)
             }
 
             // Select the permission
             guard let permission = try self.db.permission_select(name: request.permission) else {
                 self.VDebug("\(c_user.info()) tried to assign non-existing permission \(request.permission)")
-                return Response(status: .notFound)
+                return try self.error(code: .U_USER_PERMISSION_PUT_PERMISSION_NOT_FOUND)
             }
 
             // Check if the calling user has the permission
             guard try c_user.has_permission(permission: request.permission, group: group) else {
                 self.VDebug("\(c_user.info()) tried to assign '\(request.permission)' to \(user.info()) on \(group.info()): FORBIDDEN (TOO HIGH)")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_USER_PERMISSION_PUT_HIGHER_PERMISSION)
             }
 
             // Assign the permission
@@ -215,25 +215,29 @@ extension VAPI {
             // First check if the user has the permission to revoke
             guard try c_user.has_permission(permission: "velocity.user.revoke", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to revoke permissions from user \(request.uid) on group \(request.gid): FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_USER_PERMISSION_DELETE_PERMISSION)
             }
 
             // Retrieve the user from the database
             guard let user = try self.db.user_select(uid: request.uid) else {
                 self.VDebug("\(c_user.info()) tried to revoke permissions from user \(request.uid) on group \(request.gid): USER NOT FOUND")
-                return Response(status: .notFound)
+                return try self.error(code: .U_USER_PERMISSION_DELETE_USER_NOT_FOUND)
             }
 
             // Retrieve the group from the database
             guard let group = try self.db.group_select(gid: request.gid) else {
                 self.VDebug("\(c_user.info()) tried to revoke permissions from user \(request.uid) on group \(request.gid): GROUP NOT FOUND")
-                return Response(status: .notFound)
+                return try self.error(code: .U_USER_PERMISSION_DELETE_GROUP_NOT_FOUND)
             }
 
             // Remove the permissions
             let ok = try user.remove_permission(group: group, permission_name: request.permission)
 
-            return Response(status: ok ? .ok : .notFound)
+            if ok {
+                return Response(status: .ok)
+            } else {
+                return try self.error(code: .U_USER_PERMISSION_DELETE_PERMISSION_NOT_FOUND)
+            }
         }
 
     }

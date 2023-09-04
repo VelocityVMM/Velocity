@@ -34,6 +34,51 @@ extension VAPI {
         case U_AUTH_PATCH_KEY_NOT_FOUND = 101
         /// `/u/auth - PUT`: The old authkey has expired
         case U_AUTH_PATCH_KEY_EXPIRED = 102
+
+        // MARK: /u/user: 2xxx
+
+        /// `/u/user - POST`: The `velocity.user.view` permission is missing
+        case U_USER_POST_PERMISSION = 2100
+        /// `/u/user - POST`: The requested user hasn't been found
+        case U_USER_POST_NOT_FOUND = 2110
+
+        /// `/u/user - PUT`: The `velocity.user.create` permission is missing
+        case U_USER_PUT_PERMISSION = 2200
+        /// `/u/user - PUT`: There is already a user with the same name
+        case U_USER_PUT_CONFLICT = 2220
+
+        /// `/u/user - DELETE`: The `velocity.user.remove` permission is missing
+        case U_USER_DELETE_PERMISSION = 2300
+        /// `/u/user - DELETE`: The user hasn't been found
+        case U_USER_DELETE_NOT_FOUND = 2310
+
+        // MARK: /u/user/list: 3xxx
+
+        /// `/u/user/list - POST`: The `velocity.user.list` permission is missing
+        case U_USER_LIST_POST_PERMISSION = 3100
+
+        // MARK: /u/user/permission: 4xxx
+
+        /// `/u/user/permission - PUT`: The `velocity.user.assign` permission is missing
+        case U_USER_PERMISSION_PUT_PERMISSION = 4200
+        /// `/u/user/permission - PUT`: The assigned user hasn't been found
+        case U_USER_PERMISSION_PUT_USER_NOT_FOUND = 4210
+        /// `/u/user/permission - PUT`: The assigned group hasn' been found
+        case U_USER_PERMISSION_PUT_GROUP_NOT_FOUND = 4211
+        /// `/u/user/permission - PUT`: The to assign permission hasn't been found
+        case U_USER_PERMISSION_PUT_PERMISSION_NOT_FOUND = 4212
+        /// `/u/user/permission - PUT`: The permission assigned is too high
+        case U_USER_PERMISSION_PUT_HIGHER_PERMISSION = 4220
+
+        /// `/u/user/permission - DELETE`: The `velocity.user.revoke` permission is missing
+        case U_USER_PERMISSION_DELETE_PERMISSION = 4300
+        /// `/u/user/permission - DELETE`: The revoked user hasn't been found
+        case U_USER_PERMISSION_DELETE_USER_NOT_FOUND = 4310
+        /// `/u/user/permission - DELETE`: The revoked group hasn't been found
+        case U_USER_PERMISSION_DELETE_GROUP_NOT_FOUND = 4311
+        /// `/u/user/permission - DELETE`: The to revoke permission hasn't been found
+        case U_USER_PERMISSION_DELETE_PERMISSION_NOT_FOUND = 4312
+
     }
 }
 
@@ -47,6 +92,35 @@ extension VAPI.ErrorCode {
         case .U_AUTH_PATCH_KEY_NOT_FOUND: return .forbidden
         case .U_AUTH_PATCH_KEY_EXPIRED: return .forbidden
 
+
+        // /u/user - POST
+        case .U_USER_POST_PERMISSION: return .forbidden
+        case .U_USER_POST_NOT_FOUND: return .notFound
+
+        // /u/user - PUT
+        case .U_USER_PUT_PERMISSION: return .forbidden
+        case .U_USER_PUT_CONFLICT: return .conflict
+
+        // /u/user - DELETE
+        case .U_USER_DELETE_PERMISSION: return .forbidden
+        case .U_USER_DELETE_NOT_FOUND: return .notFound
+
+        // /u/user/list - POST
+        case .U_USER_LIST_POST_PERMISSION: return .forbidden
+
+        // /u/user/permission - PUT
+        case .U_USER_PERMISSION_PUT_PERMISSION: return .forbidden
+        case .U_USER_PERMISSION_PUT_USER_NOT_FOUND: return .notFound
+        case .U_USER_PERMISSION_PUT_GROUP_NOT_FOUND: return .notFound
+        case .U_USER_PERMISSION_PUT_PERMISSION_NOT_FOUND: return .notFound
+        case .U_USER_PERMISSION_PUT_HIGHER_PERMISSION: return .forbidden
+
+        // /u/user/permission - DELETE
+        case .U_USER_PERMISSION_DELETE_PERMISSION: return .forbidden
+        case .U_USER_PERMISSION_DELETE_USER_NOT_FOUND: return .notFound
+        case .U_USER_PERMISSION_DELETE_GROUP_NOT_FOUND: return .notFound
+        case .U_USER_PERMISSION_DELETE_PERMISSION_NOT_FOUND: return .notFound
+
         }
     }
 
@@ -58,6 +132,34 @@ extension VAPI.ErrorCode {
         case .U_AUTH_POST_AUTH_FAILED: return "Authentication failed"
         case .U_AUTH_PATCH_KEY_NOT_FOUND: return "Authkey does not exist"
         case .U_AUTH_PATCH_KEY_EXPIRED: return "Authkey has expired"
+
+        // /u/user - POST
+        case .U_USER_POST_PERMISSION: return "Permission 'velocity.user.view' is needed"
+        case .U_USER_POST_NOT_FOUND: return "User has not been found"
+
+        // /u/user - PUT
+        case .U_USER_PUT_PERMISSION: return "Permission 'velocity.user.create' is needed"
+        case .U_USER_PUT_CONFLICT: return "A user with the same name exists"
+
+        // /u/user - DELETE
+        case .U_USER_DELETE_PERMISSION: return "Permission 'velocity.user.remove' is needed"
+        case .U_USER_DELETE_NOT_FOUND: return "User has not been found"
+
+        // /u/user/list - POST
+        case .U_USER_LIST_POST_PERMISSION: return "Permission 'velocity.user.list' is needed"
+
+        // /u/user/permission - PUT
+        case .U_USER_PERMISSION_PUT_PERMISSION: return "Permission 'velocity.user.assign' is needed"
+        case .U_USER_PERMISSION_PUT_USER_NOT_FOUND: return "User has not been found"
+        case .U_USER_PERMISSION_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .U_USER_PERMISSION_PUT_PERMISSION_NOT_FOUND: return "Permission has not been found"
+        case .U_USER_PERMISSION_PUT_HIGHER_PERMISSION: return "Assigned permission is too high"
+
+        // /u/user/permission - DELETE
+        case .U_USER_PERMISSION_DELETE_PERMISSION: return "Permission 'velocity.user.revoke' is needed"
+        case .U_USER_PERMISSION_DELETE_USER_NOT_FOUND: return "User has not been found"
+        case .U_USER_PERMISSION_DELETE_GROUP_NOT_FOUND: return "Group has not been found"
+        case .U_USER_PERMISSION_DELETE_PERMISSION_NOT_FOUND: return "Permission has not been found"
 
         }
     }
