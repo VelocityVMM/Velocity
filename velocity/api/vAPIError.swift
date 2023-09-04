@@ -29,11 +29,11 @@ extension VAPI {
     /// An enumeration of all possible error codes that can be thrown by the Velocity API
     enum ErrorCode : Int64, Encodable {
         /// `/u/auth - POST`: Authentication failed (username or password do not match)
-        case U_AUTH_POST_AUTH_FAILED = 100
+        case U_AUTH_POST_AUTH_FAILED = 1100
         /// `/u/auth - PUT`: The old authkey hasn't been found
-        case U_AUTH_PATCH_KEY_NOT_FOUND = 101
+        case U_AUTH_PATCH_KEY_NOT_FOUND = 1400
         /// `/u/auth - PUT`: The old authkey has expired
-        case U_AUTH_PATCH_KEY_EXPIRED = 102
+        case U_AUTH_PATCH_KEY_EXPIRED = 1401
 
         // MARK: /u/user: 2xxx
 

@@ -36,19 +36,19 @@ If a route has the error id `12` and wants to indicate a permission error on the
 1230x
 ```
 
-**Structure:**
-
-- `<Velocity error> (<http status>)` - `<route> - <method>`: Error description
-
 ## `/u`
 
 ### `/u/auth`
 
-- `100 (403)` - `/u/auth - POST`: Authentication failed (username or password do not match)
+**POST**
 
-- `101 (403)` - `/u/auth - PATCH`: The old authkey hasn't been found
+- `1100` > `403`: Authentication failed (username or password do not match)
 
-- `102 (403)` - `/u/auth - PATCH`:The old authkey has expired
+**PATCH**
+
+- `1400` > `403`: The old authkey hasn't been found
+
+- `1401` > `403`: The old authkey has expired
 
 ### `/u/user`
 
