@@ -99,3 +99,31 @@ If a route has the error id `12` and wants to indicate a permission error on the
 - `4311` > `404`: Group has not been found
 
 - `4312` > `404`: Permission has not been found
+
+### `/u/group`
+
+**POST**
+
+- `5100` > `403`: Permission `velocity.group.view` is needed
+
+- `5110` > `404`: roup has not been found
+
+**PUT**
+
+- `5200` > `403`: Permission `velocity.group.create` is needed
+
+- `5210` > `404`: Parent group has not been found
+
+- `5220` > `409`: A group with the same name exists within the parent group
+
+**DELETE**
+
+- `5300` > `403`: Permission `velocity.group.remove` is needed
+
+- `5310` > `404`: Group has not been found
+
+### `/u/group/list`
+
+**POST**
+
+- `6100` > `403`: Permission `velocity.group.list` is needed

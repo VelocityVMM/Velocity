@@ -49,12 +49,12 @@ extension VAPI {
 
             guard try c_user.has_permission(permission: "velocity.group.view", group: nil) else {
                 self.VDebug("\(c_user.info()) requested group information for group \(request.gid): FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_GROUP_POST_PERMISSION)
             }
 
             guard let group = try self.db.group_select(gid: request.gid) else {
                 self.VDebug("\(c_user.info()) requested group information for group \(request.gid): NOT FOUND")
-                return Response(status: .notFound)
+                return try self.error(code: .U_GROUP_POST_NOT_FOUND, "gid = \(request.gid)")
             }
 
             self.VDebug("\(c_user.info()) requested group information for \(group.info())")
@@ -73,12 +73,12 @@ extension VAPI {
 
             guard let group = try self.db.group_select(gid: request.parent_gid) else {
                 self.VDebug("\(user.info()) tried to create new group: parent group NOT FOUND")
-                return Response(status: .notFound)
+                return try self.error(code: .U_GROUP_PUT_PARENT_NOT_FUND)
             }
 
             guard try user.has_permission(permission: "velocity.group.create", group: group) else {
                 self.VDebug("\(user.info()) tried to create new group: FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_GROUP_PUT_PERMISSION)
             }
 
             var headers = HTTPHeaders()
@@ -86,7 +86,7 @@ extension VAPI {
 
             switch try self.db.group_create(name: request.name, parent_gid: request.parent_gid) {
             case .failure(_):
-                return Response(status: .conflict)
+                return try self.error(code: .U_GROUP_PUT_CONFLICT)
             case .success(let new_group):
                 let response = VAPI.Structs.U.GROUP.PUT.Res(gid: new_group.gid, parent_gid: new_group.parent_gid, name: new_group.name)
                 self.VDebug("\(user.info()) CREATED \(new_group.info()), permissions: \(try user.get_permissions(group: new_group).count)")
@@ -107,12 +107,12 @@ extension VAPI {
 
             guard try user.has_permission(permission: "velocity.group.remove", group: nil) else {
                 self.VDebug("\(user.info()) tried to remove group: FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_GROUP_DELETE_PERMISSION)
             }
 
             guard let delete_group = try self.db.group_select(gid: request.gid) else {
                 self.VDebug("\(user.info()) tried to remove non-existing group {\(request.gid)}")
-                return Response(status: .notFound)
+                return try self.error(code: .U_GROUP_DELETE_NOT_FOUND)
             }
 
             try delete_group.delete()
@@ -133,7 +133,7 @@ extension VAPI {
 
             guard try c_user.has_permission(permission: "velocity.group.list", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to list groups: FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_GROUP_LIST_POST_PERMISSION)
             }
 
             var groups: [Structs.U.GROUP.LIST.POST.GroupInfo] = []
