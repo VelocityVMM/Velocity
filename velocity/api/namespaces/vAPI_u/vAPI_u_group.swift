@@ -39,7 +39,7 @@ extension VAPI {
             let request: Structs.U.GROUP.POST.Req = try req.content.decode(Structs.U.GROUP.POST.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             var headers = HTTPHeaders()
@@ -66,7 +66,7 @@ extension VAPI {
             let request: Structs.U.GROUP.PUT.Req = try req.content.decode(Structs.U.GROUP.PUT.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let user = key.user
@@ -100,7 +100,7 @@ extension VAPI {
             let request: Structs.U.GROUP.DELETE.Req = try req.content.decode(Structs.U.GROUP.DELETE.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let user = key.user
@@ -126,7 +126,7 @@ extension VAPI {
             let request: Structs.U.GROUP.LIST.POST.Req = try req.content.decode(Structs.U.GROUP.LIST.POST.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let c_user = key.user

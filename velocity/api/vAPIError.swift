@@ -28,6 +28,10 @@ import Vapor
 extension VAPI {
     /// An enumeration of all possible error codes that can be thrown by the Velocity API
     enum ErrorCode : Int64, Encodable {
+
+        /// An unauthorized request has been made
+        case UNAUTHORIZED = 100
+
         /// `/u/auth - POST`: Authentication failed (username or password do not match)
         case U_AUTH_POST_AUTH_FAILED = 1100
         /// `/u/auth - PUT`: The old authkey hasn't been found
@@ -110,6 +114,8 @@ extension VAPI.ErrorCode {
     func get_http_status() -> HTTPStatus {
         switch self {
 
+        case .UNAUTHORIZED: return .unauthorized
+
         // /u/auth
         case .U_AUTH_POST_AUTH_FAILED: return .forbidden
         case .U_AUTH_PATCH_KEY_NOT_FOUND: return .forbidden
@@ -166,6 +172,8 @@ extension VAPI.ErrorCode {
     /// Returns the matching error message for an error code
     func get_message() -> String {
         switch self {
+
+        case .UNAUTHORIZED: return "Unauthorized: Authkey is invalid or not present"
 
         // /u/auth
         case .U_AUTH_POST_AUTH_FAILED: return "Authentication failed"

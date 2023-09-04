@@ -36,6 +36,10 @@ If a route has the error id `12` and wants to indicate a permission error on the
 1230x
 ```
 
+## General
+
+- `100` > `403`: An authkey is needed for the request but it has expired or does not exist
+
 ## `/u`
 
 ### `/u/auth`

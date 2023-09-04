@@ -39,7 +39,7 @@ extension VAPI {
             let request: Structs.U.USER.PUT.Req = try req.content.decode(Structs.U.USER.PUT.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let user = key.user
@@ -69,7 +69,7 @@ extension VAPI {
             let request: Structs.U.USER.DELETE.Req = try req.content.decode(Structs.U.USER.DELETE.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let user = key.user
@@ -94,7 +94,7 @@ extension VAPI {
             let request: Structs.U.USER.POST.Req = try req.content.decode(Structs.U.USER.POST.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             var headers = HTTPHeaders()
@@ -125,14 +125,14 @@ extension VAPI {
             let request: Structs.U.USER.LIST.POST.Req = try req.content.decode(Structs.U.USER.LIST.POST.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.user.list", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to list users: FORBIDDEN")
-                return Response(status: .forbidden)
+                return try self.error(code: .U_USER_POST_PERMISSION)
             }
 
             var users: [Structs.U.USER.LIST.POST.UserInfo] = []
@@ -161,7 +161,7 @@ extension VAPI {
             let request: Structs.U.USER.PERMISSION.PUT.Req = try req.content.decode(Structs.U.USER.PERMISSION.PUT.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let c_user = key.user
@@ -207,7 +207,7 @@ extension VAPI {
             let request: Structs.U.USER.PERMISSION.DELETE.Req = try req.content.decode(Structs.U.USER.PERMISSION.DELETE.Req.self)
 
             guard let key = self.get_authkey(authkey: request.authkey) else {
-                return Response(status: .unauthorized)
+                return try self.error(code: .UNAUTHORIZED)
             }
 
             let c_user = key.user
