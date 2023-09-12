@@ -131,15 +131,44 @@ extension VAPI {
 
             let c_user = key.user
 
-            guard try c_user.has_permission(permission: "velocity.group.list", group: nil) else {
-                self.VDebug("\(c_user.info()) tried to list groups: FORBIDDEN")
-                return try self.error(code: .U_GROUP_LIST_POST_PERMISSION)
-            }
+            // A fast lookup table for the groups added to the result array
+            var groups_map: Dictionary<Int64, VDB.Group> = Dictionary()
+            // The result array to transmit
+            var groups: [VDB.Group.UserGroupInfo] = []
 
-            var groups: [Structs.U.GROUP.LIST.POST.GroupInfo] = []
+            // A cache array keeping groups that are yet to process
+            var work = try c_user.get_groups_with_direct_permissions()
 
-            for group in try self.db.group_list() {
-                groups.append(Structs.U.GROUP.LIST.POST.GroupInfo(gid: group.gid, parent_gid: group.parent_gid, name: group.name))
+            while let cur_group = work.popLast() {
+
+                // If the current group is already in the map, skip
+                if groups_map[cur_group.gid] != nil {
+                    continue
+                }
+
+                // If this group is not a root group, proceed with finding the parent group
+                if cur_group.parent_gid != cur_group.gid {
+                    // If the parent group is not in the map, add it to work and continue
+                    if groups_map[cur_group.parent_gid] == nil {
+                        guard let parent_group = try self.db.group_select(gid: cur_group.parent_gid) else {
+                            self.VErr("FATAL: Assumed that parent group of \(cur_group) exists")
+                            continue
+                        }
+                        work.append(cur_group)
+                        work.append(parent_group)
+                        continue
+                    }
+                }
+
+                // If the user has any permissions on the current group, add its children to the work array
+                if try c_user.count_permissions(group: cur_group) != 0 {
+                    let child_groups = try cur_group.get_children(recursive: true)
+                    work.insert(contentsOf: child_groups, at: 0)
+                }
+
+                groups_map[cur_group.gid] = cur_group
+                groups.append(try cur_group.get_user_group_info(user: c_user))
+
             }
 
             let response = Structs.U.GROUP.LIST.POST.Res(groups: groups)
@@ -147,7 +176,7 @@ extension VAPI {
             var headers = HTTPHeaders()
             headers.add(name: .contentType, value: "application/json")
 
-            self.VDebug("\(c_user.info()) requested group list")
+            self.VDebug("\(c_user.info()) requested group list, \(groups.count) groups")
             return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
         }
     }
@@ -192,12 +221,7 @@ extension VAPI.Structs.U {
                     let authkey: String
                 }
                 struct Res : Encodable {
-                    let groups: [GroupInfo]
-                }
-                struct GroupInfo : Encodable {
-                    let gid: Int64
-                    let parent_gid: Int64
-                    let name: String
+                    let groups: [VDB.Group.UserGroupInfo]
                 }
             }
         }

@@ -452,7 +452,9 @@ List back all existing groups on this velocity instance
 
 > **Note**
 > 
-> The calling user need the `velocity.group.list` permission
+> The calling user needs at least one permission on a group for its name (and subgroups) to be displayed.
+> 
+> Do note that groups that are essential to recreating the tree will get listed, too
 
 **Request:**
 
@@ -472,10 +474,17 @@ List back all existing groups on this velocity instance
     {
       "gid": "<GID>",
       "parent_gid": "<GID>",
-      "name": "<Group name>"
+      "name": "<Group name>",
+      "permissions": [
+        {
+          "pid": "<PID>",
+          "name": "<Permission name>",
+          "description": "<Permission description>"
+        }
+      ]
     }
   ]
 }
 ```
 
-- `403 - Forbidden`: The calling user lacks permissions
+The `permissions` field does only list direct permissions (not inherited ones)

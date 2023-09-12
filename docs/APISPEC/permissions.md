@@ -58,10 +58,6 @@ Remove a subgroup
 
 Retrieve information about the group and all of its members an permissions
 
-## list (`velocity.group.list`)
-
-List all existing groups
-
 # vm (`velocity.vm`)
 
 Virtual machine controls

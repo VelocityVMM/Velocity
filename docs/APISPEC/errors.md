@@ -125,9 +125,3 @@ If a route has the error id `12` and wants to indicate a permission error on the
 - `5300` > `403`: Permission `velocity.group.remove` is needed
 
 - `5310` > `404`: Group has not been found
-
-### `/u/group/list`
-
-**POST**
-
-- `6100` > `403`: Permission `velocity.group.list` is needed

@@ -162,7 +162,6 @@ class VAPI : Loggable {
         VDB.PermissionTemplate("velocity.group.create", "Create a new subgroup to the group"),
         VDB.PermissionTemplate("velocity.group.remove", "Remove a subgroup"),
         VDB.PermissionTemplate("velocity.group.view", "View group information"),
-        VDB.PermissionTemplate("velocity.group.list", "List available groups"),
 
         // velocity.vm
         VDB.PermissionTemplate("velocity.vm.create", "Create a new virtual machine in the group"),

@@ -101,11 +101,6 @@ extension VAPI {
         case U_GROUP_DELETE_PERMISSION = 5300
         /// `/u/group - DELETE`: The group to delete hasn't been found
         case U_GROUP_DELETE_NOT_FOUND = 5310
-
-        // MARK: /u/group/list: 6xxx
-
-        /// `/u/group/list - POST`: The `velocity.group.list` permission is missing
-        case U_GROUP_LIST_POST_PERMISSION = 6100
     }
 }
 
@@ -163,9 +158,6 @@ extension VAPI.ErrorCode {
         case .U_GROUP_DELETE_PERMISSION: return .forbidden
         case .U_GROUP_DELETE_NOT_FOUND: return .notFound
 
-        // /u/group/list - POST
-        case .U_GROUP_LIST_POST_PERMISSION: return .forbidden
-
         }
     }
 
@@ -220,9 +212,6 @@ extension VAPI.ErrorCode {
         // /u/group - DELETE
         case .U_GROUP_DELETE_PERMISSION: return "Permission 'velocity.group.remove' is needed"
         case .U_GROUP_DELETE_NOT_FOUND: return "Group has not been found"
-
-        // /u/group/list - POST
-        case .U_GROUP_LIST_POST_PERMISSION: return "Permission 'velocity.group.list' is needed"
 
         }
     }

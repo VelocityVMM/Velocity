@@ -136,6 +136,50 @@ extension VDB {
             return groups
         }
 
+        /// Returns the permissions a `uid` has on this group directly, no inherited permissions are listed
+        /// - Parameter uid: The `uid` to get the permissions of
+        func get_direct_permissions(uid: Int64) throws -> [Permission] {
+            let tp = self.db.t_permissions
+            let tm = self.db.t_memberships
+
+            let t_res = tm.table.filter(tm.table[tm.uid] == uid && tm.table[tm.gid] == self.gid)
+            let query = tp.table.join(t_res, on: tm.table[tm.pid] == tp.table[tp.pid])
+
+            var res: [Permission] = []
+
+            for row in try self.db.db.prepare(query) {
+                res.append(Permission(db: self.db, pid: row[tp.table[tp.pid]], name: row[tp.table[tp.name]], description: row[tp.table[tp.description]]))
+            }
+
+            return res
+        }
+
+        /// Returns the permissions a user has on this group directly, no inherited permissions are listed
+        /// - Parameter user: The user to get the permissions of
+        func get_direct_permissions(user: User) throws -> [Permission] {
+            try self.get_direct_permissions(uid: user.uid)
+        }
+
+        /// User-specific group information
+        struct UserGroupInfo : Encodable {
+            let gid: Int64
+            let parent_gid: Int64
+            let name: String
+            let permissions: [Permission]
+        }
+
+        /// Returns information about this group, tailored to the supplied user
+        /// - Parameter user: The user to target
+        func get_user_group_info(user: User) throws -> UserGroupInfo {
+            let info = UserGroupInfo(
+                gid: self.gid,
+                parent_gid: self.parent_gid,
+                name: self.name,
+                permissions: try self.get_direct_permissions(uid: user.uid))
+
+            return info
+        }
+
         /// Creates a new group in the database
         /// - Parameter db: The database to use
         /// - Parameter name: The new `name` to use
