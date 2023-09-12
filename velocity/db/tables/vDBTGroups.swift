@@ -115,6 +115,27 @@ extension VDB {
             return memberships
         }
 
+        /// Returns all the children this group has
+        /// - Parameter recursive: If this function should operate recursively
+        ///
+        /// This function will **always** insert the parent group before the child groups if it operates recursively
+        func get_children(recursive: Bool) throws -> [Group] {
+            let t_g = self.db.t_groups
+            var groups: [Group] = []
+
+            let query = t_g.table.filter(t_g.parent_gid == self.gid && t_g.parent_gid != t_g.gid)
+
+            for row in try db.db.prepare(query) {
+                let new_group = Group(db: db, name: row[t_g.name], gid: row[t_g.gid], parent_gid: row[t_g.parent_gid])
+                groups.append(new_group)
+                if recursive {
+                    groups.append(contentsOf: try new_group.get_children(recursive: recursive))
+                }
+            }
+
+            return groups
+        }
+
         /// Creates a new group in the database
         /// - Parameter db: The database to use
         /// - Parameter name: The new `name` to use
