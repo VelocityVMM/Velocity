@@ -36,7 +36,11 @@ class VAPI : Loggable {
         // By default Vapor parses command line arguments and blows up
         // with "Operation could not be completed" with Velocitys arguments.
         let env = Environment(name: "vapi-development", arguments: ["vapor"])
+
         self.app = Application(env)
+        self.encoder = JSONEncoder()
+
+        self.app.logger.logLevel = .critical
 
         // CORS headers
         let corsConfiguration = CORSMiddleware.Configuration(
@@ -49,7 +53,11 @@ class VAPI : Loggable {
 
         defer { app.shutdown() }
 
-        self.encoder = JSONEncoder()
+        if env.isRelease {
+            VInfo("vAPI is starting up in RELEASE mode")
+        } else {
+            VInfo("vAPI is starting up in DEBUG mode")
+        }
 
         try self.register_endpoints_u(route: self.app.grouped("u"))
 
