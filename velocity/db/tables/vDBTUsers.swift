@@ -150,6 +150,39 @@ extension VDB {
             return count_permissions > 0
         }
 
+        /// Counts the permissions this user has on the supplied group
+        /// - Parameter group: The group to work with
+        func count_permissions(group: Group) throws -> Int64 {
+            let tm = self.db.t_memberships
+            let tg = self.db.t_groups
+
+            let stmt_s =
+            """
+            WITH RECURSIVE tree(\(tg.gid), \(tg.parent_gid)) AS (
+                SELECT \(tg.gid), \(tg.parent_gid) FROM groups WHERE \(tg.gid) = \(group.gid)
+                UNION ALL
+                SELECT t.\(tg.gid), t.\(tg.parent_gid) FROM groups t
+                JOIN tree ON tree.parent_gid = t.\(tg.gid)
+                WHERE t.\(tg.parent_gid) != t.\(tg.gid)
+            )
+
+            SELECT DISTINCT COUNT(*) FROM memberships WHERE
+                (\(tg.gid) IN (SELECT \(tg.gid) FROM tree)
+                OR \(tg.gid) = 0)
+                AND \(tm.uid) = \(self.uid);
+            """
+
+            guard let count_permissions = try self.db.db.scalar(stmt_s) else {
+                return 0
+            }
+
+            guard let count_permissions = count_permissions as? Int64 else {
+                return 0
+            }
+
+            return count_permissions
+        }
+
         /// Returns if this user has the permissino on the group
         /// - Parameter permission: The permission string to search for
         /// - Parameter group: The group the user has the permission on (`nil` for anything)
@@ -250,6 +283,24 @@ extension VDB {
             let parent_gid: Int64
             let name: String
             let permissions: [Permission]
+        }
+
+        /// Returns an array of groups that this user has direct permissions on
+        func get_groups_with_direct_permissions() throws -> [Group] {
+            let t_m = self.db.t_memberships
+            let t_g = self.db.t_groups
+
+            let query = t_g.table
+                .select(t_g.table[t_g.gid], t_g.table[t_g.parent_gid], t_g.table[t_g.name])
+                .join(t_m.table, on: t_m.table[t_m.gid] == t_g.table[t_g.gid] && t_m.table[t_m.uid] == self.uid)
+
+            var groups: [Group] = []
+
+            for row in try self.db.db.prepare(query) {
+                groups.append(Group(db: self.db, name: row[t_g.name], gid: row[t_g.gid], parent_gid: row[t_g.parent_gid]))
+            }
+
+            return groups
         }
 
         /// Returns all the memberships that apply to this user and give it permissions
