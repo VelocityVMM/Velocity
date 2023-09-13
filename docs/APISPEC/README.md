@@ -13,7 +13,7 @@ For resources, velocity uses so-called "pools" and virtual machines are managed 
 The API is divided into several namespaces:
 
 - [`/u`](u.md): User and group management
-- [`/p`](p.md): Pool management
+- [`/m`](m.md): Pool and media management
 
 ### Errors
 

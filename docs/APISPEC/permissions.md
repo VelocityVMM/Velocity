@@ -58,74 +58,34 @@ Remove a subgroup
 
 Retrieve information about the group and all of its members an permissions
 
-# vm (`velocity.vm`)
-
-Virtual machine controls
-
-## create (`velocity.vm.create`)
-
-Create new virtual machines in the group using up system (and group) quotas.
-
-## remove (`velocity.vm.remove`)
-
-Remove a virtual machine from the assigned group
-
-## alter (`velocity.vm.alter`)
-
-Alter virtual machine attributes and quota usage (RAM, CPU, DISK...)
-
-## view (`velocity.vm.view`)
-
-View the virtual machine and statistics
-
-## interact (`velocity.vm.interact`)
-
-Interact with the virtual machine (RFB, SSH...)
-
-## state (`velocity.vm.state`)
-
-Alter the virtual machine state (start, stop, pause...)
-
-## move (`velocity.vm.move`)
-
-Move a virtual machine to and from the group
-
-> **Note**
-> 
-> The user moving a virtual machine has to have the `move` permission on both, the source and target group
-
 # pool (`velocity.pool`)
 
-Pool sharing and usage
+Pool permissions
 
-## create (`velocity.pool.create`)
+## list (`velocity.pool.list`)
 
-Create a pool in a group
+List pools available to a group
 
-## remove (`velocity.pool.remove`)
+## assign (`velocity.pool.assign`)
 
-Remove a pool from the group (delete all media and the pool)
+Assign a group to a pool
 
-## view (`velocity.pool.view`)
+## revoke (`velocity.pool.revoke`)
 
-View the pools in a group
+Revoke a group's permissions from a mediapool
 
-## media.create (`velocity.pool.media.create`)
+# media (`velocity.media`)
 
-Create media in a pool
+Media permissions
 
-## media.remove (`velocity.pool.media.remove`)
+## list (`velocity.media.list`)
 
-Remove media from a pool (delete it)
+List media in a group
 
-## media.view (`velocity.pool.media.view`)
+## create (`velocity.media.create`)
 
-View media in the pool
+Create media in a group
 
-## media.read (`velocity.pool.media.read`)
+## remove (`velocity.media.remove`)
 
-Read from the pool's media
-
-## media.write (`velocity.pool.media.write`)
-
-Write to the pool's media
+Remove media from a group (delete it)
