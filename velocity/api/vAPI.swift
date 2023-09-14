@@ -36,7 +36,11 @@ class VAPI : Loggable {
         // By default Vapor parses command line arguments and blows up
         // with "Operation could not be completed" with Velocitys arguments.
         let env = Environment(name: "vapi-development", arguments: ["vapor"])
+
         self.app = Application(env)
+        self.encoder = JSONEncoder()
+
+        self.app.logger.logLevel = .critical
 
         // CORS headers
         let corsConfiguration = CORSMiddleware.Configuration(
@@ -49,9 +53,13 @@ class VAPI : Loggable {
 
         defer { app.shutdown() }
 
-        self.encoder = JSONEncoder()
+        if env.isRelease {
+            VInfo("vAPI is starting up in RELEASE mode")
+        } else {
+            VInfo("vAPI is starting up in DEBUG mode")
+        }
 
-        try self.register_endpoints_u()
+        try self.register_endpoints_u(route: self.app.grouped("u"))
 
         // Setup server properties
         app.http.server.configuration.hostname = hostname
@@ -98,7 +106,7 @@ class VAPI : Loggable {
 
         /// The date this key will expire in unix seconds
         func expiration_datetime() -> UInt64 {
-            return UInt64(self.creation_date.timeIntervalSince1970)
+            return UInt64(self.expiration_date().timeIntervalSince1970)
         }
 
         /// Check if the key is already expired
@@ -112,7 +120,7 @@ class VAPI : Loggable {
 
         /// Provide some information about the authkey
         func info() -> String {
-            return "Authkey (\(self.key.uuidString), valid until: \(self.expiration_date()))"
+            return "Authkey (\(self.key.uuidString), valid until: \(self.expiration_date().description(with: .current)))"
         }
     }
 
@@ -146,4 +154,29 @@ class VAPI : Loggable {
 
         return key
     }
+
+    /// All the available permissions for this api
+    static let available_permissions: [VDB.PermissionTemplate] = [
+        // velocity.user
+        VDB.PermissionTemplate("velocity.user.create", "Create new users"),
+        VDB.PermissionTemplate("velocity.user.remove", "Remove users that are in the group from the system"),
+        VDB.PermissionTemplate("velocity.user.assign", "Assign new users to the group"),
+        VDB.PermissionTemplate("velocity.user.revoke", "Remove users from the group"),
+        VDB.PermissionTemplate("velocity.user.view", "View user permissions"),
+        VDB.PermissionTemplate("velocity.user.list", "List available users"),
+
+
+        // velocity.group
+        VDB.PermissionTemplate("velocity.group.create", "Create a new subgroup to the group"),
+        VDB.PermissionTemplate("velocity.group.remove", "Remove a subgroup"),
+        VDB.PermissionTemplate("velocity.group.view", "View group information"),
+
+        // velocity.vm
+        VDB.PermissionTemplate("velocity.vm.create", "Create a new virtual machine in the group"),
+        VDB.PermissionTemplate("velocity.vm.remove", "Remove a virtual machine from the group"),
+        VDB.PermissionTemplate("velocity.vm.alter", "Alter a virtual machine parameters (CPU, RAM...)"),
+        VDB.PermissionTemplate("velocity.vm.view", "View statistics for a virtual machine"),
+        VDB.PermissionTemplate("velocity.vm.interact", "Interact with a virtual machine (RFB, Serial...)"),
+        VDB.PermissionTemplate("velocity.vm.state", "Alter the virtual machine state (start, stop, pause...)"),
+    ]
 }

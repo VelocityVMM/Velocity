@@ -261,6 +261,19 @@ if (patch("u/auth", {"authkey": user2_authkey}).status_code == 403):
 else:
     pn_err("FAIL: {}, expected 403".format(last_resp.status_code))
 
+p("Retrieving user groups for '{}', as '{}'...".format(username, username))
+if (get("u/user/groups", {"authkey": user_authkey}).status_code == 200):
+    p_ok("OK ({})".format(last_resp.status_code))
+    pn(" - Groups: {}".format(last_json["groups"]))
+else:
+    pn_err("FAIL: {}, expected 200".format(last_resp.status_code))
+
+p("Not allowing retrieving of user groups for '{}', as '{}'...".format(username2, username))
+if (get("u/user/groups", {"authkey": user_authkey, "uid": uid2}).status_code == 403):
+    pn_ok("OK ({})".format(last_resp.status_code))
+else:
+    pn_err("FAIL: {}, expected 403".format(last_resp.status_code))
+
 p("Assigning user {} to group 'usermanager' as 'root'...".format(username))
 if (put("u/group/assign", {"authkey": root_authkey, "uid": uid, "groups": [1]}).status_code == 200):
     p_ok("OK ({})".format(last_resp.status_code))
@@ -296,6 +309,13 @@ if (put("u/group/assign", {"authkey": user_authkey, "uid": uid2, "groups": [0]})
     pn_ok("OK ({})".format(last_resp.status_code))
 else:
     pn_err("FAIL: {}, expected 406".format(last_resp.status_code))
+
+p("Retrieving user groups for '{}', as '{}'...".format(username2, username))
+if (get("u/user/groups", {"authkey": user_authkey, "uid": uid2}).status_code == 200):
+    p_ok("OK ({})".format(last_resp.status_code))
+    pn(" - Groups: {}".format(last_json["groups"]))
+else:
+    pn_err("FAIL: {}, expected 200".format(last_resp.status_code))
 
 p("Deleting newly created user '{}' as '{}'...".format(username2, username))
 if (delete("u/user", {"authkey": user_authkey, "uid": uid2}).status_code == 200):

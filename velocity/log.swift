@@ -68,7 +68,20 @@ func VLog(_ message: String, _ context: String? = nil, level: Loglevel? = nil) {
     var prefix = "[Velocity]"
 
     if VLogEnableEscapeCodes {
-        prefix = "\u{001B}[96m[Velocity]"
+        if let l = level {
+            switch l {
+            case .Err:
+                prefix = "\u{001B}[91m[Velocity]"
+            case .Warn:
+                prefix = "\u{001B}[93m[Velocity]"
+            case .Info:
+                prefix = "\u{001B}[92m[Velocity]"
+            case Loglevel.Debug:
+                prefix = "\u{001B}[96m[Velocity]"
+            case .Trace:
+                prefix = "\u{001B}[95m[Velocity]"
+            }
+        }
     }
 
     if let level = level {

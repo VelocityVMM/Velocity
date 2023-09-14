@@ -12,7 +12,7 @@ extension VDB {
 
     /// A user in the database
     /// > Warning: Altered member variables do not commit to the database unless `commit()` is called on the object
-    class User : Loggable {
+    class User : Loggable, Encodable {
         /// The logging context
         internal let context: String;
         /// A reference to the database for later use
@@ -24,6 +24,21 @@ extension VDB {
         var username: String;
         /// The password in hashed form
         var pwhash: String;
+
+        /// The encodable keys
+        private enum CodingKeys : CodingKey {
+            case uid
+            case name
+            case memberships
+        }
+
+        /// Provide encoding functionality
+        func encode(to encoder: Encoder) throws {
+            var container  = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.uid, forKey: .uid)
+            try container.encode(self.username, forKey: .name)
+            try container.encode(self.get_memberships(), forKey: .memberships)
+        }
 
         /// Create a new User object.
         /// > Warning: This will not create the user in the database, for this, one should call creating functions
@@ -57,114 +72,264 @@ extension VDB {
             try self.db.db.run(query);
         }
 
-        /// Returns an array of the groups this user is a member of
-        func get_groups() throws -> [Group] {
-            let query = self.db.t_groups.table
-                .select(distinct: self.db.t_groups.table[self.db.t_groups.gid], self.db.t_groups.name)
-                .join(self.db.t_usergroups.table, on: self.db.t_usergroups.table[self.db.t_usergroups.gid] == self.db.t_groups.table[self.db.t_groups.gid])
+        /// Returns all the permissions a user has on a group
+        /// - Parameter group: The group to check for permissions
+        func get_permissions(group: Group) throws -> [Permission] {
+            let tm = self.db.t_memberships
+            let tg = self.db.t_groups
 
-            var groups: [Group] = []
-            for group in try self.db.db.prepare(query) {
-                let group = Group(db: self.db, groupname: group[self.db.t_groups.name], gid: group[self.db.t_groups.gid])
-                groups.append(group)
+            let stmt_s =
+            """
+            WITH RECURSIVE tree(\(tg.gid), \(tg.parent_gid)) AS (
+                SELECT \(tg.gid), \(tg.parent_gid) FROM groups WHERE \(tg.gid) = \(group.gid)
+                UNION ALL
+                SELECT t.\(tg.gid), t.\(tg.parent_gid) FROM groups t
+                JOIN tree ON tree.parent_gid = t.\(tg.gid)
+                WHERE t.\(tg.parent_gid) != t.\(tg.gid)
+            )
+
+            SELECT DISTINCT \(tm.pid) FROM memberships WHERE
+                (\(tg.gid) IN (SELECT \(tg.gid) FROM tree)
+                OR \(tg.gid) = 0)
+                AND \(tm.uid) = \(self.uid);
+            """
+
+            var permissions: [Permission] = []
+
+            for r in try self.db.db.prepare(stmt_s) {
+                guard let pid = r[0] as? Int64 else {
+                    continue
+                }
+
+                if let permission = try self.db.permission_select(pid: pid) {
+                    permissions.append(permission)
+                }
             }
 
-            return groups
+            return permissions
         }
 
-        /// Returns an array of the group ids this user is a member of
-        func get_group_ids() throws -> [Int64] {
-            let query = self.db.t_usergroups.table
-                .select(distinct: self.db.t_usergroups.table[self.db.t_usergroups.gid])
-                .where(self.db.t_usergroups.table[self.db.t_usergroups.uid] == self.uid)
+        /// Returns if this user has the permission on the group
+        /// - Parameter permission: The permission to search for
+        /// - Parameter group: The group the user has the permission on (`nil` for anything)
+        ///
+        /// If the `group` parameter is `nil`, this will check if the user has the permission anywhere
+        func has_permission(permission: Permission, group: Group?) throws -> Bool {
+            let tm = self.db.t_memberships
+            let tg = self.db.t_groups
 
-            var groups: [Int64] = []
-            for group in try self.db.db.prepare(query) {
-                groups.append(group[self.db.t_groups.gid])
+            guard let group = group else {
+                return try self.db.db.exists(tm.table, tm.pid == permission.pid && tm.uid == self.uid)
             }
 
-            return groups
-        }
+            let stmt_s =
+            """
+            WITH RECURSIVE tree(\(tg.gid), \(tg.parent_gid)) AS (
+                SELECT \(tg.gid), \(tg.parent_gid) FROM groups WHERE \(tg.gid) = \(group.gid)
+                UNION ALL
+                SELECT t.\(tg.gid), t.\(tg.parent_gid) FROM groups t
+                JOIN tree ON tree.parent_gid = t.\(tg.gid)
+                WHERE t.\(tg.parent_gid) != t.\(tg.gid)
+            )
 
-        /// Checks if the user is a member of the supplied group
-        /// - Parameter group: The group to check for
-        func is_member_of(group: Group) throws -> Bool {
-            return try self.is_member_of(gid: group.gid)
-        }
+            SELECT COUNT(*) FROM memberships WHERE
+                (\(tg.gid) IN (SELECT \(tg.gid) FROM tree)
+                OR \(tg.gid) = 0)
+                AND \(tm.uid) = \(self.uid)
+                AND \(tm.pid) = \(permission.pid);
+            """
 
-        /// Checks if the user is a member of the supplied group
-        /// - Parameter gid: The group id of the group to check for
-        func is_member_of(gid: Int64) throws -> Bool {
-            return try self.db.db.exists(self.db.t_usergroups.table, self.db.t_usergroups.uid == self.uid && self.db.t_usergroups.gid == gid)
-        }
-
-        /// Checks if the user is a member of the supplied group
-        /// - Parameter groupname: The name of the group to check for
-        func is_member_of(groupname: String) throws -> Bool {
-            guard let grp = try self.db.group_select(groupname: groupname) else {
+            guard let count_permissions = try self.db.db.scalar(stmt_s) else {
                 return false
             }
 
-            return try self.db.db.exists(self.db.t_usergroups.table, self.db.t_usergroups.uid == self.uid && self.db.t_usergroups.gid == grp.gid)
-        }
-
-        /// Joins a group
-        /// - Parameter group: The group to join
-        /// - Returns: `false` is the group does not exist in the database, else `true`
-        @discardableResult
-        func join_group(group: Group) throws -> Bool {
-            VDebug("Joining \(group.info())");
-            return try self.join_group(gid: group.gid);
-        }
-
-        /// Joins a group with the supplied gid
-        /// - Parameter gid: The group to join
-        /// - Returns: `false` is the group does not exist in the database, else `true`
-        @discardableResult
-        func join_group(gid: Int64) throws -> Bool {
-            VDebug("Joining group {\(gid)}");
-
-            // Check if the group exists
-            if (try !self.db.db.exists(self.db.t_groups.table, self.db.t_groups.gid == gid)) {
-                VDebug("Group id {\(gid)} does not exist");
-                return false;
+            guard let count_permissions = count_permissions as? Int64 else {
+                return false
             }
 
-            let query = self.db.t_usergroups.table.insert(or: .replace,
-                                                          self.db.t_usergroups.uid <- self.uid,
-                                                          self.db.t_usergroups.gid <- gid);
-
-            try self.db.db.run(query);
-            return true;
+            return count_permissions > 0
         }
 
-        /// Leaves a group
-        /// - Parameter group: The group to leave
-        /// - Returns: `false` is the group does not exist in the database, else `true`
-        @discardableResult
-        func leave_group(group: Group) throws -> Bool {
-            VDebug("Leaving \(group.info())");
-            return try self.leave_group(gid: group.gid);
-        }
+        /// Counts the permissions this user has on the supplied group
+        /// - Parameter group: The group to work with
+        func count_permissions(group: Group) throws -> Int64 {
+            let tm = self.db.t_memberships
+            let tg = self.db.t_groups
 
-        /// Leaves a group with the supplied gid
-        /// - Parameter gid: The group to leave
-        /// - Returns: `false` is the group does not exist in the database, else `true`
-        @discardableResult
-        func leave_group(gid: Int64) throws -> Bool {
-            VDebug("Leaving group {\(gid)}");
+            let stmt_s =
+            """
+            WITH RECURSIVE tree(\(tg.gid), \(tg.parent_gid)) AS (
+                SELECT \(tg.gid), \(tg.parent_gid) FROM groups WHERE \(tg.gid) = \(group.gid)
+                UNION ALL
+                SELECT t.\(tg.gid), t.\(tg.parent_gid) FROM groups t
+                JOIN tree ON tree.parent_gid = t.\(tg.gid)
+                WHERE t.\(tg.parent_gid) != t.\(tg.gid)
+            )
 
-            // Check if the group exists
-            if (try !self.db.db.exists(self.db.t_groups.table, self.db.t_groups.gid == gid)) {
-                VDebug("Group id {\(gid)} does not exist");
-                return false;
+            SELECT DISTINCT COUNT(*) FROM memberships WHERE
+                (\(tg.gid) IN (SELECT \(tg.gid) FROM tree)
+                OR \(tg.gid) = 0)
+                AND \(tm.uid) = \(self.uid);
+            """
+
+            guard let count_permissions = try self.db.db.scalar(stmt_s) else {
+                return 0
             }
 
-            let query = self.db.t_usergroups.table.filter(self.db.t_usergroups.uid == self.uid &&
-                                                          self.db.t_usergroups.gid == gid).delete();
+            guard let count_permissions = count_permissions as? Int64 else {
+                return 0
+            }
 
-            try self.db.db.run(query);
-            return true;
+            return count_permissions
+        }
+
+        /// Returns if this user has the permissino on the group
+        /// - Parameter permission: The permission string to search for
+        /// - Parameter group: The group the user has the permission on (`nil` for anything)
+        ///
+        /// If the `group` parameter is `nil`, this will check if the user has the permission anywhere
+        func has_permission(permission: String, group: Group?) throws -> Bool {
+            guard let permission = try self.db.permission_select(name: permission) else {
+                VTrace("Permission '\(permission)' does not exist")
+                return false
+            }
+
+            return try self.has_permission(permission: permission, group: group)
+        }
+
+        /// Adds a permission of this user on a group
+        /// - Parameter group: The group the user should have the permission on
+        /// - Parameter permission: The permission to assign
+        func add_permission(group: Group, permission: Permission) throws {
+            VTrace("Adding permission '\(permission.s_info())' on \(group.info())")
+
+            /// Check if the permission doesn't exist already
+            if try self.has_permission(permission: permission, group: group) {
+                VTrace("\(permission.s_info()) does exist on \(group.info())")
+                return
+            }
+
+            let tm = self.db.t_memberships
+
+            let query = tm.table.insert(tm.gid <- group.gid, tm.uid <- self.uid, tm.pid <- permission.pid)
+
+            try self.db.db.run(query)
+
+            VDebug("Added \(permission.s_info()) on \(group.info())")
+        }
+
+        /// Adds a permission of this user on a group
+        /// - Parameter group: The group the user should have the permission on
+        /// - Parameter permission: The permission string to assign
+        /// - Returns: `false` if the permission hasn't been found
+        func add_permission(group: Group, permission: String) throws -> Bool {
+            /// Get the permission
+            guard let permission = try self.db.permission_select(name: permission) else {
+                VTrace("Permission '\(permission)' does not exist")
+                return false
+            }
+
+            try self.add_permission(group: group, permission: permission)
+            return true
+        }
+
+        /// Removes a permission from this user on the specified `group`
+        /// - Parameter group: The group to remove the permission from
+        /// - Parameter permission: The permission to remove - `nil` = all permissions
+        ///
+        /// If the `permission` argument is `nil`, this will remove all permissions of the user on the target group
+        func remove_permission(group: Group, permission: Permission?) throws {
+            let tm = self.db.t_memberships
+
+            // If there is no permission supplied, remove all
+            guard let permission = permission else {
+                VTrace("Removing all permissions on \(group.info())")
+                let query = tm.table.filter(tm.gid == group.gid && tm.uid == self.uid).delete()
+                try self.db.db.run(query)
+                VDebug("Removed all permissions on \(group.info())")
+                return
+            }
+
+            VTrace("Removing permission '\(permission.s_info())' on \(group.info())")
+            let query = tm.table.filter(tm.gid == group.gid && tm.uid == self.uid && tm.pid == permission.pid).delete()
+            try self.db.db.run(query)
+            VDebug("Removed permission '\(permission.s_info())' on \(group.info())")
+        }
+
+        /// Removes a permission from this user on the specified `group`
+        /// - Parameter group: The group to remove the permission from
+        /// - Parameter permission_name: The name of the permission to remove - `nil` = all permissions
+        ///
+        /// If the `permission_name` argument is `nil`, this will remove all permissions of the user on the target group
+        func remove_permission(group: Group, permission_name: String?) throws -> Bool {
+            guard let permission = permission_name else {
+                try self.remove_permission(group: group, permission: nil)
+                return true
+            }
+
+            /// Get the permission
+            guard let permission = try self.db.permission_select(name: permission) else {
+                VTrace("Permission '\(permission)' does not exist")
+                return false
+            }
+
+            try self.remove_permission(group: group, permission: permission)
+            return true
+        }
+
+        /// Information about a membership
+        struct MembershipInfo : Encodable {
+            let gid: Int64
+            let parent_gid: Int64
+            let name: String
+            let permissions: [Permission]
+        }
+
+        /// Returns an array of groups that this user has direct permissions on
+        func get_groups_with_direct_permissions() throws -> [Group] {
+            let t_m = self.db.t_memberships
+            let t_g = self.db.t_groups
+
+            let query = t_g.table
+                .select(t_g.table[t_g.gid], t_g.table[t_g.parent_gid], t_g.table[t_g.name])
+                .join(t_m.table, on: t_m.table[t_m.gid] == t_g.table[t_g.gid] && t_m.table[t_m.uid] == self.uid)
+
+            var groups: [Group] = []
+
+            for row in try self.db.db.prepare(query) {
+                groups.append(Group(db: self.db, name: row[t_g.name], gid: row[t_g.gid], parent_gid: row[t_g.parent_gid]))
+            }
+
+            return groups
+        }
+
+        /// Returns all the memberships that apply to this user and give it permissions
+        func get_memberships() throws -> [MembershipInfo] {
+            let t_m = self.db.t_memberships;
+
+            var memberships: [MembershipInfo] = []
+
+            // Iterate over all membership groups
+            let query = t_m.table.filter(t_m.uid == self.uid).select(distinct: t_m.gid)
+            for row_m in try self.db.db.prepare(query) {
+                guard let group = try self.db.group_select(gid: row_m[t_m.gid]) else {
+                    continue
+                }
+
+                var permissions: [Permission] = []
+
+                // Iterate over all permissions on this group
+                let query = t_m.table.filter(t_m.uid == self.uid && t_m.gid == group.gid)
+                for permission in try self.db.db.prepare(query) {
+                    if let permission = try self.db.permission_select(pid: permission[t_m.pid]) {
+                        permissions.append(permission)
+                    }
+                }
+
+                memberships.append(MembershipInfo(gid: group.gid, parent_gid: group.parent_gid, name: group.name, permissions: permissions))
+            }
+
+            return memberships
         }
 
         /// Creates a new user in the database
@@ -234,10 +399,38 @@ extension VDB {
             velocity.VTrace("Creating new user (uid = \(String(describing: uid)), name = '\(username)')", "[vDB::User]");
             return try Self.create(db: db, username: username, password: password, uid: uid);
         }
+
+        /// Checks if a user exists in the database
+        /// - Parameter db: The database to consult
+        /// - Parameter username: The `username` to search for
+        static func exists(db: VDB, username: String) throws -> Bool {
+            return try db.db.exists(db.t_users.table, db.t_users.username == username)
+        }
+
+        /// Checks if a user exists in the database
+        /// - Parameter db: The database to consult
+        /// - Parameter uid: The `uid` to search for
+        static func exists(db: VDB, uid: Int64) throws -> Bool {
+            return try db.db.exists(db.t_users.table, db.t_users.uid == uid)
+        }
+
+        /// List all available users
+        /// - Parameter db: The database to query and to store for later usage
+        static func list(db: VDB) throws -> [User] {
+            var arr: [User] = []
+            let tu = db.t_users
+            let query = tu.table
+
+            for row in try db.db.prepare(query) {
+                arr.append(User(db: db, username: row[tu.username], pwhash: row[tu.password], uid: row[tu.uid]))
+            }
+
+            return arr
+        }
     }
 
     /// The `users` table
-    struct Users : Loggable{
+    class Users : Loggable{
         let context = "[vDB::Users]";
         let table = Table("users");
         let uid = Expression<Int64>("uid");
@@ -333,6 +526,23 @@ extension VDB {
     /// - Parameter uid: (optional) The uid to search for / use
     func user_ensure(username: String, password: String, uid: Int64? = nil) throws -> Swift.Result<User, Users.InsertError> {
         return try User.ensure(db: self, username: username, password: password, uid: uid);
+    }
+
+    /// Checks if a user exists in the database
+    /// - Parameter username: The `username` to search for
+    func user_exists(username: String) throws -> Bool {
+        return try User.exists(db: self, username: username)
+    }
+
+    /// Checks if a user exists in the database
+    /// - Parameter uid: The `uid` to search for
+    func user_exists(uid: Int64) throws -> Bool {
+        return try User.exists(db: self, uid: uid)
+    }
+
+    /// List back all users available in this database
+    func user_list() throws -> [User] {
+        return try User.list(db: self)
     }
 
     /// Hashes a password using a hashing algorithm

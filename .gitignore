@@ -1,2 +1,15 @@
 *.DS_Store*
 velocity.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# Xcode
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+*project.xcworkspace/
+xcuserdata/
+xcschememanagement.plist
+
+# Build directory
+build/
