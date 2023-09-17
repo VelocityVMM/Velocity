@@ -237,6 +237,17 @@ extension VAPI {
         return try Response(status: code.get_http_status(), headers: headers, body: .init(data: self.encoder.encode(error)))
     }
 
+    /// Resolves the promise but embeds a error struct into the Response
+    /// - Parameter response: The eventloop promise to resolve
+    /// - Parameter code: The code of the error
+    func promise_error(_ promise: EventLoopPromise<Void>, code: ErrorCode) throws -> EventLoopFuture<Response> {
+        let response = try self.error(code: code)
+        promise.succeed()
+        return promise.futureResult.always { r in }.map {
+            return response
+        }
+    }
+
     /// Construct a new error from an error code and an additional string
     /// - Parameter code: The error code to return
     /// - Parameter additional: The additional message
@@ -247,5 +258,17 @@ extension VAPI {
         headers.add(name: .contentType, value: "application/json")
 
         return try Response(status: code.get_http_status(), headers: headers, body: .init(data: self.encoder.encode(error)))
+    }
+
+    /// Resolves the promise but embeds a error struct with additional information into the Response
+    /// - Parameter response: The eventloop promise to resolve
+    /// - Parameter code: The code of the error
+    /// - Parameter additional: The additional message
+    func promise_error(_ promise: EventLoopPromise<Void>, code: ErrorCode, _ additional: String) throws -> EventLoopFuture<Response> {
+        let response = try self.error(code: code, additional)
+        promise.succeed()
+        return promise.futureResult.always { r in }.map {
+            return response
+        }
     }
 }
