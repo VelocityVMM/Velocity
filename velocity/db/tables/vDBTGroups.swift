@@ -8,6 +8,9 @@
 import Foundation
 import SQLite
 
+/// The group id is a Int64
+typealias GID = Int64
+
 extension VDB {
 
     /// A group in the database
@@ -19,11 +22,11 @@ extension VDB {
         internal let db: VDB
 
         /// The unique group id
-        let gid: Int64
+        let gid: GID
         /// The `gid` of the parent group
         ///
         /// If this is set to `0`, the parent is the root group. The `root {0}` group has this set to `0`, too
-        let parent_gid: Int64
+        let parent_gid: GID
         /// The group name (unique within the parent group)
         var name: String
 

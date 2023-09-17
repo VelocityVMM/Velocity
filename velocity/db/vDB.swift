@@ -14,6 +14,9 @@ class VDB : Loggable {
     /// The database connection to work with
     let db: Connection;
 
+    /// The available mediapools
+    var mediapools: Dictionary<Int64, MediaPool> = Dictionary()
+
     /// The `users` table
     let t_users: Users;
     /// The `groups` table
@@ -22,6 +25,8 @@ class VDB : Loggable {
     let t_permissions: Permissions
     /// The `memberships` table
     let t_memberships: Memberships
+    /// The `grouppools` table
+    let t_grouppools: TGroupPools
 
     /// Opens a new database connection at the specified location
     /// - Parameter location: The location to open the database at
@@ -43,6 +48,7 @@ class VDB : Loggable {
         self.t_groups = try Groups(db: self.db)
         self.t_permissions = try Permissions(db: self.db)
         self.t_memberships = try Memberships(db: self.db, groups: self.t_groups, users: self.t_users, permissions: self.t_permissions)
+        self.t_grouppools = try TGroupPools(db: self.db, t_groups: self.t_groups)
 
         try self.db.execute("PRAGMA foreign_keys = ON;");
     }
