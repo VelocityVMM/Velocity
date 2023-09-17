@@ -25,6 +25,8 @@ class VDB : Loggable {
     let t_permissions: Permissions
     /// The `memberships` table
     let t_memberships: Memberships
+    /// The `media` table
+    let t_media: TMedia
     /// The `grouppools` table
     let t_grouppools: TGroupPools
 
@@ -48,6 +50,7 @@ class VDB : Loggable {
         self.t_groups = try Groups(db: self.db)
         self.t_permissions = try Permissions(db: self.db)
         self.t_memberships = try Memberships(db: self.db, groups: self.t_groups, users: self.t_users, permissions: self.t_permissions)
+        self.t_media = try TMedia(db: self.db, groups: self.t_groups)
         self.t_grouppools = try TGroupPools(db: self.db, t_groups: self.t_groups)
 
         try self.db.execute("PRAGMA foreign_keys = ON;");

@@ -106,6 +106,22 @@ extension VDB {
             let query = t_gp.table.filter(t_gp.mpid == self.mpid && t_gp.gid == group.gid).delete()
             try db.db.run(query)
         }
+
+        /// Returns an array of media that is in this pool and attached to the provided group
+        /// - Parameter db: The db to use for this call
+        /// - Parameter group: The group to search for
+        func get_media(db: VDB, group: Group) throws -> [Media] {
+            let tm = db.t_media
+            var media: [Media] = []
+
+            let query = tm.table.filter(tm.mpid == self.mpid && tm.gid == group.gid)
+
+            for row in try db.db.prepare(query) {
+                media.append(try Media.from_row(db: db, pool: self, group: group, row: row))
+            }
+
+            return media
+        }
     }
 
     /// Add a new pool to this database
