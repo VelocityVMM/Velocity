@@ -150,6 +150,21 @@ extension VDB {
             return count_permissions > 0
         }
 
+        /// Checks if the user has a direct permission on a group, this will not account for inherited permissions
+        /// - Parameter permision: The permission to check for
+        /// - Parameter group: The group to check for
+        func has_direct_permission(permission: Permission, group: Group) throws -> Bool {
+            let tm = self.db.t_memberships
+
+            let query = tm.table.filter(
+                tm.table[tm.uid] == self.uid &&
+                tm.table[tm.gid] == group.gid &&
+                tm.table[tm.pid] == permission.pid).count
+
+
+            return try self.db.db.scalar(query) > 0
+        }
+
         /// Counts the permissions this user has on the supplied group
         /// - Parameter group: The group to work with
         func count_permissions(group: Group) throws -> Int64 {
@@ -204,7 +219,7 @@ extension VDB {
             VTrace("Adding permission '\(permission.s_info())' on \(group.info())")
 
             /// Check if the permission doesn't exist already
-            if try self.has_permission(permission: permission, group: group) {
+            if try self.has_direct_permission(permission: permission, group: group) {
                 VTrace("\(permission.s_info()) does exist on \(group.info())")
                 return
             }
