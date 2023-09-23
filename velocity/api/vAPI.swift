@@ -60,6 +60,7 @@ class VAPI : Loggable {
         }
 
         try self.register_endpoints_u(route: self.app.grouped("u"))
+        try self.register_endpoints_m(route: self.app.grouped("m"))
 
         // Setup server properties
         app.http.server.configuration.hostname = hostname
@@ -170,6 +171,15 @@ class VAPI : Loggable {
         VDB.PermissionTemplate("velocity.group.create", "Create a new subgroup to the group"),
         VDB.PermissionTemplate("velocity.group.remove", "Remove a subgroup"),
         VDB.PermissionTemplate("velocity.group.view", "View group information"),
+
+        // velocity.pool
+        VDB.PermissionTemplate("velocity.pool.list", "List available pools"),
+        VDB.PermissionTemplate("velocity.pool.assign", "Assign groups to pools"),
+        VDB.PermissionTemplate("velocity.pool.revoke", "Revoke group's permissions on pools"),
+
+        // velocity.media
+        VDB.PermissionTemplate("velocity.media.create", "Create / Upload media"),
+        VDB.PermissionTemplate("velocity.media.list", "List available media for a group"),
 
         // velocity.vm
         VDB.PermissionTemplate("velocity.vm.create", "Create a new virtual machine in the group"),

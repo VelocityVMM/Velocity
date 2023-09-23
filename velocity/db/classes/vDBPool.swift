@@ -81,6 +81,14 @@ extension VDB {
             }
         }
 
+        /// Serializable information about a media pool
+        struct Info : Encodable {
+            let mpid: MPID
+            let name: String
+            let write: Bool
+            let manage: Bool
+        }
+
         /// Assign a group to this pool with some permissions and a quota
         /// - Parameter db: The database instance to use for execution
         /// - Parameter group: The group to assign

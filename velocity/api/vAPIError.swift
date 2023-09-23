@@ -101,6 +101,83 @@ extension VAPI {
         case U_GROUP_DELETE_PERMISSION = 5300
         /// `/u/group - DELETE`: The group to delete hasn't been found
         case U_GROUP_DELETE_NOT_FOUND = 5310
+
+        // MARK: /m/pool/assign: 6xxx
+
+        /// `/m/pool/assign - PUT`: The `velocity.pool.assign` permission is missing
+        case M_POOL_ASSIGN_PUT_PERMISSION = 6200
+        /// `/m/pool/assign - PUT`: The group hasn't been found
+        case M_POOL_ASSIGN_PUT_GROUP_NOT_FOUND = 6210
+        /// `/m/pool/assign - PUT`: The mediapool hasn't been found
+        case M_POOL_ASSIGN_PUT_MEDIAPOOL_NOT_FOUND = 6211
+
+        /// `/m/pool/assign - DELETE`: The `velocity.pool.revoke` permission is missing
+        case M_POOL_ASSIGN_DELETE_PERMISSION = 6300
+        /// `/m/pool/assign - DELETE`: The group hasn't been found
+        case M_POOL_ASSIGN_DELETE_GROUP_NOT_FOUND = 6310
+        /// `/m/pool/assign - DELETE`: The mediapool hasn't been found
+        case M_POOL_ASSIGN_DELETE_MEDIAPOOL_NOT_FOUND = 6311
+
+        // MARK: /m/pool/list: 7xxx
+
+        /// `/m/pool/list - POST`: The `velocity.pool.list` permission is missing
+        case M_POOL_LIST_POST_PERMISSION = 7100
+        /// `/m/pool/list - POST`: The  `gid` hasn't been found
+        case M_POOL_LIST_POST_GROUP_NOT_FOUND = 7110
+
+        // MARK: /m/media/create: 8xxx
+
+        /// `/m/media/create - PUT`: The `velocity.media.create` permission is missing
+        case M_MEDIA_CREATE_PUT_PERMISSION = 8200
+        /// `/m/media/create - PUT`: The group does not have the `manage` permission on the mediapool
+        case M_MEDIA_CREATE_PUT_GROUP_PERMISSION = 8201
+        /// `/m/media/create - PUT`: The  `gid` hasn't been found
+        case M_MEDIA_CREATE_PUT_GROUP_NOT_FOUND = 8210
+        /// `/m/media/create - PUT`: The  `mpid` hasn't been found
+        case M_MEDIA_CREATE_PUT_MEDIAPOOL_NOT_FOUND = 8211
+        /// `/m/media/create - PUT`: A file with the same `name` does already exist
+        case M_MEDIA_CREATE_PUT_CONFLICT = 8220
+        /// `/m/media/create - PUT`: The  quota has been surpassed
+        case M_MEDIA_CREATE_PUT_QUOTA = 8221
+
+        // MARK: /m/media/upload: 9xxx
+
+        /// `/m/media/upload - PUT`: The `velocity.media.create` permission is missing
+        case M_MEDIA_UPLOAD_PUT_PERMISSION = 9200
+        /// `/m/media/upload - PUT`: The group does not have the `manage` permission on the mediapool
+        case M_MEDIA_UPLOAD_PUT_GROUP_PERMISSION = 9201
+        /// `/m/media/upload - PUT`: HTTP header: `Content-Length` field is missing
+        case M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH = 9210
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-authkey` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_AUTHKEY = 9211
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-mpid` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_MPID = 9212
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-gid` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_GID = 9213
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-name` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_NAME = 9214
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-type` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_TYPE = 9215
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-readonly` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_READONLY = 9216
+        /// `/m/media/upload - PUT`: The  `gid` hasn't been found
+        case M_MEDIA_UPLOAD_PUT_GROUP_NOT_FOUND = 9217
+        /// `/m/media/upload - PUT`: The  `mpid` hasn't been found
+        case M_MEDIA_UPLOAD_PUT_MEDIAPOOL_NOT_FOUND = 9218
+        /// `/m/media/upload - PUT`: A file with the same `name` does already exist
+        case M_MEDIA_UPLOAD_PUT_CONFLICT = 9220
+        /// `/m/media/upload - PUT`: The  quota has been surpassed
+        case M_MEDIA_UPLOAD_PUT_QUOTA = 9221
+        /// `/m/media/upload - PUT`: The effective content lenght surpassed the promised `Content-Length`
+        case M_MEDIA_UPLOAD_PUT_TOO_MANY_BYTES = 9222
+
+        // MARK: /m/media/list: 10xxx
+
+        /// `/m/media/list - POST`: The `velocity.media.list` permission is missing
+        case M_MEDIA_LIST_POST_PERMISSION = 10100
+        /// `/m/media/list - POST`: The `gid` has not been found
+        case M_MEDIA_LIST_POST_GROUP_NOT_FOUND = 10110
+
     }
 }
 
@@ -158,6 +235,48 @@ extension VAPI.ErrorCode {
         case .U_GROUP_DELETE_PERMISSION: return .forbidden
         case .U_GROUP_DELETE_NOT_FOUND: return .notFound
 
+        // /m/pool/assign - PUT
+        case .M_POOL_ASSIGN_PUT_PERMISSION: return .forbidden
+        case .M_POOL_ASSIGN_PUT_GROUP_NOT_FOUND: return .notFound
+        case .M_POOL_ASSIGN_PUT_MEDIAPOOL_NOT_FOUND: return .notFound
+
+        // /m/pool/assign - DELETE
+        case .M_POOL_ASSIGN_DELETE_PERMISSION: return .forbidden
+        case .M_POOL_ASSIGN_DELETE_GROUP_NOT_FOUND: return .notFound
+        case .M_POOL_ASSIGN_DELETE_MEDIAPOOL_NOT_FOUND: return .notFound
+
+        // /m/pool/list - POST
+        case .M_POOL_LIST_POST_PERMISSION: return .forbidden
+        case .M_POOL_LIST_POST_GROUP_NOT_FOUND: return .notFound
+
+        // /m/media/create - PUT
+        case .M_MEDIA_CREATE_PUT_PERMISSION: return .forbidden
+        case .M_MEDIA_CREATE_PUT_GROUP_PERMISSION: return .forbidden
+        case .M_MEDIA_CREATE_PUT_GROUP_NOT_FOUND: return .notFound
+        case .M_MEDIA_CREATE_PUT_MEDIAPOOL_NOT_FOUND: return .notFound
+        case .M_MEDIA_CREATE_PUT_CONFLICT: return .conflict
+        case .M_MEDIA_CREATE_PUT_QUOTA: return .notAcceptable
+
+        // /m/media/upload - PUT
+        case .M_MEDIA_UPLOAD_PUT_PERMISSION: return .forbidden
+        case .M_MEDIA_UPLOAD_PUT_GROUP_PERMISSION: return .forbidden
+        case .M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_AUTHKEY: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_MPID: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_GID: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_NAME: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_TYPE: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_READONLY: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_GROUP_NOT_FOUND: return .notFound
+        case .M_MEDIA_UPLOAD_PUT_MEDIAPOOL_NOT_FOUND: return .notFound
+        case .M_MEDIA_UPLOAD_PUT_CONFLICT: return .conflict
+        case .M_MEDIA_UPLOAD_PUT_QUOTA: return .notAcceptable
+        case .M_MEDIA_UPLOAD_PUT_TOO_MANY_BYTES: return .payloadTooLarge
+
+        // /m/media/list - POST
+        case .M_MEDIA_LIST_POST_PERMISSION: return .forbidden
+        case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return .notFound
+
         }
     }
 
@@ -212,6 +331,48 @@ extension VAPI.ErrorCode {
         // /u/group - DELETE
         case .U_GROUP_DELETE_PERMISSION: return "Permission 'velocity.group.remove' is needed"
         case .U_GROUP_DELETE_NOT_FOUND: return "Group has not been found"
+
+        // /m/pool/assign - PUT
+        case .M_POOL_ASSIGN_PUT_PERMISSION: return "Permission 'velocity.pool.assign' is needed"
+        case .M_POOL_ASSIGN_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_POOL_ASSIGN_PUT_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+
+        // /m/pool/assign - DELETE
+        case .M_POOL_ASSIGN_DELETE_PERMISSION: return "Permission 'velocity.pool.revoke' is needed"
+        case .M_POOL_ASSIGN_DELETE_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_POOL_ASSIGN_DELETE_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+
+        // /m/pool/list - POST
+        case .M_POOL_LIST_POST_PERMISSION: return "Permission 'velocity.pool.list' is needed"
+        case .M_POOL_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
+
+        // /m/media/create - PUT
+        case .M_MEDIA_CREATE_PUT_PERMISSION: return "Permission 'velocity.media.create' is needed"
+        case .M_MEDIA_CREATE_PUT_GROUP_PERMISSION: return "The group does not have the 'manage' permission on the mediapool"
+        case .M_MEDIA_CREATE_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_MEDIA_CREATE_PUT_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+        case .M_MEDIA_CREATE_PUT_CONFLICT: return "A file with the same name does already exist in this pool"
+        case .M_MEDIA_CREATE_PUT_QUOTA: return "Some quota has been surpassed"
+
+        // /m/media/upload - PUT
+        case .M_MEDIA_UPLOAD_PUT_PERMISSION: return "Permission 'velocity.media.create' is needed"
+        case .M_MEDIA_UPLOAD_PUT_GROUP_PERMISSION: return "The group does not have the 'manage' permission on the mediapool"
+        case .M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH: return "The HTTP header is missing the 'Content-Length' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_AUTHKEY: return "The HTTP header is missing the 'x-velocity-authkey' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_MPID: return "The HTTP header is missing the 'x-velocity-mpid' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_GID: return "The HTTP header is missing the 'x-velocity-gid' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_NAME: return "The HTTP header is missing the 'x-velocity-name' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_TYPE: return "The HTTP header is missing the 'x-velocity-type' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_READONLY: return "The HTTP header is missing the 'x-velocity-readonly' field"
+        case .M_MEDIA_UPLOAD_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_MEDIA_UPLOAD_PUT_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+        case .M_MEDIA_UPLOAD_PUT_CONFLICT: return "A file with the same name does already exist in this pool"
+        case .M_MEDIA_UPLOAD_PUT_QUOTA: return "Some quota has been surpassed"
+        case .M_MEDIA_UPLOAD_PUT_TOO_MANY_BYTES: return "More bytes were submitted than promised by 'Content-Length'"
+
+        // /m/media/list - POST
+        case .M_MEDIA_LIST_POST_PERMISSION: return "Permission 'velocity.media.list' is needed"
+        case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
 
         }
     }

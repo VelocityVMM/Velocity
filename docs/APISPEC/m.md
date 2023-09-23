@@ -14,7 +14,13 @@ A pool allows groups to access media with two permissions:
 
 - `manage`: Create / remove media from this pool
 
-Every piece of media is identified by its media id (`mid`) that is a UUID string
+Every piece of media is identified by its media id (`mid`) that is a UUID string and its `type`, which can be anything, but some strings are recommended:
+
+- `ISO`: ISO images for bootable read-only media
+
+- `DISK`: Disk images to use for virtual machine storage devices
+
+- `IPSW`: `macOS` restore / installer images
 
 ### Available endpoints
 
@@ -148,6 +154,7 @@ Allocate new media on a pool (`pid`) owned by a group (`gid`)
     "mpid": "<MPID>",
     "gid": "<GID>",
     "name": "<Media name>",
+    "type": "<Media type>",
     "size": "<Size in Bytes>"
 }
 ```
@@ -188,6 +195,8 @@ In contrast to the whole rest of the Velocity API, uploads are handled uniquely:
   - `x-velocity-gid`: The group id (`GID`)
   
   - `x-velocity-name`: The name of the file
+  
+  - `x-velocity-type`: The type of file
   
   - `x-velocity-readonly`: If the file should be read only or not (`true` or `false`)
 
@@ -258,6 +267,7 @@ List back available media to a group
             "mid": "<MID>",
             "mpid": "<MPID>",
             "name": "<Media name>",
+            "type": "<Media type>",
             "size": "<Size in Bytes>",
             "readonly": true
         }

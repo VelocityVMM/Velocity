@@ -47,21 +47,32 @@ extension VDB {
         let size: Int64
         /// The media id to identify this media uniquely
         let mid: MID
+        /// The media type
+        let type: String
         /// If this media should only be openable in read-only mode
         let readonly: Bool
 
-        init(db: VDB, pool: MediaPool, group: Group, name: String, size: Int64, mid: MID, readonly: Bool) {
+        init(db: VDB, pool: MediaPool, group: Group, name: String, type: String, size: Int64, mid: MID, readonly: Bool) {
             self.db = db
             self.pool = pool
             self.group = group
             self.name = name
+            self.type = type
             self.size = size
             self.mid = mid
             self.readonly = readonly
         }
 
         convenience init(db: VDB, info: Info, mid: MID) {
-            self.init(db: db, pool: info.pool, group: info.group, name: info.name, size: info.size, mid: mid, readonly: info.readonly)
+            self.init(
+                db: db,
+                pool: info.pool,
+                group: info.group,
+                name: info.name,
+                type: info.type,
+                size: info.size,
+                mid: mid,
+                readonly: info.readonly)
         }
 
         /// Returns the full file path to the media file
@@ -159,6 +170,8 @@ extension VDB {
             let group: Group
             /// The name
             let name: String
+            /// The type
+            let type: String
             /// The size in bytes
             let size: Int64
             /// If this media should only be openable in read-only mode

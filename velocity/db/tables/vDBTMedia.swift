@@ -36,6 +36,8 @@ extension VDB {
 
         /// The name for the media
         let name = Expression<String>("name")
+        /// The type of media
+        let type = Expression<String>("type")
         /// The unique media id
         let mid = Expression<MID>("mid")
         /// The media pool id the media is stored in
@@ -51,6 +53,7 @@ extension VDB {
             // Setup the table
             try db.run(self.table.create(ifNotExists: true) {t in
                 t.column(self.name)
+                t.column(self.type)
                 t.column(self.mid)
                 t.column(self.mpid)
                 t.column(self.gid)
@@ -65,9 +68,10 @@ extension VDB {
 
         /// Inserts or replaces media from its parameters into this table
         /// - Parameter db: The database to use
-        func insert(db: Connection, name: String, mid: MID, mpid: MPID, gid: GID, readonly: Bool) throws {
+        func insert(db: Connection, name: String, type: String, mid: MID, mpid: MPID, gid: GID, readonly: Bool) throws {
             let query = self.table.insert(
                 self.name <- name,
+                self.type <- type,
                 self.mid <- mid,
                 self.mpid <- mpid,
                 self.gid <- gid,
@@ -80,13 +84,13 @@ extension VDB {
         /// - Parameter db: The database to use
         /// - Parameter media: The media to insert
         func insert(db: Connection, _ media: Media) throws {
-            try self.insert(db: db, name: media.name, mid: media.mid, mpid: media.pool.mpid, gid: media.group.gid, readonly: media.readonly)
+            try self.insert(db: db, name: media.name, type: media.type, mid: media.mid, mpid: media.pool.mpid, gid: media.group.gid, readonly: media.readonly)
         }
     }
 
     /// Inserts or replaces media from its parameters into this table
-    func media_insert(name: String, mid: MID, mpid: MPID, gid: GID, readonly: Bool) throws {
-        try self.t_media.insert(db: self.db, name: name, mid: mid, mpid: mpid, gid: gid, readonly: readonly)
+    func media_insert(name: String, type: String, mid: MID, mpid: MPID, gid: GID, readonly: Bool) throws {
+        try self.t_media.insert(db: self.db, name: name, type: type, mid: mid, mpid: mpid, gid: gid, readonly: readonly)
     }
 
     /// Inserts or replaces media in this table
