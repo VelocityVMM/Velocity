@@ -89,3 +89,35 @@ Create media in a group
 ## remove (`velocity.media.remove`)
 
 Remove media from a group (delete it)
+
+# vm (`velocity.vm`)
+
+## create (`velocity.vm.create`)
+
+Create a new virtual machine in the group
+
+## remove (`velocity.vm.remove`)
+
+Remove a virtual machine from the group
+
+## alter (`velocity.vm.alter`)
+
+Alter a virtual machine parameters (CPU, RAM...)
+
+## view (`velocity.vm.view`)
+
+View statistics for a virtual machine
+
+## interact (`velocity.vm.interact`)
+
+Interact with a virtual machine (RFB, Serial...)
+
+## state (`velocity.vm.state`)
+
+Alter the virtual machine state (start, stop, pause...)
+
+# nic (`velocity.nic`)
+
+## list (`velocity.nic.list`)
+
+List available host NICs

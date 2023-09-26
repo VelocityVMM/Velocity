@@ -14,6 +14,7 @@ The API is divided into several namespaces:
 
 - [`/u`](u.md): User and group management
 - [`/m`](m.md): Pool and media management
+- [`/v`](v.md): Virtual machine management
 
 ### Errors
 
