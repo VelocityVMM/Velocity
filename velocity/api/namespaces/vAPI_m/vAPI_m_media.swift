@@ -61,11 +61,7 @@ extension VAPI {
 
             self.VDebug("\(c_user.info()) listed media for \(group.info())")
 
-            let response = Structs.M.MEDIA.LIST.POST.Res(media: media_info)
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+            return try self.response(Structs.M.MEDIA.LIST.POST.Res(media: media_info))
         }
 
         route.put("create") { req in
@@ -110,12 +106,8 @@ extension VAPI {
                     return try self.error(code: .M_MEDIA_CREATE_PUT_QUOTA)
                 }
             case .success(let media):
-                let response = Structs.M.MEDIA.CREATE.PUT.Res(mid: media.mid, size: media.size)
-                var headers = HTTPHeaders()
-                headers.add(name: .contentType, value: "application/json")
-
                 self.VDebug("\(user.info()) created new media '\(media.name)' of \(media.size) bytes: \(media.mid)")
-                return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+                return try self.response(Structs.M.MEDIA.CREATE.PUT.Res(mid: media.mid, size: media.size))
             }
         }
 
@@ -259,12 +251,7 @@ extension VAPI {
                 }.map {
                     if uploaded_bytes <= content_length {
                         self.VDebug("\(c_user.info()) uploaded new media '\(media.name)' of \(media.size) bytes: \(media.mid)")
-
-                        let response_struct = VAPI.Structs.M.MEDIA.UPLOAD.PUT.Res(mid: media.mid, size_mib: media.size)
-                        var headers = HTTPHeaders()
-                        headers.add(name: .contentType, value: "application/json")
-
-                        return try! Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response_struct)))
+                        return try! self.response(VAPI.Structs.M.MEDIA.UPLOAD.PUT.Res(mid: media.mid, size_mib: media.size))
                     } else {
                         return try! self.error(code: .M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH)
                     }

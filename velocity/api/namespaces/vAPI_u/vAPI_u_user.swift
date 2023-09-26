@@ -55,13 +55,10 @@ extension VAPI {
             }
 
             let new_user = try self.db.user_create(username: request.name, password: request.password).get()
-            let response = VAPI.Structs.U.USER.PUT.Res(uid: new_user.uid, name: new_user.username)
             self.VDebug("\(user.info()) CREATED \(new_user.info())")
 
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
 
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+            return try self.response(Structs.U.USER.PUT.Res(uid: new_user.uid, name: new_user.username))
         }
 
         // Delete an existing user
@@ -87,7 +84,7 @@ extension VAPI {
             try delete_user.delete()
             self.VDebug("\(user.info()) DELETED \(delete_user.info())")
 
-            return Response(status: .ok)
+            return try self.response(nil, status: .ok)
         }
 
         route.post() { req in
@@ -97,14 +94,11 @@ extension VAPI {
                 return try self.error(code: .UNAUTHORIZED)
             }
 
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
             let c_user = key.user
 
             guard let uid = request.uid else {
                 self.VDebug("\(c_user.info()) requested user information")
-                return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(c_user)))
+                return try self.response(c_user)
             }
 
             guard try c_user.has_permission(permission: "velocity.user.view", group: nil) else {
@@ -118,7 +112,7 @@ extension VAPI {
             }
 
             self.VDebug("\(c_user.info()) requested user information for \(user.info())")
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(user)))
+            return try self.response(user)
         }
 
         route.post("list") { req in
@@ -141,13 +135,8 @@ extension VAPI {
                 users.append(Structs.U.USER.LIST.POST.UserInfo(uid: u.uid, name: u.username))
             }
 
-            let response = Structs.U.USER.LIST.POST.Res(users: users)
-
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
             self.VDebug("\(c_user.info()) requested user list")
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+            return try self.response(Structs.U.USER.LIST.POST.Res(users: users))
         }
 
         //
@@ -199,7 +188,7 @@ extension VAPI {
             // Assign the permission
             try user.add_permission(group: group, permission: permission)
 
-            return Response(status: .ok)
+            return try self.response(nil)
         }
 
         // Remove a permission
@@ -234,7 +223,7 @@ extension VAPI {
             let ok = try user.remove_permission(group: group, permission_name: request.permission)
 
             if ok {
-                return Response(status: .ok)
+                return try self.response(nil)
             } else {
                 return try self.error(code: .U_USER_PERMISSION_DELETE_PERMISSION_NOT_FOUND)
             }

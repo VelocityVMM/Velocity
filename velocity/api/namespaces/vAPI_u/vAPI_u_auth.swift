@@ -38,9 +38,6 @@ extension VAPI {
         route.post() { req in
             let request: Structs.U.AUTH.POST.Req = try req.content.decode(Structs.U.AUTH.POST.Req.self)
 
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
             // Get the user
             guard let user = { () -> VDB.User? in
                 do {
@@ -67,8 +64,7 @@ extension VAPI {
             let key = self.generate_authkey(user: user)
 
             self.VDebug("Authenticated \(user.info()) until \(key.expiration_date().description(with: .current))")
-            let response = Structs.U.AUTH.POST.Res(authkey: key.key.uuidString, expires: key.expiration_datetime())
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+            return try self.response(Structs.U.AUTH.POST.Res(authkey: key.key.uuidString, expires: key.expiration_datetime()))
         }
 
         // Drop an existing authkey to invalidate it
@@ -78,20 +74,17 @@ extension VAPI {
             // Search for the key
             guard let key = self.authkeys.removeValue(forKey: request.authkey) else {
                 self.VDebug("Key \(request.authkey) hasn't been found")
-                return Response(status: .ok)
+                return try self.response(nil)
             }
 
             self.VDebug("Invalidated authkey for \(key.user.info())")
 
-            return Response(status: .ok)
+            return try self.response(nil)
         }
 
         // Refresh an expiring authkey for a new one
         route.patch() { req in
             let request: Structs.U.AUTH.PATCH.Req = try req.content.decode(Structs.U.AUTH.PATCH.Req.self)
-
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
 
             // Search for the key
             guard let old_key = self.authkeys.removeValue(forKey: request.authkey) else {
@@ -108,8 +101,7 @@ extension VAPI {
             let key = self.generate_authkey(user: old_key.user)
 
             self.VDebug("Refreshed key for \(key.user.info()), valid until: \(key.expiration_date().description(with: .current)), \(self.authkeys.count) active keys")
-            let response = Structs.U.AUTH.PATCH.Res(authkey: key.key.uuidString, expires: key.expiration_datetime())
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+            return try self.response(Structs.U.AUTH.PATCH.Res(authkey: key.key.uuidString, expires: key.expiration_datetime()))
         }
     }
 }

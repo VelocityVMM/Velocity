@@ -387,17 +387,6 @@ extension VAPI {
         let message: String
     }
 
-    /// Construct a new error from an error code
-    /// - Parameter code: The error code to return
-    func error(code: ErrorCode) throws -> Response {
-        let error = Error(code: code, message: code.get_message())
-
-        var headers = HTTPHeaders()
-        headers.add(name: .contentType, value: "application/json")
-
-        return try Response(status: code.get_http_status(), headers: headers, body: .init(data: self.encoder.encode(error)))
-    }
-
     /// Resolves the promise but embeds a error struct into the Response
     /// - Parameter response: The eventloop promise to resolve
     /// - Parameter code: The code of the error
@@ -412,8 +401,15 @@ extension VAPI {
     /// Construct a new error from an error code and an additional string
     /// - Parameter code: The error code to return
     /// - Parameter additional: The additional message
-    func error(code: ErrorCode, _ additional: String) throws -> Response {
-        let error = Error(code: code, message: "\(code.get_message()): \(additional)")
+    func error(code: ErrorCode, _ additional: String? = nil) throws -> Response {
+        var msg = "\(code.get_message())"
+        if let additional = additional {
+            msg = "\(code.get_message()): \(additional)"
+        }
+
+        let error = Error(code: code, message: msg)
+
+        VTrace("ERROR (\(code.get_http_status())): \(error)")
 
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")

@@ -156,6 +156,23 @@ class VAPI : Loggable {
         return key
     }
 
+    /// Creates a Vapor response structure from the provided `Encodable`
+    /// - Parameter r: The response structure, if `nil` the response will have no body
+    /// - Parameter status: (default: `.ok`) The response status
+    func response(_ r: Encodable?, status: HTTPResponseStatus = .ok) throws -> Response {
+        guard let r = r else {
+            VTrace("RESPONSE (\(status))")
+            return Response(status: status)
+        }
+
+        VTrace("RESPONSE (\(status)): \(r)")
+
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+
+        return try Response(status: status, headers: headers, body: .init(data: self.encoder.encode(r)))
+    }
+
     /// All the available permissions for this api
     static let available_permissions: [VDB.PermissionTemplate] = [
         // velocity.user

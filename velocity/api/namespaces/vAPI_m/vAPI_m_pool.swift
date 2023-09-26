@@ -56,7 +56,7 @@ extension VAPI {
             try pool.assign(db: self.db, group: group, quota: request.quota, write: request.write, manage: request.write)
             self.VDebug("\(user.info()) assigned \(group.info()) to pool (\(pool.name)): write: \(request.write), manage: \(request.manage)")
 
-            return Response(status: .ok)
+            return try self.response(nil)
         }
 
         route.delete("assign") { req in
@@ -86,7 +86,7 @@ extension VAPI {
             try pool.revoke(db: self.db, group: group)
             self.VDebug("\(user.info()) revoked \(group.info()) from pool (\(pool.name))")
 
-            return Response(status: .ok)
+            return try self.response(nil)
         }
 
         route.post("list") { req in
@@ -108,17 +108,10 @@ extension VAPI {
                 return try self.error(code: .M_POOL_LIST_POST_GROUP_NOT_FOUND)
             }
 
+            let pools = try group.get_mediapools_info()
+            self.VDebug("\(user.info()) requested mediapool list: \(pools.count) pools")
 
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
-            let response = Structs.M.POOL.LIST.POST.Res(pools: try group.get_mediapools_info())
-            self.VDebug("\(user.info()) requested mediapool list: \(response.pools.count) pools")
-
-            return try Response(
-                status: .ok,
-                headers: headers,
-                body: .init(data: self.encoder.encode(response)))
+            return try self.response(Structs.M.POOL.LIST.POST.Res(pools: pools))
         }
     }
 }
