@@ -178,6 +178,9 @@ extension VAPI {
         /// `/m/media/list - POST`: The `gid` has not been found
         case M_MEDIA_LIST_POST_GROUP_NOT_FOUND = 10110
 
+        /// `/v/nic/list - POST`: The `velocity.nic.list` permission is missing
+        case V_NIC_LIST_POST_PERMISSION = 11100
+
     }
 }
 
@@ -277,6 +280,9 @@ extension VAPI.ErrorCode {
         case .M_MEDIA_LIST_POST_PERMISSION: return .forbidden
         case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return .notFound
 
+        // /v/nic/list - POST
+        case .V_NIC_LIST_POST_PERMISSION: return .forbidden
+
         }
     }
 
@@ -373,6 +379,9 @@ extension VAPI.ErrorCode {
         // /m/media/list - POST
         case .M_MEDIA_LIST_POST_PERMISSION: return "Permission 'velocity.media.list' is needed"
         case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
+
+        // /v/nic/list - POST
+        case .V_NIC_LIST_POST_PERMISSION: return "Permission 'velocity.nic.list' is needed"
 
         }
     }
