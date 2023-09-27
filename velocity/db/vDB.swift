@@ -38,6 +38,8 @@ class VDB : Loggable {
     let t_vmdisks: TVMDisks
     /// The `vmdisplays` table
     let t_vmdisplays: TVMDisplays
+    /// The `vmnics` table
+    let t_vmnics: TVMNICs
 
     /// Opens a new database connection at the specified location
     /// - Parameter location: The location to open the database at

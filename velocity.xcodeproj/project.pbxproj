@@ -31,6 +31,7 @@
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50394E522A2CD2E3006A7CB4 /* vRFBSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */; };
 		50422FCF2AC498AC0090637B /* vDBTVMDisplays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50422FCE2AC498AC0090637B /* vDBTVMDisplays.swift */; };
+		50422FD12AC49ABE0090637B /* vDBTVMNICs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50422FD02AC49ABE0090637B /* vDBTVMNICs.swift */; };
 		504C2E3B2AB3456100130F85 /* vAPI_m.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504C2E3A2AB3456100130F85 /* vAPI_m.swift */; };
 		504C2E3D2AB3463B00130F85 /* vAPI_m_media.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504C2E3C2AB3463B00130F85 /* vAPI_m_media.swift */; };
 		504C2E3F2AB356E400130F85 /* vDBTMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504C2E3E2AB356E400130F85 /* vDBTMedia.swift */; };
@@ -91,6 +92,7 @@
 		50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBStructs.swift; sourceTree = "<group>"; };
 		50394E512A2CD2E3006A7CB4 /* vRFBSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBSession.swift; sourceTree = "<group>"; };
 		50422FCE2AC498AC0090637B /* vDBTVMDisplays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMDisplays.swift; sourceTree = "<group>"; };
+		50422FD02AC49ABE0090637B /* vDBTVMNICs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMNICs.swift; sourceTree = "<group>"; };
 		504C2E3A2AB3456100130F85 /* vAPI_m.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_m.swift; sourceTree = "<group>"; };
 		504C2E3C2AB3463B00130F85 /* vAPI_m_media.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_m_media.swift; sourceTree = "<group>"; };
 		504C2E3E2AB356E400130F85 /* vDBTMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTMedia.swift; sourceTree = "<group>"; };
@@ -272,6 +274,7 @@
 			children = (
 				50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */,
 				50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */,
+				50422FD02AC49ABE0090637B /* vDBTVMNICs.swift */,
 				50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */,
 				504C2E3E2AB356E400130F85 /* vDBTMedia.swift */,
 				50A5BD852A9495E700440303 /* vDBTMemberships.swift */,
@@ -381,6 +384,7 @@
 				5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */,
 				47A78B4C2A350181007C8FB8 /* vVMStructs.swift in Sources */,
 				504C2E3F2AB356E400130F85 /* vDBTMedia.swift in Sources */,
+				50422FD12AC49ABE0090637B /* vDBTVMNICs.swift in Sources */,
 				500504FE2AC4151C00BB0163 /* vAPI_v_nic.swift in Sources */,
 				50422FCF2AC498AC0090637B /* vDBTVMDisplays.swift in Sources */,
 				50A5BD8B2A95495200440303 /* vAPI_u_user.swift in Sources */,
