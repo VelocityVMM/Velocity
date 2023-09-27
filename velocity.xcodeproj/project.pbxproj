@@ -23,6 +23,7 @@
 		500504F92AC410DA00BB0163 /* vDBHostNIC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500504F82AC410DA00BB0163 /* vDBHostNIC.swift */; };
 		500504FC2AC4135000BB0163 /* vAPI_v.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500504FB2AC4135000BB0163 /* vAPI_v.swift */; };
 		500504FE2AC4151C00BB0163 /* vAPI_v_nic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500504FD2AC4151C00BB0163 /* vAPI_v_nic.swift */; };
+		500505042AC4952F00BB0163 /* vDBTVMs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500505032AC4952F00BB0163 /* vDBTVMs.swift */; };
 		50394E2E2A2CC48B006A7CB4 /* vRFBServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E2D2A2CC48B006A7CB4 /* vRFBServer.swift */; };
 		50394E342A2CC9BF006A7CB4 /* vRFBUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */; };
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
@@ -81,6 +82,7 @@
 		500504F82AC410DA00BB0163 /* vDBHostNIC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBHostNIC.swift; sourceTree = "<group>"; };
 		500504FB2AC4135000BB0163 /* vAPI_v.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_v.swift; sourceTree = "<group>"; };
 		500504FD2AC4151C00BB0163 /* vAPI_v_nic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_v_nic.swift; sourceTree = "<group>"; };
+		500505032AC4952F00BB0163 /* vDBTVMs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMs.swift; sourceTree = "<group>"; };
 		50394E2D2A2CC48B006A7CB4 /* vRFBServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBServer.swift; sourceTree = "<group>"; };
 		50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBUtil.swift; sourceTree = "<group>"; };
 		50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBStructs.swift; sourceTree = "<group>"; };
@@ -270,6 +272,7 @@
 				504C2E3E2AB356E400130F85 /* vDBTMedia.swift */,
 				50A5BD852A9495E700440303 /* vDBTMemberships.swift */,
 				5072DFB92AB46FFC00DB1F0D /* vDBTGroupPools.swift */,
+				500505032AC4952F00BB0163 /* vDBTVMs.swift */,
 			);
 			path = tables;
 			sourceTree = "<group>";
@@ -346,6 +349,7 @@
 				506A198C2A97346F00463D79 /* vAPI_u_group.swift in Sources */,
 				47A78B502A36DE89007C8FB8 /* vMacOSUtils.swift in Sources */,
 				509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */,
+				500505042AC4952F00BB0163 /* vDBTVMs.swift in Sources */,
 				50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */,
 				50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */,
 				500504FC2AC4135000BB0163 /* vAPI_v.swift in Sources */,
