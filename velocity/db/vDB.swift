@@ -17,6 +17,9 @@ class VDB : Loggable {
     /// The available mediapools
     var mediapools: Dictionary<Int64, MediaPool> = Dictionary()
 
+    /// The available host NICs
+    var host_nics: Dictionary<NICID, HostNIC> = Dictionary()
+
     /// The `users` table
     let t_users: Users;
     /// The `groups` table
