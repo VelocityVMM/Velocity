@@ -21,6 +21,7 @@
 		47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A2E2A1EB00A006FFE2A /* utils.swift */; };
 		47D62A352A210095006FFE2A /* manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D62A342A210095006FFE2A /* manager.swift */; };
 		500504F92AC410DA00BB0163 /* vDBHostNIC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500504F82AC410DA00BB0163 /* vDBHostNIC.swift */; };
+		500504FC2AC4135000BB0163 /* vAPI_v.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500504FB2AC4135000BB0163 /* vAPI_v.swift */; };
 		50394E2E2A2CC48B006A7CB4 /* vRFBServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E2D2A2CC48B006A7CB4 /* vRFBServer.swift */; };
 		50394E342A2CC9BF006A7CB4 /* vRFBUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */; };
 		50394E362A2CCB5E006A7CB4 /* vRFBStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */; };
@@ -77,6 +78,7 @@
 		47D62A2E2A1EB00A006FFE2A /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		47D62A342A210095006FFE2A /* manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = manager.swift; sourceTree = "<group>"; };
 		500504F82AC410DA00BB0163 /* vDBHostNIC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBHostNIC.swift; sourceTree = "<group>"; };
+		500504FB2AC4135000BB0163 /* vAPI_v.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_v.swift; sourceTree = "<group>"; };
 		50394E2D2A2CC48B006A7CB4 /* vRFBServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBServer.swift; sourceTree = "<group>"; };
 		50394E332A2CC9BF006A7CB4 /* vRFBUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBUtil.swift; sourceTree = "<group>"; };
 		50394E352A2CCB5E006A7CB4 /* vRFBStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vRFBStructs.swift; sourceTree = "<group>"; };
@@ -166,6 +168,14 @@
 			path = velocity;
 			sourceTree = "<group>";
 		};
+		500504FA2AC4134400BB0163 /* vAPI_v */ = {
+			isa = PBXGroup;
+			children = (
+				500504FB2AC4135000BB0163 /* vAPI_v.swift */,
+			);
+			path = vAPI_v;
+			sourceTree = "<group>";
+		};
 		50394E322A2CC962006A7CB4 /* vrfb */ = {
 			isa = PBXGroup;
 			children = (
@@ -212,6 +222,7 @@
 		5056EC7C2A778CFA00D93422 /* namespaces */ = {
 			isa = PBXGroup;
 			children = (
+				500504FA2AC4134400BB0163 /* vAPI_v */,
 				504C2E392AB342ED00130F85 /* vAPI_m */,
 				50A5BD872A95462A00440303 /* vAPI_u */,
 			);
@@ -334,6 +345,7 @@
 				509AB0EF2A346FAC00F4DD2C /* vwindow.swift in Sources */,
 				50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */,
 				50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */,
+				500504FC2AC4135000BB0163 /* vAPI_v.swift in Sources */,
 				471189072A5AED1A0091EAB3 /* config.swift in Sources */,
 				47D62A352A210095006FFE2A /* manager.swift in Sources */,
 				504C2E3D2AB3463B00130F85 /* vAPI_m_media.swift in Sources */,

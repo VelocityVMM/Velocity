@@ -61,6 +61,7 @@ class VAPI : Loggable {
 
         try self.register_endpoints_u(route: self.app.grouped("u"))
         try self.register_endpoints_m(route: self.app.grouped("m"))
+        try self.register_endpoints_v(route: self.app.grouped("v"))
 
         // Setup server properties
         app.http.server.configuration.hostname = hostname
