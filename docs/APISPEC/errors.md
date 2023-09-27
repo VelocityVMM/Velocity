@@ -207,3 +207,9 @@ If a route has the error id `12` and wants to indicate a permission error on the
 - `10100` > `403`: Permission `velocity.media.list` is needed
 
 - `10110` > `404`: Group has not been found
+
+### `/v/nic/list`
+
+**POST**
+
+- `11100` > `403`: Permission `velocity.nic.list` is needed

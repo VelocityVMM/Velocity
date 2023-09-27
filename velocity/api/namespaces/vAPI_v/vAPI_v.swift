@@ -28,6 +28,7 @@ import Vapor
 extension VAPI {
     /// Registers all endpoints within the namespace `/v`
     func register_endpoints_v(route: RoutesBuilder) throws {
+        try self.register_endpoints_v_nic(route: route.grouped("nic"))
     }
 }
 

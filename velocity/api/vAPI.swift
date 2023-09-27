@@ -206,5 +206,8 @@ class VAPI : Loggable {
         VDB.PermissionTemplate("velocity.vm.view", "View statistics for a virtual machine"),
         VDB.PermissionTemplate("velocity.vm.interact", "Interact with a virtual machine (RFB, Serial...)"),
         VDB.PermissionTemplate("velocity.vm.state", "Alter the virtual machine state (start, stop, pause...)"),
+
+        // velocity.nic
+        VDB.PermissionTemplate("velocity.nic.list", "List available host NICs"),
     ]
 }
