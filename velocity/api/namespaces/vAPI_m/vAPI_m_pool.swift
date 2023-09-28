@@ -53,7 +53,7 @@ extension VAPI {
                 return try self.error(code: .M_POOL_ASSIGN_PUT_MEDIAPOOL_NOT_FOUND)
             }
 
-            try pool.assign(db: self.db, group: group, quota: request.quota, write: request.write, manage: request.write)
+            try pool.assign(db: self.db, group: group, quota: request.quota, write: request.write, manage: request.manage)
             self.VDebug("\(user.info()) assigned \(group.info()) to pool (\(pool.name)): write: \(request.write), manage: \(request.manage)")
 
             return try self.response(nil)
