@@ -125,7 +125,7 @@ extension VDB {
             let query = tm.table.filter(tm.mpid == self.mpid && tm.gid == group.gid)
 
             for row in try db.db.prepare(query) {
-                media.append(try Media.from_row(db: db, pool: self, group: group, row: row))
+                media.append(Media.from_row(db: db, pool: self, group: group, row: row))
             }
 
             return media

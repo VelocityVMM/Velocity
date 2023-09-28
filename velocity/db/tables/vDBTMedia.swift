@@ -86,6 +86,35 @@ extension VDB {
         func insert(db: Connection, _ media: Media) throws {
             try self.insert(db: db, name: media.name, type: media.type, mid: media.mid, mpid: media.pool.mpid, gid: media.group.gid, readonly: media.readonly)
         }
+
+        /// Select a piece of media from the database
+        /// - Parameter db: The VDB to use for selecting
+        /// - Parameter mid: The `mid` of the piece of media to select
+        static func select(db: VDB, mid: MID) throws -> Swift.Result<Media, SelectError> {
+            guard let row = try db.db.pluck(db.t_media.table.filter(db.t_media.mid == mid)) else {
+                return .failure(.MediaNotFound)
+            }
+
+            guard let group = try db.group_select(gid: row[db.t_media.gid]) else {
+                return .failure(.GroupNotFound)
+            }
+
+            guard let pool = db.pool_get(mpid: row[db.t_media.mpid]) else {
+                return .failure(.MediapoolNotFound)
+            }
+
+            return .success(Media.from_row(db: db, pool: pool, group: group, row: row))
+        }
+
+        /// An error that occured during selection
+        enum SelectError : Error {
+            /// The `mid` does not exist
+            case MediaNotFound
+            /// The `gid` does not exist
+            case GroupNotFound
+            /// The `mpid` does not exist, maybe the pool is no longer attached?
+            case MediapoolNotFound
+        }
     }
 
     /// Inserts or replaces media from its parameters into this table
@@ -97,5 +126,11 @@ extension VDB {
     /// - Parameter media: The media to insert
     func media_insert(_ media: Media) throws {
         try self.t_media.insert(db: self.db, media)
+    }
+
+    /// Select a piece of media from the database
+    /// - Parameter mid: The `mid` of the piece of media to select
+    func media_select(mid: MID) throws -> Swift.Result<Media, TMedia.SelectError> {
+        return try TMedia.select(db: self, mid: mid)
     }
 }
