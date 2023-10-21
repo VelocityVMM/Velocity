@@ -112,7 +112,7 @@ extension VDB {
                     }
                 }
 
-                memberships.append(MembershipInfo(uid: user.uid, name: self.name, permissions: permissions))
+                memberships.append(MembershipInfo(uid: user.uid, name: user.username, permissions: permissions))
             }
 
             return memberships
