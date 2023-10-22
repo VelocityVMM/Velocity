@@ -204,6 +204,15 @@ In contrast to the whole rest of the Velocity API, uploads are handled uniquely:
 
 **Response:**
 
+* `200`: Media uploaded
+
+```json
+{
+    "mid": "<MID>",
+    "size": "<Size in Bytes>"
+}
+```
+
 - `400 - Bad Request`: The http header is missing required fields
 
 - `403 - Forbidden`: The calling user lacks permissions or the group does not have the `manage` permission on the pool

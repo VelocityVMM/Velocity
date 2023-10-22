@@ -251,7 +251,7 @@ extension VAPI {
                 }.map {
                     if uploaded_bytes <= content_length {
                         self.VDebug("\(c_user.info()) uploaded new media '\(media.name)' of \(media.size) bytes: \(media.mid)")
-                        return try! self.response(VAPI.Structs.M.MEDIA.UPLOAD.PUT.Res(mid: media.mid, size_mib: media.size))
+                        return try! self.response(VAPI.Structs.M.MEDIA.UPLOAD.PUT.Res(mid: media.mid, size: media.size))
                     } else {
                         return try! self.error(code: .M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH)
                     }
@@ -309,7 +309,7 @@ extension VAPI.Structs.M {
             struct PUT {
                 struct Res : Encodable {
                     let mid: MID
-                    let size_mib: Int64
+                    let size: Int64
                 }
             }
         }
