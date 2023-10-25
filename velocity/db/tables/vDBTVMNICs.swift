@@ -53,5 +53,57 @@ extension VDB {
                 t.foreignKey(self.vmid, references: t_vms.table, t_vms.vmid)
             })
         }
+
+        /// The possible modes for a NIC
+        enum NICType : String, Decodable {
+            case NAT = "NAT"
+            case BRIDGE = "BRIDGE"
+        }
+
+        /// An error that can happen when inserting a NIC into the database
+        enum InsertError {
+            /// The `BRIDGE` NIC type requires a host NIC, but no one was provided
+            case HostNICRequired
+            /// The host NICID could not be found
+            case HostNICNotFound
+        }
+
+        /// Insert a virtual NIC, attached to a virtual machine
+        /// - Parameter db: The database to use for inserting
+        /// - Parameter vm: The virtual machine to attach the NIC to
+        /// - Parameter type: The type of NIC to use
+        /// - Parameter host: A host NIC to use when `type` is `BRIDGE`
+        /// - Returns: `false` if the operation could not be completed due to the `host` NIC missing
+        func insert(db: VDB, vm: VM, type: NICType, host: NICID?) throws -> InsertError? {
+            if type == .BRIDGE {
+                guard let host = host else {
+                    VErr("Inserting a NIC of type 'BRIDGE' requires a host NIC")
+                    return .HostNICRequired
+                }
+
+                guard let _ = db.host_nic_get(nicid: host) else {
+                    return .HostNICNotFound
+                }
+            }
+
+            let query = self.table.insert(
+                self.vmid <- vm.vmid,
+                self.type <- type.rawValue,
+                self.host <- host
+            )
+
+            try db.db.run(query);
+
+            return nil
+        }
+    }
+
+    /// Insert a virtual NIC, attached to a virtual machine
+    /// - Parameter vm: The virtual machine to attach the NIC to
+    /// - Parameter type: The type of NIC to use
+    /// - Parameter host: A host NIC to use when `type` is `BRIDGE`
+    /// - Returns: `false` if the operation could not be completed due to the `host` NIC missing
+    func vmnic_insert(vm: VM, type: TVMNICs.NICType, host: NICID?) throws -> TVMNICs.InsertError? {
+        return try self.t_vmnics.insert(db: self, vm: vm, type: type, host: host)
     }
 }
