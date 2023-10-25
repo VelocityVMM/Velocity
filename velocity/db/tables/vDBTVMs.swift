@@ -67,5 +67,29 @@ extension VDB {
                 t.foreignKey(self.gid, references: t_groups.table, t_groups.gid)
             })
         }
+
+        /// Insert a virtual macine into the database using the provided information
+        /// - Parameter db: The database to use for inserting
+        /// - Parameter info: Information about the virtual machine to insert
+        func insert(db: VDB, info: VM.Info) throws -> VM {
+            let query = self.table.insert(
+                self.name <- info.name,
+                self.gid <- info.group.gid,
+                self.cpus <- Int64(info.cpu_count),
+                self.memory <- Int64(info.memory_size),
+                self.rosetta <- info.rosetta,
+                self.autostart <- info.autostart
+            )
+
+            let vmid = try db.db.run(query);
+
+            return VM(db: db, vmid: vmid, info: info)
+        }
+    }
+
+    /// Insert a virtual macine into the database using the provided information
+    /// - Parameter info: Information about the virtual machine to insert
+    func vm_insert(info: VM.Info) throws -> VM {
+        return try self.t_vms.insert(db: self, info: info)
     }
 }

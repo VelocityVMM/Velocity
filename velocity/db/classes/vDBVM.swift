@@ -52,12 +52,12 @@ extension VDB {
         /// If the VM should start automatically on Velocity startup
         let autostart: Bool
 
-        init(db: VDB, info: Info) {
+        init(db: VDB, vmid: VMID, info: Info) {
             self.context = "[vDB::VM (\(info.name))]"
 
             self.db = db
 
-            self.vmid = info.vmid
+            self.vmid = vmid
             self.name = info.name
             self.group = info.group
             self.cpu_count = info.cpu_count
@@ -67,8 +67,6 @@ extension VDB {
         }
 
         struct Info {
-            /// The unique id of this VM
-            let vmid: VMID
             /// The unique name of the VM in the group
             let name: String
             /// The group this VM belongs to
