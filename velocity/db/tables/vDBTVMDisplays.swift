@@ -61,5 +61,42 @@ extension VDB {
                 t.foreignKey(self.vmid, references: t_vms.table, t_vms.vmid)
             })
         }
+
+        /// Inserts a new display into the database
+        /// - Parameter db: The database connection to use
+        /// - Parameter vm: The virtual machine to attach the display to
+        /// - Parameter name: The name for the new display
+        /// - Parameter width: The width of the display in pixels
+        /// - Parameter height: The height of the display in pixels
+        /// - Parameter ppi: The pixels per inch of the display
+        /// - Returns: `false` if the display is a duplicate, else `true`
+        func insert(db: VDB, vm: VM, name: String, width: Int64, height: Int64, ppi: Int64) throws -> Bool {
+            if try db.db.exists(self.table, self.vmid == vm.vmid && self.name == name) {
+                return false;
+            }
+
+            let query = self.table.insert(
+                self.vmid <- vm.vmid,
+                self.name <- name,
+                self.width <- width,
+                self.height <- height,
+                self.ppi <- ppi
+            )
+
+            try db.db.run(query)
+
+            return true
+        }
+    }
+
+    /// Inserts a new display into the database
+    /// - Parameter vm: The virtual machine to attach the display to
+    /// - Parameter name: The name for the new display
+    /// - Parameter width: The width of the display in pixels
+    /// - Parameter height: The height of the display in pixels
+    /// - Parameter ppi: The pixels per inch of the display
+    /// - Returns: `false` if the display is a duplicate, else `true`
+    func display_insert(vm: VM, name: String, width: Int64, height: Int64, ppi: Int64) throws -> Bool {
+        return try self.t_vmdisplays.insert(db: self, vm: vm, name: name, width: width, height: height, ppi: ppi)
     }
 }
