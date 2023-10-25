@@ -59,5 +59,43 @@ extension VDB {
                 t.foreignKey(self.mid, references: t_media.table, t_media.mid)
             })
         }
+
+        /// Inserts a new disk into the database
+        /// - Parameter vm: The virtual machine to attach the diplay to
+        /// - Parameter media: The media this disk wraps
+        /// - Parameter mode: The attachment mode for the disk
+        /// - Parameter readonly: If the disk should be read-only for this virtual machine
+        func insert(vm: VM, media: Media, mode: DiskMode, readonly: Bool) throws {
+            let query = self.table.insert(or: .replace,
+                self.vmid <- vm.vmid,
+                self.mid <- media.mid,
+                self.mode <- mode.rawValue,
+                self.readonly <- readonly)
+
+            try vm.db.db.run(query)
+        }
+
+        /// All possible modes a disk can be attached
+        enum DiskMode : String, Decodable {
+            case USB = "USB"
+            case VIRTIO = "VIRTIO"
+
+            static func parse(_ str: String) -> DiskMode? {
+                switch str {
+                case "USB": return .USB
+                case "VIRTIO": return .VIRTIO
+                default: return nil
+                }
+            }
+        }
+    }
+
+    /// Inserts a new disk into the database
+    /// - Parameter vm: The virtual machine to attach the diplay to
+    /// - Parameter media: The media this disk wraps
+    /// - Parameter mode: The attachment mode for the disk
+    /// - Parameter readonly: If the disk should be read-only for this virtual machine
+    func disk_insert(vm: VM, media: Media, mode: TVMDisks.DiskMode, readonly: Bool) throws {
+        return try self.t_vmdisks.insert(vm: vm, media: media, mode: mode, readonly: readonly)
     }
 }
