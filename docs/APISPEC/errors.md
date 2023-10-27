@@ -207,3 +207,28 @@ If a route has the error id `12` and wants to indicate a permission error on the
 - `10100` > `403`: Permission `velocity.media.list` is needed
 
 - `10110` > `404`: Group has not been found
+
+### `/v/nic/list`
+
+**POST**
+
+- `11100` > `403`: Permission `velocity.nic.list` is needed
+
+### `/v/vm/efi`
+
+**PUT**
+
+- `12200` > `403`: Permission `velocity.nic.list` is needed
+- `12210` > `404`: Group has not been found
+- `12211` > `404`: Media has not been found
+- `12212` > `404`: Media-owning group has not been found
+- `12213` > `404`: Media-hosting mediapool has not been found
+- `12214` > `404`: Host NIC has not been found
+- `12220` > `403`: CPU quota surpassed
+- `12221` > `403`: Memory quota surpassed
+- `12222` > `403`: Media quota surpassed
+- `12223` > `403`: VM name is a duplicate
+- `12224` > `403`: Display name is a duplicate
+- `12225` > `403`: Invalid disk mode
+- `12226` > `403`: Invalid NIC type
+- `12227` > `403`: `BRIDGE` NIC needs a host NIC

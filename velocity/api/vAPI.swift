@@ -61,6 +61,7 @@ class VAPI : Loggable {
 
         try self.register_endpoints_u(route: self.app.grouped("u"))
         try self.register_endpoints_m(route: self.app.grouped("m"))
+        try self.register_endpoints_v(route: self.app.grouped("v"))
 
         // Setup server properties
         app.http.server.configuration.hostname = hostname
@@ -205,5 +206,8 @@ class VAPI : Loggable {
         VDB.PermissionTemplate("velocity.vm.view", "View statistics for a virtual machine"),
         VDB.PermissionTemplate("velocity.vm.interact", "Interact with a virtual machine (RFB, Serial...)"),
         VDB.PermissionTemplate("velocity.vm.state", "Alter the virtual machine state (start, stop, pause...)"),
+
+        // velocity.nic
+        VDB.PermissionTemplate("velocity.nic.list", "List available host NICs"),
     ]
 }

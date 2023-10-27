@@ -147,7 +147,7 @@ extension VDB {
         /// - Parameter pool: The pool this media is part of
         /// - Parameter group: The group this media is associated with
         /// - Parameter row: The row to use for creation
-        static func from_row(db: VDB, pool: MediaPool, group: Group, row: Row) throws -> Media {
+        static func from_row(db: VDB, pool: MediaPool, group: Group, row: Row) -> Media {
             let t = db.t_media
             // TODO: Determine SIZE
             return Media(

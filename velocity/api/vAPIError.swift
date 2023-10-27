@@ -178,6 +178,38 @@ extension VAPI {
         /// `/m/media/list - POST`: The `gid` has not been found
         case M_MEDIA_LIST_POST_GROUP_NOT_FOUND = 10110
 
+        /// `/v/nic/list - POST`: The `velocity.nic.list` permission is missing
+        case V_NIC_LIST_POST_PERMISSION = 11100
+
+        /// `/v/vm/efi - PUT`: The `velocity.vm.create` permission is missing
+        case V_VM_EFI_PUT_PERMISSION = 12200
+        /// `/v/vm/efi - PUT`: The `gid` has not been found
+        case V_VM_EFI_PUT_GROUP_NOT_FOUND = 12210
+        /// `/v/vm/efi - PUT`: The `mid` of some media has not been found
+        case V_VM_EFI_PUT_MEDIA_NOT_FOUND = 12211
+        /// `/v/vm/efi - PUT`: The group for a certain `mid` has not been found
+        case V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND = 12212
+        /// `/v/vm/efi - PUT`: The mediapool for a certain `mid` has not been found
+        case V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND = 12213
+        /// `/v/vm/efi - PUT`: The `nicid` of a host NIC has not been found
+        case V_VM_EFI_PUT_HOST_NIC_NOT_FOUND = 12214
+        /// `/v/vm/efi - PUT`: Some quota in the `CPU` space has been surpassed
+        case V_VM_EFI_PUT_CPU_QUOTA = 12220
+        /// `/v/vm/efi - PUT`: Some quota in the `MEMORY` space has been surpassed
+        case V_VM_EFI_PUT_MEMORY_QUOTA = 12221
+        /// `/v/vm/efi - PUT`: Some quota in the `MEDIA` space has been surpassed
+        case V_VM_EFI_PUT_MEDIA_QUOTA = 12222
+        /// `/v/vm/efi - PUT`: There is already a VM with the same `name` in the group
+        case V_VM_EFI_PUT_CONFLICT = 12223
+        /// `/v/vm/efi - PUT`: There is already display with the same `name` in the VM
+        case V_VM_EFI_PUT_DISPLAY_CONFLICT = 12224
+        /// `/v/vm/efi - PUT`: An invalid `mode` has been supplied for a disk
+        case V_VM_EFI_PUT_DISK_MODE = 12225
+        /// `/v/vm/efi - PUT`: An invalid `type` has been supplied for a nic
+        case V_VM_EFI_PUT_NIC_TYPE = 12226
+        /// `/v/vm/efi - PUT`: A NIC with type `BRIDGE` has been used, but no host NIC was supplied
+        case V_VM_EFI_PUT_HOST_NIC_REQUIRED = 12227
+
     }
 }
 
@@ -277,6 +309,25 @@ extension VAPI.ErrorCode {
         case .M_MEDIA_LIST_POST_PERMISSION: return .forbidden
         case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return .notFound
 
+        // /v/nic/list - POST
+        case .V_NIC_LIST_POST_PERMISSION: return .forbidden
+
+
+        // /v/vm/efi - PUT
+        case .V_VM_EFI_PUT_PERMISSION: return .forbidden
+        case .V_VM_EFI_PUT_GROUP_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_MEDIA_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_HOST_NIC_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_CPU_QUOTA: return .notAcceptable
+        case .V_VM_EFI_PUT_MEMORY_QUOTA: return .notAcceptable
+        case .V_VM_EFI_PUT_MEDIA_QUOTA: return .notAcceptable
+        case .V_VM_EFI_PUT_CONFLICT: return .conflict
+        case .V_VM_EFI_PUT_DISPLAY_CONFLICT: return .conflict
+        case .V_VM_EFI_PUT_DISK_MODE: return .notAcceptable
+        case .V_VM_EFI_PUT_NIC_TYPE: return .notAcceptable
+        case .V_VM_EFI_PUT_HOST_NIC_REQUIRED: return .notAcceptable
         }
     }
 
@@ -374,6 +425,24 @@ extension VAPI.ErrorCode {
         case .M_MEDIA_LIST_POST_PERMISSION: return "Permission 'velocity.media.list' is needed"
         case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
 
+        // /v/nic/list - POST
+        case .V_NIC_LIST_POST_PERMISSION: return "Permission 'velocity.nic.list' is needed"
+
+        // /v/vm/efi - PUT
+        case .V_VM_EFI_PUT_PERMISSION: return "Permission 'velocity.vm.create' is needed"
+        case .V_VM_EFI_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .V_VM_EFI_PUT_MEDIA_NOT_FOUND: return "Media has not been found"
+        case .V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND: return "The owning group has not been found"
+        case .V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND: return "The owning mediapool has not been found"
+        case .V_VM_EFI_PUT_HOST_NIC_NOT_FOUND: return "Host NIC has not been found"
+        case .V_VM_EFI_PUT_CPU_QUOTA: return "CPU quota surpassed"
+        case .V_VM_EFI_PUT_MEMORY_QUOTA: return "Memory quota surpassed"
+        case .V_VM_EFI_PUT_MEDIA_QUOTA: return "Media quota surpassed"
+        case .V_VM_EFI_PUT_CONFLICT: return "A VM with the same name does already exist in this group"
+        case .V_VM_EFI_PUT_DISPLAY_CONFLICT: return "A display with the same name does already exist for the VM"
+        case .V_VM_EFI_PUT_DISK_MODE: return "An invalid attachment mode has been used for a disk"
+        case .V_VM_EFI_PUT_NIC_TYPE: return "An invalid interface type has been used for a NIC"
+        case .V_VM_EFI_PUT_HOST_NIC_REQUIRED: return "A NIC of type 'BRIDGE' needs a host NIC"
         }
     }
 }

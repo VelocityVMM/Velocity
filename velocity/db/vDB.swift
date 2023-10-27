@@ -17,6 +17,9 @@ class VDB : Loggable {
     /// The available mediapools
     var mediapools: Dictionary<Int64, MediaPool> = Dictionary()
 
+    /// The available host NICs
+    var host_nics: Dictionary<NICID, HostNIC> = Dictionary()
+
     /// The `users` table
     let t_users: Users;
     /// The `groups` table
@@ -29,6 +32,14 @@ class VDB : Loggable {
     let t_media: TMedia
     /// The `grouppools` table
     let t_grouppools: TGroupPools
+    /// The `vms` table
+    let t_vms: TVMs
+    /// The `vmdisks` table
+    let t_vmdisks: TVMDisks
+    /// The `vmdisplays` table
+    let t_vmdisplays: TVMDisplays
+    /// The `vmnics` table
+    let t_vmnics: TVMNICs
 
     /// Opens a new database connection at the specified location
     /// - Parameter location: The location to open the database at
@@ -52,6 +63,10 @@ class VDB : Loggable {
         self.t_memberships = try Memberships(db: self.db, groups: self.t_groups, users: self.t_users, permissions: self.t_permissions)
         self.t_media = try TMedia(db: self.db, groups: self.t_groups)
         self.t_grouppools = try TGroupPools(db: self.db, t_groups: self.t_groups)
+        self.t_vms = try TVMs(db: self.db, t_groups: self.t_groups)
+        self.t_vmdisks = try TVMDisks(db: self.db, t_vms: self.t_vms, t_media: self.t_media)
+        self.t_vmdisplays = try TVMDisplays(db: self.db, t_vms: self.t_vms)
+        self.t_vmnics = try TVMNICs(db: self.db, t_vms: self.t_vms)
 
         try self.db.execute("PRAGMA foreign_keys = ON;");
     }
