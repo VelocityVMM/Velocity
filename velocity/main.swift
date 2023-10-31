@@ -39,36 +39,6 @@ public func main() {
         let _ = try! VAPI(db: db, port: 8090);
     }
 
-    // Index local storage
-    VInfo("Indexing local storage..")
-    do {
-        try Manager.index_iso_storage()
-        try Manager.index_ipsw_storage()
-
-        // Once IPSW models are fetched, we can continue starting up.
-        VLog("Waiting for local IPSW model fetching..")
-        MacOSFetcher.dispatch_group.wait();
-        VLog("IPSW model fetching completed. Continuing")
-
-        try Manager.index_storage()
-    } catch {
-        VErr("Could not index local storage: \(error)")
-        return;
-    }
-
-    VInfo("Fetching available macOS installers from ipsw.me..")
-    MacOSFetcher.fetch_list()
-
-    // Start the RFB server
-    VInfo("Starting RFB Server..")
-    do {
-        let rfb_server = try VRFBServer(port: UInt16(VelocityConfig.velocity_vnc_port));
-        rfb_server.start();
-    } catch let e {
-        VErr("Failed to create RFB server: \(e)");
-        return;
-    }
-
     RunLoop.main.run()
 }
 
