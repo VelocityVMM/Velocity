@@ -24,21 +24,6 @@ public func main() {
         VInfo("Running in XCode, no escape codes")
     }
 
-    // Register a Signal Source
-    let signal_source = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main)
-    signal_source.setEventHandler {
-        VInfo("Caught SIGINT")
-        signal_source.cancel()
-
-        VInfo("Shutting down webserver..")
-        WebServer.ws?.shutdown()
-        exit(0)
-    }
-
-    // Ignore SIGINT by default
-    signal(SIGINT, SIG_IGN)
-    signal_source.resume()
-
     VInfo("Starting up..")
     VelocityConfig.setup()
 
@@ -73,19 +58,6 @@ public func main() {
 
     VInfo("Fetching available macOS installers from ipsw.me..")
     MacOSFetcher.fetch_list()
-
-    // Need to dispatch webserver as a background thread, because
-    // the UI needs the main thread to render
-    VInfo("Starting webserver..")
-    DispatchQueue.global().async {
-        do {
-            try start_web_server(VelocityConfig.velocity_http_port)
-        } catch {
-            VErr("Could not start webserver: \(error.localizedDescription)")
-            print(error)
-            exit(1)
-        }
-    }
 
     // Start the RFB server
     VInfo("Starting RFB Server..")

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		4707A5622A21692600E0B517 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = 4707A5612A21692600E0B517 /* Vapor */; };
-		4707A5642A21699900E0B517 /* httpserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5632A21699900E0B517 /* httpserver.swift */; };
 		4707A5662A22A09200E0B517 /* log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4707A5652A22A09200E0B517 /* log.swift */; };
 		470D4C2D2A3276C20057B58E /* vRFBConvertKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470D4C2C2A3276C20057B58E /* vRFBConvertKey.swift */; };
 		471189072A5AED1A0091EAB3 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 471189062A5AED1A0091EAB3 /* config.swift */; };
@@ -70,7 +69,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4707A5632A21699900E0B517 /* httpserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = httpserver.swift; sourceTree = "<group>"; };
 		4707A5652A22A09200E0B517 /* log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = log.swift; sourceTree = "<group>"; };
 		470D4C2C2A3276C20057B58E /* vRFBConvertKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = vRFBConvertKey.swift; sourceTree = "<group>"; };
 		471189062A5AED1A0091EAB3 /* config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
@@ -173,7 +171,6 @@
 				471189062A5AED1A0091EAB3 /* config.swift */,
 				47D62A2E2A1EB00A006FFE2A /* utils.swift */,
 				47D62A342A210095006FFE2A /* manager.swift */,
-				4707A5632A21699900E0B517 /* httpserver.swift */,
 				4707A5652A22A09200E0B517 /* log.swift */,
 				476083912A260F0200A93368 /* nsimage.swift */,
 				470D4C282A326ED10057B58E /* virtualization */,
@@ -378,7 +375,6 @@
 				50A5BD892A95471800440303 /* vAPI_u.swift in Sources */,
 				50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */,
 				47A78B4E2A351B38007C8FB8 /* vVirtualMachine.swift in Sources */,
-				4707A5642A21699900E0B517 /* httpserver.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
 				50F1C0D82AB4844C004F8FF5 /* vAPI_m_pool.swift in Sources */,
 				504C2E3B2AB3456100130F85 /* vAPI_m.swift in Sources */,

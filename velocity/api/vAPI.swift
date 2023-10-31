@@ -8,6 +8,14 @@
 import Foundation
 import Vapor
 
+internal struct VelocityWebError: Error, LocalizedError {
+    let errorDescription: String?
+
+    init(_ description: String) {
+        errorDescription = description
+    }
+}
+
 /// The Velocity api
 class VAPI : Loggable {
 
