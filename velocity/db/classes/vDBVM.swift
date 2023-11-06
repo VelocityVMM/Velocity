@@ -24,6 +24,7 @@
 
 import Foundation
 import Virtualization
+import SQLite
 
 /// The VM id (`VMID`) is an `Int64`
 typealias VMID = Int64
@@ -79,6 +80,28 @@ extension VDB {
             let rosetta: Bool
             /// If the VM should start automatically on Velocity startup
             let autostart: Bool
+        }
+
+        /// Creates a VM from a database row
+        /// - Parameter db: The db to store internally
+        /// - Parameter row: The row to use for creation
+        /// - Returns: The VM struct or `nil` if the group is not found
+        static func from_row(db: VDB, row: Row) throws -> VM? {
+            let t = db.t_vms
+
+            guard let group = try db.group_select(gid: row[t.gid]) else {
+                return nil
+            }
+
+            let info = VM.Info(
+                name: row[t.name],
+                group: group,
+                cpu_count: UInt64(row[t.cpus]),
+                memory_size_mib: UInt64(row[t.memory_mib]),
+                rosetta: row[t.rosetta],
+                autostart: row[t.autostart])
+
+            return VM(db: db, vmid: row[t.vmid], info: info)
         }
     }
 }
