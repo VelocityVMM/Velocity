@@ -165,3 +165,21 @@ extension String {
         return hash.map { String(format: "%02hhx", $0) }.joined();
     }
 }
+
+extension Result {
+    /// Returns only the `Success` variant of the Result, else `nil`
+    func get_success() -> Success? {
+        switch self {
+        case .success(let s): return s
+        case .failure(_): return nil
+        }
+    }
+
+    /// Returns only the `Failure` variant of the Result, else `nil`
+    func get_failure() -> Failure? {
+        switch self {
+        case .failure(let e): return e
+        case .success(_): return nil
+        }
+    }
+}
