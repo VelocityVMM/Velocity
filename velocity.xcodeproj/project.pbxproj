@@ -20,6 +20,7 @@
 		500505022AC4944800BB0163 /* vDBTVMDisks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500505012AC4944800BB0163 /* vDBTVMDisks.swift */; };
 		500505042AC4952F00BB0163 /* vDBTVMs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500505032AC4952F00BB0163 /* vDBTVMs.swift */; };
 		501D9CF02AF1AA3A00F6F1F6 /* manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501D9CEF2AF1AA3A00F6F1F6 /* manager.swift */; };
+		501D9CF52AF240E400F6F1F6 /* EFIStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */; };
 		501F92712AC4BA0D002456D0 /* vAPI_v_vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501F92702AC4BA0D002456D0 /* vAPI_v_vm.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50422FCF2AC498AC0090637B /* vDBTVMDisplays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50422FCE2AC498AC0090637B /* vDBTVMDisplays.swift */; };
@@ -73,6 +74,7 @@
 		500505012AC4944800BB0163 /* vDBTVMDisks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMDisks.swift; sourceTree = "<group>"; };
 		500505032AC4952F00BB0163 /* vDBTVMs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMs.swift; sourceTree = "<group>"; };
 		501D9CEF2AF1AA3A00F6F1F6 /* manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = manager.swift; sourceTree = "<group>"; };
+		501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EFIStoreManager.swift; sourceTree = "<group>"; };
 		501F92702AC4BA0D002456D0 /* vAPI_v_vm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_v_vm.swift; sourceTree = "<group>"; };
 		50422FCE2AC498AC0090637B /* vDBTVMDisplays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMDisplays.swift; sourceTree = "<group>"; };
 		50422FD02AC49ABE0090637B /* vDBTVMNICs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMNICs.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				501D9CEF2AF1AA3A00F6F1F6 /* manager.swift */,
+				501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */,
 			);
 			path = manager;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				504C2E412AB3573B00130F85 /* vDBMedia.swift in Sources */,
 				500505002AC48EE900BB0163 /* vDBVM.swift in Sources */,
 				50A5BD892A95471800440303 /* vAPI_u.swift in Sources */,
+				501D9CF52AF240E400F6F1F6 /* EFIStoreManager.swift in Sources */,
 				50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */,
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
 				50F1C0D82AB4844C004F8FF5 /* vAPI_m_pool.swift in Sources */,
