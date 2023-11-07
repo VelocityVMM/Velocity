@@ -23,8 +23,43 @@
 //
 
 import Foundation
+import System
 
 /// The core management class that all the virtual machines are managed through
 class Manager : Loggable {
     let context = "[Manager]"
+
+    /// The dictionary to store all virtual machines the manager knows
+    /// about. The `VMID` identifies each virtual machine
+    var vms: Dictionary<VMID, VirtualMachine> = Dictionary()
+
+    /// The manager for all EFIStores
+    let efistore_manager: EFIStoreManager
+
+    /// The Database to use for all operations
+    let db: VDB
+
+    /// Initializes the manager and tries to load all virtual machines
+    /// - Parameter efistore_manager: The manager for all EFIStores
+    /// - Parameter db: The database to use for all operations
+    init(efistore_manager: EFIStoreManager, db: VDB) throws {
+        self.efistore_manager = efistore_manager
+        self.db = db
+
+        // Iterate over all virtual machines available in the database
+        for vm in try self.db.t_vms.get_all_vms(db: self.db) {
+
+            VDebug("Loading virtual machine '\(vm.name)' [\(vm.vmid)]")
+
+            // Try to load each one
+            switch try VirtualMachine.new(vm: vm, manager: self) {
+            case .failure(let e):
+                VErr("Failed to load virtual machine '\(vm.name)' [\(vm.vmid)]: \(e)")
+            case .success(let new_vm):
+                self.vms[vm.vmid] = new_vm
+
+                VInfo("Loaded virtual machine '\(vm.name)' [\(vm.vmid)]")
+            }
+        }
+    }
 }
