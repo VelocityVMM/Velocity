@@ -218,7 +218,7 @@ If a route has the error id `12` and wants to indicate a permission error on the
 
 **PUT**
 
-- `12200` > `403`: Permission `velocity.nic.list` is needed
+- `12200` > `403`: Permission `velocity.vm.create` is needed
 - `12210` > `404`: Group has not been found
 - `12211` > `404`: Media has not been found
 - `12212` > `404`: Media-owning group has not been found
