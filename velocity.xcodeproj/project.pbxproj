@@ -45,6 +45,7 @@
 		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
 		50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */; };
 		50F1C0D82AB4844C004F8FF5 /* vAPI_m_pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */; };
+		50F1FED52AF98C49009F97D6 /* vmconfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1FED42AF98C49009F97D6 /* vmconfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -98,6 +99,7 @@
 		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
 		50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
 		50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_m_pool.swift; sourceTree = "<group>"; };
+		50F1FED42AF98C49009F97D6 /* vmconfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vmconfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +135,7 @@
 		47D62A232A1E72C4006FFE2A /* velocity */ = {
 			isa = PBXGroup;
 			children = (
+				501D9CF32AF1AC1000F6F1F6 /* virt */,
 				501D9CEE2AF1AA2F00F6F1F6 /* manager */,
 				5056EC772A72409D00D93422 /* api */,
 				5051AAA72A6AB7DB006FF899 /* db */,
@@ -164,6 +167,14 @@
 				501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */,
 			);
 			path = manager;
+			sourceTree = "<group>";
+		};
+		501D9CF32AF1AC1000F6F1F6 /* virt */ = {
+			isa = PBXGroup;
+			children = (
+				50F1FED42AF98C49009F97D6 /* vmconfig.swift */,
+			);
+			path = virt;
 			sourceTree = "<group>";
 		};
 		504C2E392AB342ED00130F85 /* vAPI_m */ = {
@@ -340,6 +351,7 @@
 				47D62A2F2A1EB00A006FFE2A /* utils.swift in Sources */,
 				50F1C0D82AB4844C004F8FF5 /* vAPI_m_pool.swift in Sources */,
 				504C2E3B2AB3456100130F85 /* vAPI_m.swift in Sources */,
+				50F1FED52AF98C49009F97D6 /* vmconfig.swift in Sources */,
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
 				5056EC7B2A72411700D93422 /* vAPI.swift in Sources */,
 				500504F92AC410DA00BB0163 /* vDBHostNIC.swift in Sources */,
