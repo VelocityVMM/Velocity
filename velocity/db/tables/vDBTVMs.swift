@@ -86,6 +86,21 @@ extension VDB {
             return VM(db: db, vmid: vmid, info: info)
         }
 
+        /// Retrieve all VMs that are stored in this database
+        func get_all_vms(db: VDB) throws -> [VM] {
+            var vms: [VM] = []
+
+            for row in try db.db.prepare(self.table) {
+                guard let vm = try VM.from_row(db: db, row: row) else {
+                    continue
+                }
+
+                vms.append(vm)
+            }
+
+            return vms
+        }
+
         /// Retrieve all VMs that have the `autostart` field set to `true`
         func get_autostart_vms(db: VDB) throws -> [VM] {
             let query = self.table.where(self.autostart == true)
@@ -113,5 +128,10 @@ extension VDB {
     /// Selects all VMs that have the `autostart` field set to `true`
     func vms_get_autostart_vms() throws -> [VM] {
         return try self.t_vms.get_autostart_vms(db: self)
+    }
+
+    /// Retrieve all VMs that are stored in this database
+    func vms_get_all_vms() throws -> [VM] {
+        return try self.t_vms.get_all_vms(db: self)
     }
 }
