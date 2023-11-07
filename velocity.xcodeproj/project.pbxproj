@@ -20,6 +20,7 @@
 		500505022AC4944800BB0163 /* vDBTVMDisks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500505012AC4944800BB0163 /* vDBTVMDisks.swift */; };
 		500505042AC4952F00BB0163 /* vDBTVMs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500505032AC4952F00BB0163 /* vDBTVMs.swift */; };
 		501D9CF02AF1AA3A00F6F1F6 /* manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501D9CEF2AF1AA3A00F6F1F6 /* manager.swift */; };
+		501D9CF22AF1ABF700F6F1F6 /* vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501D9CF12AF1ABF700F6F1F6 /* vm.swift */; };
 		501D9CF52AF240E400F6F1F6 /* EFIStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */; };
 		501F92712AC4BA0D002456D0 /* vAPI_v_vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501F92702AC4BA0D002456D0 /* vAPI_v_vm.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
@@ -75,6 +76,7 @@
 		500505012AC4944800BB0163 /* vDBTVMDisks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMDisks.swift; sourceTree = "<group>"; };
 		500505032AC4952F00BB0163 /* vDBTVMs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMs.swift; sourceTree = "<group>"; };
 		501D9CEF2AF1AA3A00F6F1F6 /* manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = manager.swift; sourceTree = "<group>"; };
+		501D9CF12AF1ABF700F6F1F6 /* vm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vm.swift; sourceTree = "<group>"; };
 		501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EFIStoreManager.swift; sourceTree = "<group>"; };
 		501F92702AC4BA0D002456D0 /* vAPI_v_vm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_v_vm.swift; sourceTree = "<group>"; };
 		50422FCE2AC498AC0090637B /* vDBTVMDisplays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMDisplays.swift; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 		501D9CF32AF1AC1000F6F1F6 /* virt */ = {
 			isa = PBXGroup;
 			children = (
+				501D9CF12AF1ABF700F6F1F6 /* vm.swift */,
 				50F1FED42AF98C49009F97D6 /* vmconfig.swift */,
 			);
 			path = virt;
@@ -335,6 +338,7 @@
 			files = (
 				5051AAA92A6AB7E4006FF899 /* vDB.swift in Sources */,
 				506A198C2A97346F00463D79 /* vAPI_u_group.swift in Sources */,
+				501D9CF22AF1ABF700F6F1F6 /* vm.swift in Sources */,
 				500505042AC4952F00BB0163 /* vDBTVMs.swift in Sources */,
 				50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */,
 				50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */,
