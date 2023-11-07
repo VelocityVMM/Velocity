@@ -47,7 +47,7 @@ class VirtualMachine : VZVirtualMachine {
     /// Creates a new VirtualMachine from the `VDB.VM` and the manager
     /// - Parameter vm: The `VDB.VM` struct to use for VM configuration
     /// - Parameter manager: The `Manager` struct to use for obtaining the EFIStore etc.
-    static func new(vm: VDB.VM, manager: Manager) throws -> Result<VirtualMachine, CreationError> {
+    static func new(vm: VDB.VM, manager: VMManager) throws -> Result<VirtualMachine, CreationError> {
         switch try VirtualMachineConfiguration.new(vm: vm, manager: manager) {
         case .failure(let e): return .failure(.Config(e))
         case .success(let config):

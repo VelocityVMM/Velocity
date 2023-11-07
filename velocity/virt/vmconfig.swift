@@ -36,7 +36,7 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration {
     /// using its properties for the VZVirtualMachineConfiguration
     /// - Parameter vm: The VDB.VM struct to use for configuration
     /// - Parameter manager: The manager to use for retrieving the EFIStore
-    static func new(vm: VDB.VM, manager: Manager) throws -> Result<VirtualMachineConfiguration, ConfigurationError> {
+    static func new(vm: VDB.VM, manager: VMManager) throws -> Result<VirtualMachineConfiguration, ConfigurationError> {
         let config = VirtualMachineConfiguration()
 
         // Set the CPUs

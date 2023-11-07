@@ -26,8 +26,8 @@ import Foundation
 import System
 
 /// The core management class that all the virtual machines are managed through
-class Manager : Loggable {
-    let context = "[Manager]"
+class VMManager : Loggable {
+    let context = "[VMManager]"
 
     /// The dictionary to store all virtual machines the manager knows
     /// about. The `VMID` identifies each virtual machine
