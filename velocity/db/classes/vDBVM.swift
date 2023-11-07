@@ -45,8 +45,8 @@ extension VDB {
         let group: Group
         /// The amount of CPUs this VM has available
         let cpu_count: UInt64
-        /// The amount of memory this VM has
-        let memory_size: UInt64
+        /// The amount of memory this VM has in MiB
+        let memory_size_mib: UInt64
         /// If the `rosetta` translation layer should be enabled
         let rosetta: Bool
         /// If the VM should start automatically on Velocity startup
@@ -61,7 +61,7 @@ extension VDB {
             self.name = info.name
             self.group = info.group
             self.cpu_count = info.cpu_count
-            self.memory_size = info.memory_size
+            self.memory_size_mib = info.memory_size_mib
             self.rosetta = info.rosetta
             self.autostart = info.autostart
         }
@@ -73,8 +73,8 @@ extension VDB {
             let group: Group
             /// The amount of CPUs this VM has available
             let cpu_count: UInt64
-            /// The amount of memory this VM has
-            let memory_size: UInt64
+            /// The amount of memory this VM has in MiB
+            let memory_size_mib: UInt64
             /// If the `rosetta` translation layer should be enabled
             let rosetta: Bool
             /// If the VM should start automatically on Velocity startup

@@ -42,8 +42,8 @@ extension VDB {
         let gid = Expression<GID>("gid")
         /// The amount of CPU cores the VM gets
         let cpus = Expression<Int64>("cpus")
-        /// The amount of memory the VM gets
-        let memory = Expression<Int64>("memory")
+        /// The amount of memory in MiB the VM gets
+        let memory_mib = Expression<Int64>("memory_mib")
         /// If the `Rosetta` translation layer should be enabled
         let rosetta = Expression<Bool>("rosetta")
         /// If the VM should start automatically on Velocity startup
@@ -58,7 +58,7 @@ extension VDB {
                 t.column(self.name)
                 t.column(self.gid)
                 t.column(self.cpus)
-                t.column(self.memory)
+                t.column(self.memory_mib)
                 t.column(self.rosetta)
                 t.column(self.autostart)
 
@@ -76,7 +76,7 @@ extension VDB {
                 self.name <- info.name,
                 self.gid <- info.group.gid,
                 self.cpus <- Int64(info.cpu_count),
-                self.memory <- Int64(info.memory_size),
+                self.memory_mib <- Int64(info.memory_size_mib),
                 self.rosetta <- info.rosetta,
                 self.autostart <- info.autostart
             )

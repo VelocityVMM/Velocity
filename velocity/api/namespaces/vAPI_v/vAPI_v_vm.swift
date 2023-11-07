@@ -52,7 +52,7 @@ extension VAPI {
             let vminfo = VDB.VM.Info(name: request.name,
                                      group: group,
                                      cpu_count: UInt64(request.cpus),
-                                     memory_size: UInt64(request.memory),
+                                     memory_size_mib: UInt64(request.memory_mib),
                                      rosetta: request.rosetta,
                                      autostart: request.autostart);
 
@@ -148,7 +148,7 @@ extension VAPI.Structs.V {
                     let gid: GID
 
                     let cpus: Int64
-                    let memory: Int64
+                    let memory_mib: Int64
 
                     let displays: [Display]
                     let disks: [Disk]

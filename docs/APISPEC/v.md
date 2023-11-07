@@ -65,7 +65,7 @@ Create a new virtual machineCreate a new `EFI` virtual machine using the supplie
   "gid": "<GID>",
 
   "cpus": "<Amount of CPUs assigned>",
-  "memory": "<Memory size in bytes>",
+  "memory_mib": "<Memory size in MiB>",
   "displays": [
     {
       "name": "<Friendly name>",
@@ -101,7 +101,7 @@ Create a new virtual machineCreate a new `EFI` virtual machine using the supplie
 
 - `cpus`: The amount of virtual CPUs that should be available to the guest
 
-- `memory_size`: The amount of memory assigned to the guest in `bytes`
+- `memory_mib`: The amount of memory assigned to the guest in `MiB`
 
 - `displays`: An array of displays
   
