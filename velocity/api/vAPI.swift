@@ -46,7 +46,7 @@ class VAPI : Loggable {
         let corsConfiguration = CORSMiddleware.Configuration(
             allowedOrigin: .all,
             allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
-            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin, "File-Name" ]
+            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin, "File-Name", "x-velocity-authkey", "x-velocity-mpid", "x-velocity-gid", "x-velocity-name", "x-velocity-type", "x-velocity-readonly"]
         )
         let cors = CORSMiddleware(configuration: corsConfiguration)
         self.app.middleware.use(cors, at: .beginning)
