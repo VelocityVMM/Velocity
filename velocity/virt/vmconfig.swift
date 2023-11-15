@@ -79,6 +79,12 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
             config.VDebug("Attached NIC of type \(nic)")
         }
 
+        let displays = try vm.db.t_vmdisplays.select_vm_displays(vm: vm)
+        for display in displays {
+            config.graphicsDevices.append(try display.get_graphics_device_configuration())
+            config.VDebug("Attached graphics device \"\(display.name)\": \(display.width)x\(display.height) px")
+        }
+
         return .success(config)
     }
 
