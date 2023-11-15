@@ -27,7 +27,8 @@ import Virtualization
 
 /// A wrapper around the `VZVirtualMachineConfiguration` with some useful
 /// safeguards and sensible error handling
-class VirtualMachineConfiguration : VZVirtualMachineConfiguration {
+class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
+    var context: String = "[VMConfiguration]"
 
     /// Make the constructor private, allow only static initialization
     private override init() {}
@@ -36,6 +37,10 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration {
     /// using its properties for the VZVirtualMachineConfiguration
     /// - Parameter vm: The VDB.VM struct to use for configuration
     /// - Parameter manager: The manager to use for retrieving the EFIStore
+    ///
+    /// This function should probably change for a new signature that allows non-critical
+    /// errors to be returned to inform the manager about errors that arose but did not
+    /// prevent virtual machine creation
     static func new(vm: VDB.VM, manager: VMManager) throws -> Result<VirtualMachineConfiguration, ConfigurationError> {
         let config = VirtualMachineConfiguration()
 
@@ -53,6 +58,16 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration {
         let bootloader = VZEFIBootLoader()
         bootloader.variableStore = try manager.efistore_manager.get_efistore(vmid: vm.vmid)
         config.bootLoader = bootloader
+
+        // Setup the disks, printing errors
+        let disks = try vm.db.t_vmdisks.select_vm_disks(vm: vm)
+        for error in disks.1 {
+            config.VErr("Failed to load disk for vm \"\(vm.name)\" [\(vm.vmid)]: \(error)")
+        }
+        for disk in disks.0 {
+            config.VDebug("Attaching media \"\(disk.media.name)\"...")
+            config.storageDevices.append(try disk.get_storage_device_configuration())
+        }
 
         return .success(config)
     }
