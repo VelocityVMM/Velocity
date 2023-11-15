@@ -87,6 +87,28 @@ extension VDB {
 
             return true
         }
+
+        /// Selects all display configurations for a virtual machine
+        /// - Parameter vm: The VM to select the displays of
+        func select_vm_displays(vm: VM) throws -> [VZ.DisplayConfiguration] {
+            let query = self.table.filter(self.vmid == vm.vmid)
+            var res: [VZ.DisplayConfiguration] = []
+
+            for row in try vm.db.db.prepare(query) {
+                res.append(self.display_from_row(row: row))
+            }
+
+            return res
+        }
+
+        /// Creates a `VZ.DisplayConfiguration` from a provided database row
+        func display_from_row(row: Row) -> VZ.DisplayConfiguration {
+            return VZ.DisplayConfiguration(
+                name: row[self.name],
+                width: row[self.width],
+                height: row[self.height],
+                ppi: row[self.ppi])
+        }
     }
 
     /// Inserts a new display into the database
