@@ -39,6 +39,7 @@
 		5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5075244D2A37A2810072B094 /* vNWConnection.swift */; };
 		5085FD3B2B04E42B008EAB16 /* diskconfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5085FD3A2B04E42B008EAB16 /* diskconfiguration.swift */; };
 		5085FD3D2B04E47E008EAB16 /* vz.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5085FD3C2B04E47E008EAB16 /* vz.swift */; };
+		5085FD3F2B04F9C0008EAB16 /* nicconfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5085FD3E2B04F9C0008EAB16 /* nicconfiguration.swift */; };
 		50A5BD862A9495E700440303 /* vDBTMemberships.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A5BD852A9495E700440303 /* vDBTMemberships.swift */; };
 		50A5BD892A95471800440303 /* vAPI_u.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A5BD882A95471800440303 /* vAPI_u.swift */; };
 		50A5BD8B2A95495200440303 /* vAPI_u_user.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A5BD8A2A95495200440303 /* vAPI_u_user.swift */; };
@@ -96,6 +97,7 @@
 		5075244D2A37A2810072B094 /* vNWConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vNWConnection.swift; sourceTree = "<group>"; };
 		5085FD3A2B04E42B008EAB16 /* diskconfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = diskconfiguration.swift; sourceTree = "<group>"; };
 		5085FD3C2B04E47E008EAB16 /* vz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vz.swift; sourceTree = "<group>"; };
+		5085FD3E2B04F9C0008EAB16 /* nicconfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = nicconfiguration.swift; sourceTree = "<group>"; };
 		508BEF142A78507D007D276A /* APITest.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = APITest.py; sourceTree = "<group>"; };
 		50A5BD852A9495E700440303 /* vDBTMemberships.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTMemberships.swift; sourceTree = "<group>"; };
 		50A5BD882A95471800440303 /* vAPI_u.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_u.swift; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 			isa = PBXGroup;
 			children = (
 				5085FD3A2B04E42B008EAB16 /* diskconfiguration.swift */,
+				5085FD3E2B04F9C0008EAB16 /* nicconfiguration.swift */,
 			);
 			path = vz;
 			sourceTree = "<group>";
@@ -385,6 +388,7 @@
 				501D9CF02AF1AA3A00F6F1F6 /* vmmanager.swift in Sources */,
 				50422FCF2AC498AC0090637B /* vDBTVMDisplays.swift in Sources */,
 				50A5BD8B2A95495200440303 /* vAPI_u_user.swift in Sources */,
+				5085FD3F2B04F9C0008EAB16 /* nicconfiguration.swift in Sources */,
 				5056EC7E2A778D1A00D93422 /* vAPI_u_auth.swift in Sources */,
 				500505022AC4944800BB0163 /* vDBTVMDisks.swift in Sources */,
 				5072DFBA2AB46FFC00DB1F0D /* vDBTGroupPools.swift in Sources */,
