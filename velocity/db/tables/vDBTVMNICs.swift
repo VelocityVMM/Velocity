@@ -54,6 +54,26 @@ extension VDB {
             })
         }
 
+        /// Selects all the NICs assiciated with a virtual machine
+        /// - Parameter vm: The virtual machine to select the NICs from
+        /// - Returns: A tuple of valid NIC configurations and the errors that occured
+        func select_vm_nics(vm: VM) throws -> ([VZ.NICConfiguration], [SelectError]) {
+            let query = self.table.filter(self.vmid == vm.vmid)
+            var res: [VZ.NICConfiguration] = []
+            var errors: [SelectError] = []
+
+            for nic in try vm.db.db.prepare(query) {
+                switch VZ.NICConfiguration.parse(type: nic[self.type], db: vm.db, host: nic[self.host]) {
+                case .success(let nic):
+                    res.append(nic)
+                case .failure(let e):
+                    errors.append(e)
+                }
+            }
+
+            return (res, errors)
+        }
+
         /// The possible modes for a NIC
         enum NICType : String, Decodable {
             case NAT = "NAT"
@@ -66,6 +86,31 @@ extension VDB {
             case HostNICRequired
             /// The host NICID could not be found
             case HostNICNotFound
+        }
+
+        /// An error that can occur when selecting a NIC from this table
+        enum SelectError : Error, CustomStringConvertible {
+
+            /// The mode is unknown or invalid
+            /// - Parameter value: The invalid value
+            case UnknownMode(value: String)
+
+            /// The mode requires a host NIC, but none was provided
+            case NoHostNIC
+
+            /// The host NIC is unavailable
+            case HostNICUnavailable(nicid: NICID)
+
+            var description: String {
+                switch self {
+                case .UnknownMode(value: let value):
+                    return "Invalid NIC mode '\(value)#"
+                case .NoHostNIC:
+                    return "No Host NIC was specified for type 'BRIDGE'"
+                case .HostNICUnavailable(nicid: let nicid):
+                    return "Host NIC with NICID=\(nicid) is not available"
+                }
+            }
         }
 
         /// Insert a virtual NIC, attached to a virtual machine
@@ -105,5 +150,31 @@ extension VDB {
     /// - Returns: `false` if the operation could not be completed due to the `host` NIC missing
     func vmnic_insert(vm: VM, type: TVMNICs.NICType, host: NICID?) throws -> TVMNICs.InsertError? {
         return try self.t_vmnics.insert(db: self, vm: vm, type: type, host: host)
+    }
+}
+
+extension VZ.NICConfiguration {
+    /// Parse a `NICConfiguration` from the provided values
+    /// - Parameter type: The type to use and parse
+    /// - Parameter db: The database to use for further queries
+    /// - Parameter host: The host NIC if required
+    /// - Returns: Either the configuration or an error indicating the failure
+    static func parse(type: String, db: VDB, host: NICID?) -> Swift.Result<VZ.NICConfiguration, VDB.TVMNICs.SelectError> {
+        switch type {
+        case "NAT":
+            return .success(.NAT)
+        case "BRIDGE":
+            guard let nicid = host else {
+                return .failure(.NoHostNIC)
+            }
+
+            guard let host = db.host_nic_get(nicid: nicid) else {
+                return .failure(.HostNICUnavailable(nicid: nicid))
+            }
+
+            return .success(.BRIDGE(host))
+        default:
+            return .failure(.UnknownMode(value: type))
+        }
     }
 }
