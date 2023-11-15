@@ -69,6 +69,15 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
             config.storageDevices.append(try disk.get_storage_device_configuration())
         }
 
+        let nics = try vm.db.t_vmnics.select_vm_nics(vm: vm)
+        for error in nics.1 {
+            config.VErr("Failed to load NIC for vm \"\(vm.name)\" [\(vm.vmid)]: \(error)")
+        }
+        for nic in nics.0 {
+            config.networkDevices.append(nic.get_network_device_configuration())
+            config.VDebug("Attached NIC of type \(nic)")
+        }
+
         return .success(config)
     }
 
