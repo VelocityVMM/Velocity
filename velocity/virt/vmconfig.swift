@@ -43,6 +43,7 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
     /// prevent virtual machine creation
     static func new(vm: VDB.VM, manager: VMManager) throws -> Result<VirtualMachineConfiguration, ConfigurationError> {
         let config = VirtualMachineConfiguration()
+        config.context = "[VMConfiguration (\(vm.name))]"
 
         // Set the CPUs
         if let e = config.set_cpu_count(cpu_count: Int(vm.cpu_count)).get_failure() {
@@ -65,8 +66,8 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
             config.VErr("Failed to load disk for vm \"\(vm.name)\" [\(vm.vmid)]: \(error)")
         }
         for disk in disks.0 {
-            config.VDebug("Attaching media \"\(disk.media.name)\"...")
             config.storageDevices.append(try disk.get_storage_device_configuration())
+            config.VDebug("Attached media \"\(disk.media.name)\" {\(disk.media.mid)} via \(disk.mode)")
         }
 
         let nics = try vm.db.t_vmnics.select_vm_nics(vm: vm)
