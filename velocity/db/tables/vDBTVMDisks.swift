@@ -75,6 +75,72 @@ extension VDB {
             try vm.db.db.run(query)
         }
 
+        /// Parses a disk config from a provided row
+        /// - Parameter db: The database to use for extra queries
+        /// - Parameter row: The row to parse
+        /// - Returns: Either the configuration, or an error why the selection process failed
+        func disk_config_from_row(db: VDB, row: Row) throws -> Swift.Result<VZ.DiskConfiguration, SelectError> {
+            // Select the media first
+            switch try db.media_select(mid: row[self.mid]) {
+
+            // If that fails, we're done here
+            case .failure(let e):
+                return .failure(.Media(mid: row[self.mid], error: e))
+
+            case .success(let media):
+                // Try parsing the mode
+                guard let mode = DiskMode.parse(row[self.mode]) else {
+                    return .failure(.DiskMode(media: media, value: row[self.mode]))
+                }
+
+                // Consutrct a DiskConfiguration
+                return .success(VZ.DiskConfiguration(media: media, mode: mode, readonly: row[self.readonly]))
+            }
+        }
+
+        /// Selects all the disks connected to a virtual machine
+        /// - Parameter vm: The virtual machine to select the disks of
+        /// - Returns: A tuple of the disk configurations and the errors that occured
+        func select_vm_disks(vm: VM) throws -> ([VZ.DiskConfiguration], [SelectError]) {
+            let query = self.table.filter(self.vmid == vm.vmid)
+            var res: [VZ.DiskConfiguration] = []
+            var errors: [SelectError] = []
+
+            for row in try vm.db.db.prepare(query) {
+                switch try self.disk_config_from_row(db: vm.db, row: row) {
+                case .success(let config):
+                    res.append(config)
+                case .failure(let e):
+                    errors.append(e)
+                }
+            }
+
+            return (res, errors)
+        }
+
+        /// An error that can occur when selecting from this table
+        enum SelectError : Error, CustomStringConvertible {
+
+            /// The media with the supplied MID failed to select
+            /// - Parameter mid: The MID of the referenced piece of media
+            /// - Parameter error: The error
+            case Media(mid: MID, error: TMedia.SelectError)
+
+            /// An invalid disk mode has been parsed
+            /// - Parameter media: The piece of media that was referenced by the disk
+            /// - Parameter value: The invalid string
+            case DiskMode(media: Media, value: String)
+
+            var description: String {
+                switch self {
+                case .Media(mid: let mid, error: let error):
+                    return "Failed to select media {\(mid)}: \(error)"
+                case .DiskMode(media: let media, value: let value):
+                    return "Invalid disk mode \"\(value)\" for media \"\(media.name)\" {\(media.mid)}"
+                }
+            }
+        }
+
         /// All possible modes a disk can be attached
         enum DiskMode : String, Decodable {
             case USB = "USB"
