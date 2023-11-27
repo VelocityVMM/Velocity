@@ -40,16 +40,9 @@ extension VZ {
         /// The pixels per inch value (MacOS only)
         let ppi: Int64
 
-        /// Generates a `VZGraphicsDeviceConfiguration` from this configuration
-        func get_graphics_device_configuration() throws -> VZGraphicsDeviceConfiguration {
-            let scanout = VZVirtioGraphicsScanoutConfiguration(
-                widthInPixels: Int(self.width),
-                heightInPixels: Int(self.height))
-
-            let device = VZVirtioGraphicsDeviceConfiguration()
-            device.scanouts.append(scanout)
-
-            return device
+        /// Returns a `VZVirtioGraphicsScanoutConfiguration` from this configuration
+        func get_scanout() -> VZVirtioGraphicsScanoutConfiguration {
+            return VZVirtioGraphicsScanoutConfiguration(widthInPixels: Int(self.width), heightInPixels: Int(self.height))
         }
 
     }

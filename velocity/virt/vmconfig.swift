@@ -79,10 +79,16 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
             config.VDebug("Attached NIC of type \(nic)")
         }
 
+        // Setup the displays
         let displays = try vm.db.t_vmdisplays.select_vm_displays(vm: vm)
-        for display in displays {
-            config.graphicsDevices.append(try display.get_graphics_device_configuration())
-            config.VDebug("Attached graphics device \"\(display.name)\": \(display.width)x\(display.height) px")
+        if let display = displays.last {
+            let gpu = VZVirtioGraphicsDeviceConfiguration()
+            gpu.scanouts.append(display.get_scanout())
+            config.graphicsDevices.append(gpu)
+        }
+        // Warn the user that currently only 1 display is possible
+        if displays.count > 1 {
+            config.VWarn("Virtualization framework does not allow for more than 1 display")
         }
 
         return .success(config)
