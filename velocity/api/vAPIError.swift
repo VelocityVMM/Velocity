@@ -29,6 +29,9 @@ extension VAPI {
     /// An enumeration of all possible error codes that can be thrown by the Velocity API
     enum ErrorCode : Int64, Encodable {
 
+        /// The endpoint is not implemented yet
+        case NOT_IMPLEMENTED = 200
+
         /// An unauthorized request has been made
         case UNAUTHORIZED = 100
 
@@ -232,6 +235,8 @@ extension VAPI.ErrorCode {
     func get_http_status() -> HTTPStatus {
         switch self {
 
+        case .NOT_IMPLEMENTED: return .notImplemented
+
         case .UNAUTHORIZED: return .unauthorized
 
         // /u/auth
@@ -357,6 +362,8 @@ extension VAPI.ErrorCode {
     /// Returns the matching error message for an error code
     func get_message() -> String {
         switch self {
+
+        case .NOT_IMPLEMENTED: return "Feature not implemented"
 
         case .UNAUTHORIZED: return "Unauthorized: Authkey is invalid or not present"
 
