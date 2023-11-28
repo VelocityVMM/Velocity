@@ -210,6 +210,20 @@ extension VAPI {
         /// `/v/vm/efi - PUT`: A NIC with type `BRIDGE` has been used, but no host NIC was supplied
         case V_VM_EFI_PUT_HOST_NIC_REQUIRED = 12227
 
+        // MARK: /v/vm/state: 11xxx
+
+        /// `/v/vm/state - POST`: The `velocity.vm.view` permission is missing
+        case V_VM_STATE_POST_PERMISSION = 13100
+        /// `/v/vm/state - POST`: The requested VMID has not been found
+        case V_VM_STATE_POST_VM_NOT_FOUND = 13110
+
+        /// `/v/vm/state - PUT`: The `velocity.vm.state` permission is missing
+        case V_VM_STATE_PUT_PERMISSION = 13200
+        /// `/v/vm/state - PUT`: The requested VMID has not been found
+        case V_VM_STATE_PUT_VM_NOT_FOUND = 13210
+        /// `/v/vm/state - PUT`: The requested state transition can not be completed
+        case V_VM_STATE_PUT_NOT_ALLOWED = 13220
+
     }
 }
 
@@ -328,6 +342,15 @@ extension VAPI.ErrorCode {
         case .V_VM_EFI_PUT_DISK_MODE: return .notAcceptable
         case .V_VM_EFI_PUT_NIC_TYPE: return .notAcceptable
         case .V_VM_EFI_PUT_HOST_NIC_REQUIRED: return .notAcceptable
+
+        // /v/vm/state - POST
+        case .V_VM_STATE_POST_PERMISSION: return .forbidden
+        case .V_VM_STATE_POST_VM_NOT_FOUND: return .notFound
+
+        // /v/vm/state - PUT
+        case .V_VM_STATE_PUT_PERMISSION: return .forbidden
+        case .V_VM_STATE_PUT_VM_NOT_FOUND: return .notFound
+        case .V_VM_STATE_PUT_NOT_ALLOWED: return .notAcceptable
         }
     }
 
@@ -443,6 +466,15 @@ extension VAPI.ErrorCode {
         case .V_VM_EFI_PUT_DISK_MODE: return "An invalid attachment mode has been used for a disk"
         case .V_VM_EFI_PUT_NIC_TYPE: return "An invalid interface type has been used for a NIC"
         case .V_VM_EFI_PUT_HOST_NIC_REQUIRED: return "A NIC of type 'BRIDGE' needs a host NIC"
+
+        // /v/vm/state - POST
+        case .V_VM_STATE_POST_PERMISSION: return "Permission 'velocity.vm.view' is needed"
+        case .V_VM_STATE_POST_VM_NOT_FOUND: return "Virtual machine has not been found"
+
+        // /v/vm/state - PUT
+        case .V_VM_STATE_PUT_PERMISSION: return "Permission 'velocity.vm.state' is needed"
+        case .V_VM_STATE_PUT_VM_NOT_FOUND: return "Virtual machine has not been found"
+        case .V_VM_STATE_PUT_NOT_ALLOWED: return "State transition not allowed"
         }
     }
 }

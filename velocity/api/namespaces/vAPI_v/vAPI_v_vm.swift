@@ -132,6 +132,56 @@ extension VAPI {
             }
 
         }
+
+        route.post("state") { req in
+            let request: Structs.V.VM.STATE.POST.Req = try req.content.decode(Structs.V.VM.STATE.POST.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return try self.error(code: .UNAUTHORIZED)
+            }
+
+            let c_user = key.user
+
+            guard try c_user.has_permission(permission: "velocity.vm.view", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to retrieve VM state: FORBIDDEN")
+                return try self.error(code: .V_VM_STATE_POST_PERMISSION)
+            }
+
+            guard let vm = self.vm_manager.get_vm(vmid: request.vmid) else {
+                self.VDebug("\(c_user.info()) tried to retrieve VM state: VM NOT FOUND")
+                return try self.error(code: .V_VM_STATE_POST_VM_NOT_FOUND)
+            }
+
+            return try self.response(Structs.V.VM.STATE.Res(vmid: vm.vvm.vmid, state: vm.get_state().rawValue))
+        }
+
+        route.put("state") { req in
+            let request: Structs.V.VM.STATE.PUT.Req = try req.content.decode(Structs.V.VM.STATE.PUT.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return try self.error(code: .UNAUTHORIZED)
+            }
+
+            let c_user = key.user
+
+            guard try c_user.has_permission(permission: "velocity.vm.state", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to change VM state: FORBIDDEN")
+                return try self.error(code: .V_VM_STATE_PUT_PERMISSION)
+            }
+
+            guard let vm = self.vm_manager.get_vm(vmid: request.vmid) else {
+                self.VDebug("\(c_user.info()) tried to retrieve VM state: VM NOT FOUND")
+                return try self.error(code: .V_VM_STATE_POST_VM_NOT_FOUND)
+            }
+
+            let res = try vm.request_state_transition(state: request.state, force: request.force)
+
+            if res {
+                return try self.response(Structs.V.VM.STATE.Res(vmid: vm.vvm.vmid, state: vm.get_state().rawValue))
+            } else {
+                return try self.error(code: .V_VM_STATE_PUT_NOT_ALLOWED)
+            }
+        }
     }
 }
 
@@ -176,6 +226,31 @@ extension VAPI.Structs.V {
                 struct Res: Encodable {
                     let vmid: VMID
                 }
+            }
+        }
+        /// `/v/vm/state`
+        struct STATE {
+            /// `/v/vm/state` - POST
+            struct POST {
+                struct Req : Decodable {
+                    let authkey: String
+                    let vmid: VMID
+                }
+            }
+            /// `/v/vm/state` - PUT
+            struct PUT : Decodable{
+                struct Req : Decodable {
+                    let authkey: String
+                    let vmid: VMID
+                    let state: VirtualMachine.StateRequest
+                    let force: Bool
+                }
+            }
+
+            /// `/v/vm/state` - Common response structure
+            struct Res : Encodable {
+                let vmid: VMID
+                let state: String
             }
         }
     }
