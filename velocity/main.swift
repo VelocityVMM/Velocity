@@ -33,10 +33,13 @@ public func main() {
     }
 
     let db = try! VDB("\(VelocityConfig.velocity_root)/db.sqlite");
+    let efistore_manager = try! EFIStoreManager(efistore_dir: FilePath("\(VelocityConfig.velocity_root)/EFIStore"))
+    let manager = try! VMManager(efistore_manager: efistore_manager, db: db)
+
 
     let api_queue = DispatchQueue(label: "VAPI")
     api_queue.async {
-        let _ = try! VAPI(db: db, port: 8090);
+        let _ = try! VAPI(db: db, vm_manager: manager, port: 8090);
     }
 
     RunLoop.main.run()

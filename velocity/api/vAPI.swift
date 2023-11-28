@@ -25,6 +25,8 @@ class VAPI : Loggable {
     let app: Application
     /// The database to run all queries on
     let db: VDB
+    /// The manager for all running virtual machines
+    let vm_manager: VMManager
     /// JSON encoder
     let encoder: JSONEncoder
     /// The currently registered authkeys. Can contain expired keys
@@ -36,9 +38,10 @@ class VAPI : Loggable {
     /// - Parameter hostname: (optional) The hostname to use ("0.0.0.0")
     ///
     /// This immediately starts the API and blocks until the API errors or stops
-    init(db: VDB, port: Int, hostname: String = "0.0.0.0") throws {
+    init(db: VDB, vm_manager: VMManager, port: Int, hostname: String = "0.0.0.0") throws {
         self.context = "[vAPI (\(port))]"
         self.db = db;
+        self.vm_manager = vm_manager
 
         // Stupid workaround for Vapor
         // By default Vapor parses command line arguments and blows up
