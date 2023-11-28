@@ -27,7 +27,8 @@ import Virtualization
 
 /// A virtual machine `Velocity` can work with. It wraps `VZVirtualMachine`
 /// and wraps it in convenient functions with better error handling
-class VirtualMachine : VZVirtualMachine {
+class VirtualMachine : VZVirtualMachine, Loggable {
+    let context: String
 
     /// The `DispatchQueue` to use for all interactions with this VirtualMachine
     /// including the VirtualMachine itself
@@ -40,6 +41,7 @@ class VirtualMachine : VZVirtualMachine {
     private init(config: VirtualMachineConfiguration, vvm: VDB.VM) {
         self.vvm = vvm
         self.queue = DispatchQueue(label: "vm_\(vvm.vmid)")
+        self.context = "[VM (\(vvm.name))]"
 
         super.init(configuration: config, queue: queue)
     }
