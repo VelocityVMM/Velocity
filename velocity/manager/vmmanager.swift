@@ -62,4 +62,11 @@ class VMManager : Loggable {
             }
         }
     }
+
+    /// Tries to retrieve a `VirtualMachine` by its `VMID`
+    /// - Parameter vmid: The `VMID` of the virtual machine to retrieve
+    /// - Returns: The virtual machine if found, else `nil`
+    func get_vm(vmid: VMID) -> VirtualMachine? {
+        self.vms[vmid]
+    }
 }
