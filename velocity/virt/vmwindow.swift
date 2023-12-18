@@ -41,9 +41,18 @@ class VirtualMachineWindow : NSWindow, Loggable {
     /// The last captured frame
     var last_frame: CGImage? = nil
 
+    /// The active RFB sessions for this virtual machine
+    var rfb_sessions: [VRFBSession] = []
+
+    /// A dispatch queue to synchronize updates to the last frame
+    let capture_queue: DispatchQueue
+
     init(vm_view: VZVirtualMachineView, size: NSSize) {
+        let window_uuid = UUID().uuidString;
+
         self.vm_view = vm_view
         self.screen_size = size
+        self.capture_queue = DispatchQueue(label: "eu.zimsneexh.Velocity.vm_window.\(window_uuid)")
 
         // Create a style mask
         let transparent_window_style = NSWindow.StyleMask.init(rawValue: 0);
@@ -62,7 +71,6 @@ class VirtualMachineWindow : NSWindow, Loggable {
         self.standardWindowButton(.miniaturizeButton)?.isHidden = true
         self.standardWindowButton(.closeButton)?.isHidden = true
         self.standardWindowButton(.zoomButton)?.isHidden = true
-        let window_uuid = UUID().uuidString;
         self.title = window_uuid;
 
         // Window accepts MouseMovedEvents
@@ -116,7 +124,16 @@ class VirtualMachineWindow : NSWindow, Loggable {
     /// Updates the internally held image of the last screenshot of the virtual machine
     /// - Parameter frame: The frame to set
     func update_last_frame(_ frame: CGImage) {
-        VTrace("Updating last frame")
-        self.last_frame = frame
+        self.capture_queue.sync {
+            self.last_frame = frame
+        }
+
+        for session in self.rfb_sessions {
+            do {
+                try session.update_fb(image: frame)
+            } catch {
+
+            }
+        }
     }
 }
