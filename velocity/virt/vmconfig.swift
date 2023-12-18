@@ -63,6 +63,14 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
         bootloader.variableStore = try manager.efistore_manager.get_efistore(vmid: vm.vmid)
         config.bootLoader = bootloader
 
+        // Add a USB keyboard for getting keyboard inputs
+        let keyboard = VZUSBKeyboardConfiguration()
+        config.keyboards.append(keyboard)
+
+        // Add a USB pointing device for getting pointer (mouse) inputs
+        let pointer = VZUSBScreenCoordinatePointingDeviceConfiguration()
+        config.pointingDevices.append(pointer)
+
         // Setup the disks, printing errors
         let disks = try vm.db.t_vmdisks.select_vm_disks(vm: vm)
         for error in disks.1 {
