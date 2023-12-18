@@ -47,6 +47,7 @@
 		50B7A4062A6DAE5700083BE8 /* vDBTUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */; };
 		50BAC2862A6A609B00DE0F95 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 50BAC2852A6A609B00DE0F95 /* SQLite */; };
 		50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */; };
+		50BF15F92B3058E600102231 /* vmwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15F82B3058E600102231 /* vmwindow.swift */; };
 		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
 		50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */; };
 		50F1C0D82AB4844C004F8FF5 /* vAPI_m_pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */; };
@@ -106,6 +107,7 @@
 		50A5BD8A2A95495200440303 /* vAPI_u_user.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_u_user.swift; sourceTree = "<group>"; };
 		50B7A4052A6DAE5700083BE8 /* vDBTUsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTUsers.swift; sourceTree = "<group>"; };
 		50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPIError.swift; sourceTree = "<group>"; };
+		50BF15F82B3058E600102231 /* vmwindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vmwindow.swift; sourceTree = "<group>"; };
 		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
 		50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
 		50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_m_pool.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 				501D9CF12AF1ABF700F6F1F6 /* vm.swift */,
 				5085FD3C2B04E47E008EAB16 /* vz.swift */,
 				50F1FED42AF98C49009F97D6 /* vmconfig.swift */,
+				50BF15F82B3058E600102231 /* vmwindow.swift */,
 			);
 			path = virt;
 			sourceTree = "<group>";
@@ -387,6 +390,7 @@
 				5075244E2A37A2810072B094 /* vNWConnection.swift in Sources */,
 				504C2E3F2AB356E400130F85 /* vDBTMedia.swift in Sources */,
 				50422FD12AC49ABE0090637B /* vDBTVMNICs.swift in Sources */,
+				50BF15F92B3058E600102231 /* vmwindow.swift in Sources */,
 				501F92712AC4BA0D002456D0 /* vAPI_v_vm.swift in Sources */,
 				500504FE2AC4151C00BB0163 /* vAPI_v_nic.swift in Sources */,
 				501D9CF02AF1AA3A00F6F1F6 /* vmmanager.swift in Sources */,
