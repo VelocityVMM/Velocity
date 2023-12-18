@@ -59,6 +59,12 @@ class VMManager : Loggable {
                 self.vms[vm.vmid] = new_vm
 
                 VInfo("Loaded virtual machine '\(vm.name)' [\(vm.vmid)]")
+
+                // If a VM requested autostart, start it now
+                if vm.autostart {
+                    VInfo("Autostarting virtual machine '\(vm.name)' [\(vm.vmid)]")
+                    let _ = try new_vm.request_state_transition(state: .RUNNING)
+                }
             }
         }
     }
