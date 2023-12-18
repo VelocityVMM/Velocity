@@ -36,6 +36,8 @@ class VirtualMachine : VZVirtualMachine, Loggable {
     /// The VM struct this VirtualMachine represents and implements. This is the
     /// blueprint for the real virtual machine
     let vvm: VDB.VM
+    /// The window for this virtual machine, if needed
+    let window: VirtualMachineWindow?
 
     /// The constructor is private, allow only guarded creation
     private init(config: VirtualMachineConfiguration, vvm: VDB.VM) {
@@ -43,7 +45,20 @@ class VirtualMachine : VZVirtualMachine, Loggable {
         self.queue = DispatchQueue(label: "vm_\(vvm.vmid)")
         self.context = "[VM (\(vvm.name))]"
 
+        // If we have the need for a capture window, create it
+        if let window_size = config.capture_window_size {
+            let view = VZVirtualMachineView()
+            self.window = VirtualMachineWindow(vm_view: view, size: window_size)
+        } else {
+            self.window = nil
+        }
+
         super.init(configuration: config, queue: queue)
+
+        // If the capture window was created, assign the virtual machine now
+        if let window = self.window {
+            window.vm_view.virtualMachine = self
+        }
     }
 
     /// Returns the current state of the virtual machine
