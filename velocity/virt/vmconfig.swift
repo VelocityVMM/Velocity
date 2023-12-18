@@ -30,6 +30,9 @@ import Virtualization
 class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
     var context: String = "[VMConfiguration]"
 
+    /// If there is a display, this is the size of the window needed to house it
+    var capture_window_size: NSSize? = nil
+
     /// Make the constructor private, allow only static initialization
     private override init() {}
 
@@ -82,6 +85,9 @@ class VirtualMachineConfiguration : VZVirtualMachineConfiguration, Loggable {
         // Setup the displays
         let displays = try vm.db.t_vmdisplays.select_vm_displays(vm: vm)
         if let display = displays.last {
+            // If we have a display, set the capture window size to its size
+            config.capture_window_size = NSSize(width: Double(display.width), height: Double(display.height))
+
             let gpu = VZVirtioGraphicsDeviceConfiguration()
             gpu.scanouts.append(display.get_scanout())
             config.graphicsDevices.append(gpu)
