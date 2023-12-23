@@ -29,6 +29,33 @@ extension VAPI {
     /// Registers all endpoints withing the namespace `/m/media`
     func register_endpoints_m_media(route: RoutesBuilder) throws {
 
+        route.delete { req in
+            let request: Structs.M.MEDIA.DELETE.Req = try req.content.decode(Structs.M.MEDIA.DELETE.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return try self.error(code: .UNAUTHORIZED)
+            }
+
+            let c_user = key.user
+
+            // We first select the media, if not found, return FORBIDDEN
+            guard let media = try self.db.media_select(mid: request.mid).get_success() else {
+                self.VDebug("\(c_user.info()) tried to remove non-existing media \(request.mid): MEDIA NOT FOUND")
+                return try self.error(code: .M_MEDIA_DELETE_PERMISSION)
+            }
+
+            guard try c_user.has_permission(permission: "velocity.media.remove", group: media.group) else {
+                self.VDebug("\(c_user.info()) tried to remove media \(media.mid) ('\(media.name)') from group \(media.group.gid): FORBIDDEN")
+                return try self.error(code: .M_MEDIA_DELETE_PERMISSION)
+            }
+
+            try media.remove()
+
+            self.VDebug("\(c_user.info()) REMOVED media \(media.mid) ('\(media.name)') from group \(media.group.gid) (POOL: \(media.pool.name)")
+
+            return Response(status: .ok)
+        }
+
         route.post("list") { req in
             let request: Structs.M.MEDIA.LIST.POST.Req = try req.content.decode(Structs.M.MEDIA.LIST.POST.Req.self)
 
@@ -313,6 +340,12 @@ extension VAPI.Structs.M {
                 }
             }
         }
-
+        /// `/m/media` - DELETE
+        struct DELETE {
+            struct Req : Decodable {
+                let authkey: String
+                let mid: MID
+            }
+        }
     }
 }

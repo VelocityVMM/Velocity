@@ -172,7 +172,15 @@ extension VDB {
                 size: 0,
                 mid: row[t.mid],
                 readonly: row[t.readonly])
+        }
 
+        /// Removes this piece of media from the mediapool, the filesystem and the database
+        func remove() throws {
+            try FileManager.default.removeItem(atPath: self.get_file_path().string)
+
+            let t_media = self.db.t_media
+            let query = t_media.table.where(t_media.mid == self.mid).delete()
+            try self.db.db.run(query)
         }
 
         /// A structure to bundle media information

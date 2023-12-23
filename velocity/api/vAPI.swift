@@ -209,6 +209,7 @@ class VAPI : Loggable {
         // velocity.media
         VDB.PermissionTemplate("velocity.media.create", "Create / Upload media"),
         VDB.PermissionTemplate("velocity.media.list", "List available media for a group"),
+        VDB.PermissionTemplate("velocity.media.remove", "Remove media from a group"),
 
         // velocity.vm
         VDB.PermissionTemplate("velocity.vm.create", "Create a new virtual machine in the group"),

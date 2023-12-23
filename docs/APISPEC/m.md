@@ -231,6 +231,10 @@ Remove media (delete it)
 > 
 > The calling user needs the `velocity.media.remove` permission
 
+> **Note**
+> 
+> If the media is not found, this returns `403 - Forbidden`. This is for security reasons to prevent guessing and bruteforcing attacks.
+
 **Request:**
 
 ```json
@@ -244,9 +248,7 @@ Remove media (delete it)
 
 - `200`: Media removed
 
-- `403 - Forbidden`: The calling user lacks permissions
-
-- `404 - Not Found`: The `mid` has not been found
+- `403 - Forbidden`: The calling user lacks permissions or the piece of media has not been found
 
 # `/m/media/list` - POST <a name="post-m-media-list"></a>
 

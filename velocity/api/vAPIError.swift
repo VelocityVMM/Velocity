@@ -181,51 +181,57 @@ extension VAPI {
         /// `/m/media/list - POST`: The `gid` has not been found
         case M_MEDIA_LIST_POST_GROUP_NOT_FOUND = 10110
 
+        // MARK: /m/media
+
+        /// `/m/media - DELETE`: The `velocity.media.remove` premission is missing
+        case M_MEDIA_DELETE_PERMISSION = 11100
+
         /// `/v/nic/list - POST`: The `velocity.nic.list` permission is missing
-        case V_NIC_LIST_POST_PERMISSION = 11100
+        case V_NIC_LIST_POST_PERMISSION = 12100
+
 
         /// `/v/vm/efi - PUT`: The `velocity.vm.create` permission is missing
-        case V_VM_EFI_PUT_PERMISSION = 12200
+        case V_VM_EFI_PUT_PERMISSION = 13200
         /// `/v/vm/efi - PUT`: The `gid` has not been found
-        case V_VM_EFI_PUT_GROUP_NOT_FOUND = 12210
+        case V_VM_EFI_PUT_GROUP_NOT_FOUND = 13210
         /// `/v/vm/efi - PUT`: The `mid` of some media has not been found
-        case V_VM_EFI_PUT_MEDIA_NOT_FOUND = 12211
+        case V_VM_EFI_PUT_MEDIA_NOT_FOUND = 13211
         /// `/v/vm/efi - PUT`: The group for a certain `mid` has not been found
-        case V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND = 12212
+        case V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND = 13212
         /// `/v/vm/efi - PUT`: The mediapool for a certain `mid` has not been found
-        case V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND = 12213
+        case V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND = 13213
         /// `/v/vm/efi - PUT`: The `nicid` of a host NIC has not been found
-        case V_VM_EFI_PUT_HOST_NIC_NOT_FOUND = 12214
+        case V_VM_EFI_PUT_HOST_NIC_NOT_FOUND = 13214
         /// `/v/vm/efi - PUT`: Some quota in the `CPU` space has been surpassed
-        case V_VM_EFI_PUT_CPU_QUOTA = 12220
+        case V_VM_EFI_PUT_CPU_QUOTA = 13220
         /// `/v/vm/efi - PUT`: Some quota in the `MEMORY` space has been surpassed
-        case V_VM_EFI_PUT_MEMORY_QUOTA = 12221
+        case V_VM_EFI_PUT_MEMORY_QUOTA = 13221
         /// `/v/vm/efi - PUT`: Some quota in the `MEDIA` space has been surpassed
-        case V_VM_EFI_PUT_MEDIA_QUOTA = 12222
+        case V_VM_EFI_PUT_MEDIA_QUOTA = 13222
         /// `/v/vm/efi - PUT`: There is already a VM with the same `name` in the group
-        case V_VM_EFI_PUT_CONFLICT = 12223
+        case V_VM_EFI_PUT_CONFLICT = 13223
         /// `/v/vm/efi - PUT`: There is already display with the same `name` in the VM
-        case V_VM_EFI_PUT_DISPLAY_CONFLICT = 12224
+        case V_VM_EFI_PUT_DISPLAY_CONFLICT = 13224
         /// `/v/vm/efi - PUT`: An invalid `mode` has been supplied for a disk
-        case V_VM_EFI_PUT_DISK_MODE = 12225
+        case V_VM_EFI_PUT_DISK_MODE = 13225
         /// `/v/vm/efi - PUT`: An invalid `type` has been supplied for a nic
-        case V_VM_EFI_PUT_NIC_TYPE = 12226
+        case V_VM_EFI_PUT_NIC_TYPE = 13226
         /// `/v/vm/efi - PUT`: A NIC with type `BRIDGE` has been used, but no host NIC was supplied
-        case V_VM_EFI_PUT_HOST_NIC_REQUIRED = 12227
+        case V_VM_EFI_PUT_HOST_NIC_REQUIRED = 13227
 
         // MARK: /v/vm/state: 11xxx
 
         /// `/v/vm/state - POST`: The `velocity.vm.view` permission is missing
-        case V_VM_STATE_POST_PERMISSION = 13100
+        case V_VM_STATE_POST_PERMISSION = 14100
         /// `/v/vm/state - POST`: The requested VMID has not been found
-        case V_VM_STATE_POST_VM_NOT_FOUND = 13110
+        case V_VM_STATE_POST_VM_NOT_FOUND = 14110
 
         /// `/v/vm/state - PUT`: The `velocity.vm.state` permission is missing
-        case V_VM_STATE_PUT_PERMISSION = 13200
+        case V_VM_STATE_PUT_PERMISSION = 15200
         /// `/v/vm/state - PUT`: The requested VMID has not been found
-        case V_VM_STATE_PUT_VM_NOT_FOUND = 13210
+        case V_VM_STATE_PUT_VM_NOT_FOUND = 15210
         /// `/v/vm/state - PUT`: The requested state transition can not be completed
-        case V_VM_STATE_PUT_NOT_ALLOWED = 13220
+        case V_VM_STATE_PUT_NOT_ALLOWED = 15220
 
     }
 }
@@ -327,6 +333,9 @@ extension VAPI.ErrorCode {
         // /m/media/list - POST
         case .M_MEDIA_LIST_POST_PERMISSION: return .forbidden
         case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return .notFound
+
+        // /m/media - DELETE
+        case .M_MEDIA_DELETE_PERMISSION: return .forbidden
 
         // /v/nic/list - POST
         case .V_NIC_LIST_POST_PERMISSION: return .forbidden
@@ -454,6 +463,9 @@ extension VAPI.ErrorCode {
         // /m/media/list - POST
         case .M_MEDIA_LIST_POST_PERMISSION: return "Permission 'velocity.media.list' is needed"
         case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
+
+        // /m/media - DELETE
+        case .M_MEDIA_DELETE_PERMISSION: return "Permission 'velocity.media.remove' is needed on target group"
 
         // /v/nic/list - POST
         case .V_NIC_LIST_POST_PERMISSION: return "Permission 'velocity.nic.list' is needed"
