@@ -8,6 +8,7 @@
 import Foundation
 import Virtualization
 import AppKit
+import System
 
 var VELOCITY_VERSION = 0.1
 var VELOCITY_CODENAME = "Xen Catalyst"
