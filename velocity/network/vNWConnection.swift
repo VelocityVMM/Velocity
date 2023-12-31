@@ -81,7 +81,7 @@ class VNWConnection {
         var error: VConnectionError? = nil;
         self.connection.send(content: data, completion: .contentProcessed() { err in
             if let e = err {
-                error = VConnectionError("When sending: \(e)");
+                error = VConnectionError.Other("When sending: \(e)");
             }
             semaphore.signal();
         });
@@ -110,14 +110,21 @@ class VNWConnection {
         };
 
         let semaphore = DispatchSemaphore(value: 0);
-        var received: Res = .Err(VConnectionError("Unknown"));
+        var received: Res = .Err(VConnectionError.Other("Unknown"));
 
         connection.receive(minimumIncompleteLength: 0, maximumLength: Int(self.buf_len)) { (data, _, _, error) in
-            if let data = data {
-                received = .Ok(data);
-            } else if let error = error {
-                received = .Err(VConnectionError("When receiving: \(error)"));
+            // If we have an error, throw it
+            if let error = error {
+                received = .Err(VConnectionError.Other("When receiving: \(error)"))
+            } else {
+                // If there is data, return it, else the connection closed on us
+                if let data = data {
+                    received = .Ok(data)
+                } else {
+                    received = .Err(.ConnectionClosed)
+                }
             }
+
             semaphore.signal();
         }
 
@@ -157,12 +164,12 @@ class VNWConnection {
     }
 }
 
-internal struct VConnectionError: Error, LocalizedError {
-    let errorDescription: String?
-
-    init(_ description: String) {
-        errorDescription = description
-    }
+/// An enum of all the possible connection errors that can occur
+enum VConnectionError : Error {
+    /// The connection closed while waiting for a message
+    case ConnectionClosed
+    /// Some other error occured
+    case Other(String)
 }
 
 extension NWConnection {
