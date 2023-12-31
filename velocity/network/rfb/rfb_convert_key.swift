@@ -58,6 +58,62 @@ struct MacOSKeyEvent {
         self.modifier_flags = modifier_flag
         self.keycode = keycode
     }
+
+    /// Tries to extract the raw character from this key event
+    /// respecting the `SHIFT` modifier key to upper/lowercase the character
+    /// - Returns: The character or `nil` if no character is involved in the event
+    func get_raw_char() -> Character? {
+        // Try to get the character, else this will return 'nil'
+        guard let char = self.char else {
+            return nil
+        }
+
+        // If we don't have any modifiers to check, return the raw character
+        guard let modifier_flags = self.modifier_flags else {
+            return char
+        }
+
+        // Check for 'SHIFT' to modify the case of the character
+        if modifier_flags.contains(.shift) {
+            // Try to uppercase the character, else return as is
+            return char.uppercased().first ?? char
+        } else {
+            // Try to lowercase the character, else return as is
+            return char.lowercased().first ?? char
+        }
+    }
+
+    /// Constructs a `NSEvent` from this key event for use with MacOS
+    /// - Parameter pressed: If the key event should be `keyDown` or `keyUp`
+    /// - Returns: A `NSEvent` or `nil` if the state is inrepresentable
+    func get_ns_event(pressed: Bool) -> NSEvent? {
+        // Check if there is a char attached, else return a modifier-only event
+        guard let raw_char = self.get_raw_char() else {
+            return NSEvent.keyEvent(
+                with: pressed ? .keyDown : .keyUp,
+                location: NSPoint.zero,
+                modifierFlags: self.modifier_flags ?? [],
+                timestamp: TimeInterval(),
+                windowNumber: 0,
+                context: nil,
+                characters: "",
+                charactersIgnoringModifiers: "",
+                isARepeat: false,
+                keyCode: UInt16(self.keycode))
+        }
+
+        return NSEvent.keyEvent(
+            with: pressed ? .keyDown : .keyUp,
+            location: NSPoint.zero,
+            modifierFlags: self.modifier_flags ?? [],
+            timestamp: TimeInterval(),
+            windowNumber: 0,
+            context: nil,
+            characters: String(raw_char),
+            charactersIgnoringModifiers: String(raw_char),
+            isARepeat: false,
+            keyCode: UInt16(self.keycode))
+    }
 }
 
 // MARK: Probably needs some changes to support other layouts, aswell.
