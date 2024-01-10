@@ -296,6 +296,23 @@ struct VRFBPointerEvent {
             self.wheel_right = ((data >> 6) & 1) != 0
         }
     }
+
+    /// Returns the `NSEvent.EventType` for this pointer event
+    /// for dragging events
+    func get_move_eventtype() -> NSEvent.EventType {
+        let bt = self.pressed_buttons
+
+        if bt.button_left {
+            return .leftMouseDragged
+        } else if bt.button_middle {
+            return .otherMouseDragged
+        } else if bt.button_right {
+            return .rightMouseDragged
+        }
+
+        return .mouseMoved
+    }
+
 }
 
 
