@@ -47,6 +47,9 @@ class VirtualMachineWindow : NSWindow, Loggable {
     /// A dispatch queue to synchronize updates to the last frame
     let capture_queue: DispatchQueue
 
+    /// Internal structure to keep track of the mouse state and prevent unnecessary events
+    internal var mouse_state: MouseState = MouseState(last_position: NSPoint())
+
     init(vm_view: VZVirtualMachineView, size: NSSize) {
         let window_uuid = UUID().uuidString;
 
@@ -134,6 +137,51 @@ class VirtualMachineWindow : NSWindow, Loggable {
             } catch {
 
             }
+        }
+    }
+
+    /// Sends a macOS KeyEvent to the VM's Window
+    /// - Parameter event: The MacOS key event to fire
+    /// - Parameter pressed: `true` -> Press / `false` -> Release
+    func send_key_event(event: MacOSKeyEvent, pressed: Bool) {
+        // Get the NSEvent from the key event
+        if let keyevent = event.get_ns_event(pressed: pressed) {
+
+            // Fire the event on the 'main' thread
+            DispatchQueue.main.async {
+
+                if (pressed) {
+                    self.vm_view.keyDown(with: keyevent)
+                } else {
+                    self.vm_view.keyUp(with: keyevent)
+                }
+
+            }
+        }
+    }
+
+    /// Sends the provided pointer event to the window
+    /// - Parameter event: The event to handle
+    ///
+    /// The event will fire in the `main` DispatchQueue to conform with MacOS UI thread requirements
+    func send_pointer_event(event: VRFBPointerEvent) {
+        // We have to flip the Y coordinate due to MacOS windows being weird...
+        let transformed_y_position = UInt16(self.screen_size.height) - event.y_position
+
+        // After we flipped the Y coordinate, construct a new event to fire
+        let new_event = VRFBPointerEvent(pressed_buttons: event.pressed_buttons, x_position: event.x_position, y_position: transformed_y_position)
+
+        // Gather all the events the mouse state gives us
+        let events = self.mouse_state.handle(event: new_event)
+
+        // Fire the events on the 'main' thread
+        DispatchQueue.main.sync {
+
+            for event in events {
+                // Channel all events through this function, somehow it doesn't make any difference?
+                self.vm_view.mouseMoved(with: event)
+            }
+
         }
     }
 }
