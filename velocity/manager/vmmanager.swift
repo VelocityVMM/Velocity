@@ -90,8 +90,16 @@ class VMManager : Loggable {
     @objc func update_frame() {
         // Iterate over all virtual machines
         for vm in self.vms {
+            // Skip this virtual machine if it is not running
+            if vm.value.state != .running {
+                continue
+            }
             // If the virtual machine has an attached window
             if let window = vm.value.window {
+                // Skip capturing if no RFB sessions are active
+                if window.rfb_sessions.count == 0 {
+                    continue
+                }
                 // Dispatch the work in an asynchronous dispatch queue to parallelize it
                 self.capture_queue.async {
                     let _ = window.capture()
