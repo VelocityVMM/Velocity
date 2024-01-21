@@ -24,6 +24,8 @@
 		501D9CF52AF240E400F6F1F6 /* EFIStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */; };
 		5033B2BC2B41EF290047B3AC /* input.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5033B2BB2B41EF290047B3AC /* input.swift */; };
 		501F92712AC4BA0D002456D0 /* vAPI_v_vm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501F92702AC4BA0D002456D0 /* vAPI_v_vm.swift */; };
+		5037DB382B3E0B5400BDBD1C /* rfb_s_handshake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5037DB372B3E0B5400BDBD1C /* rfb_s_handshake.swift */; };
+		5037DB3B2B3EE57200BDBD1C /* rfb_s_handle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5037DB3A2B3EE57200BDBD1C /* rfb_s_handle.swift */; };
 		50394E4E2A2CD160006A7CB4 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 50394E4D2A2CD160006A7CB4 /* Atomics */; };
 		50422FCF2AC498AC0090637B /* vDBTVMDisplays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50422FCE2AC498AC0090637B /* vDBTVMDisplays.swift */; };
 		50422FD12AC49ABE0090637B /* vDBTVMNICs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50422FD02AC49ABE0090637B /* vDBTVMNICs.swift */; };
@@ -50,6 +52,7 @@
 		50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */; };
 		50BF15F92B3058E600102231 /* vmwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15F82B3058E600102231 /* vmwindow.swift */; };
 		50BF15FC2B30623B00102231 /* rfb_convert_key.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15FB2B30623B00102231 /* rfb_convert_key.swift */; };
+		50BF16002B30628300102231 /* rfb_session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15FF2B30628300102231 /* rfb_session.swift */; };
 		50BF16022B3062A400102231 /* rfb_structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16012B3062A400102231 /* rfb_structs.swift */; };
 		50BF16052B3062BB00102231 /* rfb_util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16042B3062BB00102231 /* rfb_util.swift */; };
 		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
@@ -89,6 +92,8 @@
 		501D9CF42AF240E400F6F1F6 /* EFIStoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EFIStoreManager.swift; sourceTree = "<group>"; };
 		5033B2BB2B41EF290047B3AC /* input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = input.swift; sourceTree = "<group>"; };
 		501F92702AC4BA0D002456D0 /* vAPI_v_vm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_v_vm.swift; sourceTree = "<group>"; };
+		5037DB372B3E0B5400BDBD1C /* rfb_s_handshake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_s_handshake.swift; sourceTree = "<group>"; };
+		5037DB3A2B3EE57200BDBD1C /* rfb_s_handle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_s_handle.swift; sourceTree = "<group>"; };
 		50422FCE2AC498AC0090637B /* vDBTVMDisplays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMDisplays.swift; sourceTree = "<group>"; };
 		50422FD02AC49ABE0090637B /* vDBTVMNICs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTVMNICs.swift; sourceTree = "<group>"; };
 		504C2E3A2AB3456100130F85 /* vAPI_m.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_m.swift; sourceTree = "<group>"; };
@@ -113,6 +118,7 @@
 		50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPIError.swift; sourceTree = "<group>"; };
 		50BF15F82B3058E600102231 /* vmwindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vmwindow.swift; sourceTree = "<group>"; };
 		50BF15FB2B30623B00102231 /* rfb_convert_key.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_convert_key.swift; sourceTree = "<group>"; };
+		50BF15FF2B30628300102231 /* rfb_session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_session.swift; sourceTree = "<group>"; };
 		50BF16012B3062A400102231 /* rfb_structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_structs.swift; sourceTree = "<group>"; };
 		50BF16042B3062BB00102231 /* rfb_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_util.swift; sourceTree = "<group>"; };
 		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
@@ -207,6 +213,15 @@
 				5033B2BB2B41EF290047B3AC /* input.swift */,
 			);
 			path = vmwindow;
+			sourceTree = "<group>";
+		};
+		5037DB362B3E0B4400BDBD1C /* rfb_session */ = {
+			isa = PBXGroup;
+			children = (
+				5037DB372B3E0B5400BDBD1C /* rfb_s_handshake.swift */,
+				5037DB3A2B3EE57200BDBD1C /* rfb_s_handle.swift */,
+			);
+			path = rfb_session;
 			sourceTree = "<group>";
 		};
 		504C2E392AB342ED00130F85 /* vAPI_m */ = {
@@ -310,6 +325,8 @@
 		50BF15FA2B30621E00102231 /* rfb */ = {
 			isa = PBXGroup;
 			children = (
+				50BF15FF2B30628300102231 /* rfb_session.swift */,
+				5037DB362B3E0B4400BDBD1C /* rfb_session */,
 				50BF15FB2B30623B00102231 /* rfb_convert_key.swift */,
 				50BF16042B3062BB00102231 /* rfb_util.swift */,
 				50BF16012B3062A400102231 /* rfb_structs.swift */,
@@ -400,8 +417,10 @@
 				50BF16052B3062BB00102231 /* rfb_util.swift in Sources */,
 				50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */,
 				50A5BD862A9495E700440303 /* vDBTMemberships.swift in Sources */,
+				50BF16002B30628300102231 /* rfb_session.swift in Sources */,
 				504C2E412AB3573B00130F85 /* vDBMedia.swift in Sources */,
 				500505002AC48EE900BB0163 /* vDBVM.swift in Sources */,
+				5037DB382B3E0B5400BDBD1C /* rfb_s_handshake.swift in Sources */,
 				50A5BD892A95471800440303 /* vAPI_u.swift in Sources */,
 				501D9CF52AF240E400F6F1F6 /* EFIStoreManager.swift in Sources */,
 				50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */,
@@ -411,6 +430,7 @@
 				504C2E3B2AB3456100130F85 /* vAPI_m.swift in Sources */,
 				50F1FED52AF98C49009F97D6 /* vmconfig.swift in Sources */,
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
+				5037DB3B2B3EE57200BDBD1C /* rfb_s_handle.swift in Sources */,
 				5056EC7B2A72411700D93422 /* vAPI.swift in Sources */,
 				500504F92AC410DA00BB0163 /* vDBHostNIC.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
