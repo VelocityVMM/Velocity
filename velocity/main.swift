@@ -38,6 +38,9 @@ public func main() {
     let manager = try! VMManager(efistore_manager: efistore_manager, db: db)
 
 
+    let vrfb = try! VRFBServer(port: 8091, manager: manager)
+    vrfb.start()
+
     let api_queue = DispatchQueue(label: "VAPI")
     api_queue.async {
         let _ = try! VAPI(db: db, vm_manager: manager, port: 8090);
