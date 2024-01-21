@@ -52,6 +52,7 @@
 		50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */; };
 		50BF15F92B3058E600102231 /* vmwindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15F82B3058E600102231 /* vmwindow.swift */; };
 		50BF15FC2B30623B00102231 /* rfb_convert_key.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15FB2B30623B00102231 /* rfb_convert_key.swift */; };
+		50BF15FE2B30625600102231 /* rfb_server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15FD2B30625600102231 /* rfb_server.swift */; };
 		50BF16002B30628300102231 /* rfb_session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15FF2B30628300102231 /* rfb_session.swift */; };
 		50BF16022B3062A400102231 /* rfb_structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16012B3062A400102231 /* rfb_structs.swift */; };
 		50BF16052B3062BB00102231 /* rfb_util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16042B3062BB00102231 /* rfb_util.swift */; };
@@ -118,6 +119,7 @@
 		50BC4E8B2A9F152F0048FC91 /* vAPIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPIError.swift; sourceTree = "<group>"; };
 		50BF15F82B3058E600102231 /* vmwindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vmwindow.swift; sourceTree = "<group>"; };
 		50BF15FB2B30623B00102231 /* rfb_convert_key.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_convert_key.swift; sourceTree = "<group>"; };
+		50BF15FD2B30625600102231 /* rfb_server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_server.swift; sourceTree = "<group>"; };
 		50BF15FF2B30628300102231 /* rfb_session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_session.swift; sourceTree = "<group>"; };
 		50BF16012B3062A400102231 /* rfb_structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_structs.swift; sourceTree = "<group>"; };
 		50BF16042B3062BB00102231 /* rfb_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_util.swift; sourceTree = "<group>"; };
@@ -327,6 +329,7 @@
 			children = (
 				50BF15FF2B30628300102231 /* rfb_session.swift */,
 				5037DB362B3E0B4400BDBD1C /* rfb_session */,
+				50BF15FD2B30625600102231 /* rfb_server.swift */,
 				50BF15FB2B30623B00102231 /* rfb_convert_key.swift */,
 				50BF16042B3062BB00102231 /* rfb_util.swift */,
 				50BF16012B3062A400102231 /* rfb_structs.swift */,
@@ -445,6 +448,7 @@
 				5033B2BC2B41EF290047B3AC /* input.swift in Sources */,
 				50422FCF2AC498AC0090637B /* vDBTVMDisplays.swift in Sources */,
 				50A5BD8B2A95495200440303 /* vAPI_u_user.swift in Sources */,
+				50BF15FE2B30625600102231 /* rfb_server.swift in Sources */,
 				5085FD3F2B04F9C0008EAB16 /* nicconfiguration.swift in Sources */,
 				50BF15FC2B30623B00102231 /* rfb_convert_key.swift in Sources */,
 				5056EC7E2A778D1A00D93422 /* vAPI_u_auth.swift in Sources */,
