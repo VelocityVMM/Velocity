@@ -8,6 +8,14 @@
 import Foundation
 import Vapor
 
+internal struct VelocityWebError: Error, LocalizedError {
+    let errorDescription: String?
+
+    init(_ description: String) {
+        errorDescription = description
+    }
+}
+
 /// The Velocity api
 class VAPI : Loggable {
 
@@ -17,6 +25,8 @@ class VAPI : Loggable {
     let app: Application
     /// The database to run all queries on
     let db: VDB
+    /// The manager for all running virtual machines
+    let vm_manager: VMManager
     /// JSON encoder
     let encoder: JSONEncoder
     /// The currently registered authkeys. Can contain expired keys
@@ -28,9 +38,10 @@ class VAPI : Loggable {
     /// - Parameter hostname: (optional) The hostname to use ("0.0.0.0")
     ///
     /// This immediately starts the API and blocks until the API errors or stops
-    init(db: VDB, port: Int, hostname: String = "0.0.0.0") throws {
+    init(db: VDB, vm_manager: VMManager, port: Int, hostname: String = "0.0.0.0") throws {
         self.context = "[vAPI (\(port))]"
         self.db = db;
+        self.vm_manager = vm_manager
 
         // Stupid workaround for Vapor
         // By default Vapor parses command line arguments and blows up
@@ -46,7 +57,7 @@ class VAPI : Loggable {
         let corsConfiguration = CORSMiddleware.Configuration(
             allowedOrigin: .all,
             allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
-            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin, "File-Name" ]
+            allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin, "File-Name", "x-velocity-authkey", "x-velocity-mpid", "x-velocity-gid", "x-velocity-name", "x-velocity-type", "x-velocity-readonly"]
         )
         let cors = CORSMiddleware(configuration: corsConfiguration)
         self.app.middleware.use(cors, at: .beginning)
@@ -60,6 +71,8 @@ class VAPI : Loggable {
         }
 
         try self.register_endpoints_u(route: self.app.grouped("u"))
+        try self.register_endpoints_m(route: self.app.grouped("m"))
+        try self.register_endpoints_v(route: self.app.grouped("v"))
 
         // Setup server properties
         app.http.server.configuration.hostname = hostname
@@ -155,6 +168,23 @@ class VAPI : Loggable {
         return key
     }
 
+    /// Creates a Vapor response structure from the provided `Encodable`
+    /// - Parameter r: The response structure, if `nil` the response will have no body
+    /// - Parameter status: (default: `.ok`) The response status
+    func response(_ r: Encodable?, status: HTTPResponseStatus = .ok) throws -> Response {
+        guard let r = r else {
+            VTrace("RESPONSE (\(status))")
+            return Response(status: status)
+        }
+
+        VTrace("RESPONSE (\(status)): \(r)")
+
+        var headers = HTTPHeaders()
+        headers.add(name: .contentType, value: "application/json")
+
+        return try Response(status: status, headers: headers, body: .init(data: self.encoder.encode(r)))
+    }
+
     /// All the available permissions for this api
     static let available_permissions: [VDB.PermissionTemplate] = [
         // velocity.user
@@ -171,6 +201,15 @@ class VAPI : Loggable {
         VDB.PermissionTemplate("velocity.group.remove", "Remove a subgroup"),
         VDB.PermissionTemplate("velocity.group.view", "View group information"),
 
+        // velocity.pool
+        VDB.PermissionTemplate("velocity.pool.list", "List available pools"),
+        VDB.PermissionTemplate("velocity.pool.assign", "Assign groups to pools"),
+        VDB.PermissionTemplate("velocity.pool.revoke", "Revoke group's permissions on pools"),
+
+        // velocity.media
+        VDB.PermissionTemplate("velocity.media.create", "Create / Upload media"),
+        VDB.PermissionTemplate("velocity.media.list", "List available media for a group"),
+
         // velocity.vm
         VDB.PermissionTemplate("velocity.vm.create", "Create a new virtual machine in the group"),
         VDB.PermissionTemplate("velocity.vm.remove", "Remove a virtual machine from the group"),
@@ -178,5 +217,8 @@ class VAPI : Loggable {
         VDB.PermissionTemplate("velocity.vm.view", "View statistics for a virtual machine"),
         VDB.PermissionTemplate("velocity.vm.interact", "Interact with a virtual machine (RFB, Serial...)"),
         VDB.PermissionTemplate("velocity.vm.state", "Alter the virtual machine state (start, stop, pause...)"),
+
+        // velocity.nic
+        VDB.PermissionTemplate("velocity.nic.list", "List available host NICs"),
     ]
 }

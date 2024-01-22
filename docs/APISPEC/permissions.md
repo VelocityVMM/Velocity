@@ -58,74 +58,66 @@ Remove a subgroup
 
 Retrieve information about the group and all of its members an permissions
 
-# vm (`velocity.vm`)
+# pool (`velocity.pool`)
 
-Virtual machine controls
+Pool permissions
+
+## list (`velocity.pool.list`)
+
+List pools available to a group
+
+## assign (`velocity.pool.assign`)
+
+Assign a group to a pool
+
+## revoke (`velocity.pool.revoke`)
+
+Revoke a group's permissions from a mediapool
+
+# media (`velocity.media`)
+
+Media permissions
+
+## list (`velocity.media.list`)
+
+List media in a group
+
+## create (`velocity.media.create`)
+
+Create media in a group
+
+## remove (`velocity.media.remove`)
+
+Remove media from a group (delete it)
+
+# vm (`velocity.vm`)
 
 ## create (`velocity.vm.create`)
 
-Create new virtual machines in the group using up system (and group) quotas.
+Create a new virtual machine in the group
 
 ## remove (`velocity.vm.remove`)
 
-Remove a virtual machine from the assigned group
+Remove a virtual machine from the group
 
 ## alter (`velocity.vm.alter`)
 
-Alter virtual machine attributes and quota usage (RAM, CPU, DISK...)
+Alter a virtual machine parameters (CPU, RAM...)
 
 ## view (`velocity.vm.view`)
 
-View the virtual machine and statistics
+View statistics for a virtual machine
 
 ## interact (`velocity.vm.interact`)
 
-Interact with the virtual machine (RFB, SSH...)
+Interact with a virtual machine (RFB, Serial...)
 
 ## state (`velocity.vm.state`)
 
 Alter the virtual machine state (start, stop, pause...)
 
-## move (`velocity.vm.move`)
+# nic (`velocity.nic`)
 
-Move a virtual machine to and from the group
+## list (`velocity.nic.list`)
 
-> **Note**
-> 
-> The user moving a virtual machine has to have the `move` permission on both, the source and target group
-
-# pool (`velocity.pool`)
-
-Pool sharing and usage
-
-## create (`velocity.pool.create`)
-
-Create a pool in a group
-
-## remove (`velocity.pool.remove`)
-
-Remove a pool from the group (delete all media and the pool)
-
-## view (`velocity.pool.view`)
-
-View the pools in a group
-
-## media.create (`velocity.pool.media.create`)
-
-Create media in a pool
-
-## media.remove (`velocity.pool.media.remove`)
-
-Remove media from a pool (delete it)
-
-## media.view (`velocity.pool.media.view`)
-
-View media in the pool
-
-## media.read (`velocity.pool.media.read`)
-
-Read from the pool's media
-
-## media.write (`velocity.pool.media.write`)
-
-Write to the pool's media
+List available host NICs

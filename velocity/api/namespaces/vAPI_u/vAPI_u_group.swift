@@ -42,9 +42,6 @@ extension VAPI {
                 return try self.error(code: .UNAUTHORIZED)
             }
 
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
             let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.group.view", group: nil) else {
@@ -58,7 +55,7 @@ extension VAPI {
             }
 
             self.VDebug("\(c_user.info()) requested group information for \(group.info())")
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(group)))
+            return try self.response(group)
         }
 
         // Create a new group
@@ -81,17 +78,13 @@ extension VAPI {
                 return try self.error(code: .U_GROUP_PUT_PERMISSION)
             }
 
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
             switch try self.db.group_create(name: request.name, parent_gid: request.parent_gid) {
             case .failure(_):
                 return try self.error(code: .U_GROUP_PUT_CONFLICT)
             case .success(let new_group):
-                let response = VAPI.Structs.U.GROUP.PUT.Res(gid: new_group.gid, parent_gid: new_group.parent_gid, name: new_group.name)
                 self.VDebug("\(user.info()) CREATED \(new_group.info()), permissions: \(try user.get_permissions(group: new_group).count)")
 
-                return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+                return try self.response(Structs.U.GROUP.PUT.Res(gid: new_group.gid, parent_gid: new_group.parent_gid, name: new_group.name))
             }
         }
 
@@ -118,7 +111,7 @@ extension VAPI {
             try delete_group.delete()
             self.VDebug("\(user.info()) DELETED \(delete_group.info())")
 
-            return Response(status: .ok)
+            return try self.response(nil)
         }
 
         // List all groups
@@ -171,13 +164,8 @@ extension VAPI {
 
             }
 
-            let response = Structs.U.GROUP.LIST.POST.Res(groups: groups)
-
-            var headers = HTTPHeaders()
-            headers.add(name: .contentType, value: "application/json")
-
             self.VDebug("\(c_user.info()) requested group list, \(groups.count) groups")
-            return try Response(status: .ok, headers: headers, body: .init(data: self.encoder.encode(response)))
+            return try self.response(Structs.U.GROUP.LIST.POST.Res(groups: groups))
         }
     }
 }

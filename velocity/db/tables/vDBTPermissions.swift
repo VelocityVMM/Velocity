@@ -25,6 +25,9 @@
 import Foundation
 import SQLite
 
+/// The permission id is a Int64
+typealias PID = Int64
+
 extension VDB {
 
     /// A permission in the database
@@ -36,7 +39,7 @@ extension VDB {
         internal let db: VDB
 
         /// The unique permission id
-        let pid: Int64
+        let pid: PID
         /// The unique string identifier for this permission
         let name: String
         /// A description of this permission

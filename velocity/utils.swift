@@ -43,32 +43,6 @@ class IPSWDownloader: NSObject, URLSessionDataDelegate {
         }
         completionHandler(.allow)
     }
-
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        self.fetched_size += data.count
-        Manager.operations[self.operation_index].progress = Float(self.fetched_size) / Float(self.total_size)
-        fileHandle?.write(data)
-    }
-
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        if let error = error {
-            VErr("Download task completed with error: \(error)")
-            Manager.operations[self.operation_index].description = "Downloading IPSW failed: \(error)";
-        } else {
-            VInfo("Download task completed successfully. Moving to ipsw cache..")
-            Manager.operations[self.operation_index].description = "macOS download completed."
-            do {
-                try FileManager.default.moveItem(atPath: self.destination_url.absoluteString, toPath: self.completed_target.absoluteString)
-            } catch {
-                VErr("Could not move from DLCache to IPSW Storage..")
-                Manager.operations[self.operation_index].description = "Could not move IPSW to Storage: \(error)";
-            }
-        }
-        Manager.operations[self.operation_index].completed = true;
-        fileHandle?.closeFile()
-        VLog("Determining model for downloaded IPSW..")
-        determine_for_ipsw(file: self.completed_target.absoluteString)
-    }
 }
 
 //
@@ -189,5 +163,23 @@ extension String {
             }
         }
         return hash.map { String(format: "%02hhx", $0) }.joined();
+    }
+}
+
+extension Result {
+    /// Returns only the `Success` variant of the Result, else `nil`
+    func get_success() -> Success? {
+        switch self {
+        case .success(let s): return s
+        case .failure(_): return nil
+        }
+    }
+
+    /// Returns only the `Failure` variant of the Result, else `nil`
+    func get_failure() -> Failure? {
+        switch self {
+        case .failure(let e): return e
+        case .success(_): return nil
+        }
     }
 }

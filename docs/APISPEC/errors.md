@@ -125,3 +125,110 @@ If a route has the error id `12` and wants to indicate a permission error on the
 - `5300` > `403`: Permission `velocity.group.remove` is needed
 
 - `5310` > `404`: Group has not been found
+
+### `/m/pool/assign`
+
+**PUT**
+
+- `6200` > `403`: Permission `velocity.pool.assign` is needed
+
+- `6210` > `404`: Group has not been found
+
+- `6211` > `404`: Mediapool has not been found
+
+**DELETE**
+
+- `6300` > `403`: Permission `velocity.pool.revoke` is needed
+
+- `6310` > `404`: Group has not been found
+
+- `6311` > `404`: Mediapool has not been found
+
+### `/m/pool/list`
+
+**POST**
+
+- `7100` > `403`: Permission `velocity.pool.list` is needed
+
+- `7110` > `404`: Group has not been found
+
+### `/m/media/create`
+
+**PUT**
+
+- `8200` > `403`: Permission `velocity.media.create` is needed
+
+- `8201` > `403`: Group does not have the `manage` permission on the media pool
+
+- `8210` > `404`: Group has not been found
+
+- `8211` > `404`: Mediapool has not been found
+
+- `8220` > `409`: The filename is a duplicate
+
+- `8221` > `406`: Some quota has been surpassed
+
+### `/m/media/upload`
+
+**PUT**
+
+- `9200` > `403`: Permission `velocity.media.create` is needed
+
+- `9201` > `403`: Group does not have the `manage` permission on the media pool
+
+- `9210` > `400`: The `Content-Length` header field is missing
+
+- `9211` > `400`: The `x-velocity-authkey` header field is missing
+
+- `9212` > `400`: The `x-velocity-mpid` header field is missing
+
+- `9213` > `400`: The `x-velocity-gid` header field is missing
+
+- `9214` > `400`: The `x-velocity-name` header field is missing
+
+- `9215` > `400`: The `x-velocity-type` header field is missing
+
+- `9216` > `400`: The `x-velocity-readonly` header field is missing
+
+- `9217` > `404`: Group has not been found
+
+- `9218` > `404`: Mediapool has not been found
+
+- `9220` > `409`: The filename is a duplicate
+
+- `9221` > `406`: Some quota has been surpassed
+
+- `9222` > `413`: More bytes than specified in `Content-Length` have been submitted
+
+### `/m/media/list`
+
+**POST**
+
+- `10100` > `403`: Permission `velocity.media.list` is needed
+
+- `10110` > `404`: Group has not been found
+
+### `/v/nic/list`
+
+**POST**
+
+- `11100` > `403`: Permission `velocity.nic.list` is needed
+
+### `/v/vm/efi`
+
+**PUT**
+
+- `12200` > `403`: Permission `velocity.vm.create` is needed
+- `12210` > `404`: Group has not been found
+- `12211` > `404`: Media has not been found
+- `12212` > `404`: Media-owning group has not been found
+- `12213` > `404`: Media-hosting mediapool has not been found
+- `12214` > `404`: Host NIC has not been found
+- `12220` > `403`: CPU quota surpassed
+- `12221` > `403`: Memory quota surpassed
+- `12222` > `403`: Media quota surpassed
+- `12223` > `403`: VM name is a duplicate
+- `12224` > `403`: Display name is a duplicate
+- `12225` > `403`: Invalid disk mode
+- `12226` > `403`: Invalid NIC type
+- `12227` > `403`: `BRIDGE` NIC needs a host NIC

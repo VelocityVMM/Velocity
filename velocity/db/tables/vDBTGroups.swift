@@ -8,6 +8,9 @@
 import Foundation
 import SQLite
 
+/// The group id is a Int64
+typealias GID = Int64
+
 extension VDB {
 
     /// A group in the database
@@ -19,11 +22,11 @@ extension VDB {
         internal let db: VDB
 
         /// The unique group id
-        let gid: Int64
+        let gid: GID
         /// The `gid` of the parent group
         ///
         /// If this is set to `0`, the parent is the root group. The `root {0}` group has this set to `0`, too
-        let parent_gid: Int64
+        let parent_gid: GID
         /// The group name (unique within the parent group)
         var name: String
 
@@ -178,6 +181,81 @@ extension VDB {
                 permissions: try self.get_direct_permissions(uid: user.uid))
 
             return info
+        }
+
+        /// Returns an array of media pool information structs describing the pools available to this group
+        func get_mediapools_info() throws -> [MediaPool.Info] {
+            let tgp = self.db.t_grouppools
+            var res: [MediaPool.Info] = []
+
+            let query = tgp.table.filter(tgp.gid == self.gid)
+            for row in try self.db.db.prepare(query) {
+                if let pool = self.db.pool_get(mpid: row[tgp.mpid]) {
+                    res.append(MediaPool.Info(
+                        mpid: pool.mpid,
+                        name: pool.name,
+                        write: row[tgp.write],
+                        manage: row[tgp.manage]))
+                } else {
+                    VErr("Failed to get media pool with mpid = \(row[tgp.mpid])")
+                }
+            }
+
+            return res
+        }
+
+        /// Returns an array of media pools assiciated with this group
+        func get_mediapools() throws -> [MediaPool] {
+            let tgp = self.db.t_grouppools
+            var res: [MediaPool] = []
+
+            let query = tgp.table.filter(tgp.gid == self.gid)
+            for row in try self.db.db.prepare(query) {
+                if let pool = self.db.pool_get(mpid: row[tgp.mpid]) {
+                    res.append(pool)
+                } else {
+                    VErr("Failed to get media pool with mpid = \(row[tgp.mpid])")
+                }
+            }
+
+            return res
+        }
+
+        /// Returns an array of media associated with this group
+        func get_media() throws -> [Media] {
+            var media: [Media] = []
+
+            for pool in try self.get_mediapools() {
+                media.append(contentsOf: try pool.get_media(db: self.db, group: self))
+            }
+
+            return media
+        }
+
+        /// Returns if a group has the `manage` permission on a pool
+        func can_manage(pool: MediaPool) throws -> Bool {
+            let group_pools = try self.get_mediapools_info()
+
+            for g_pool in group_pools {
+                if g_pool.mpid == pool.mpid && g_pool.manage {
+                    return true
+                }
+            }
+
+            return false
+        }
+
+        /// Returns if a group has the `write` permission on a pool
+        func can_write(pool: MediaPool) throws -> Bool {
+            let group_pools = try self.get_mediapools_info()
+
+            for g_pool in group_pools {
+                if g_pool.mpid == pool.mpid && g_pool.write {
+                    return true
+                }
+            }
+
+            return false
         }
 
         /// Creates a new group in the database

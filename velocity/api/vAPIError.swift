@@ -29,6 +29,9 @@ extension VAPI {
     /// An enumeration of all possible error codes that can be thrown by the Velocity API
     enum ErrorCode : Int64, Encodable {
 
+        /// The endpoint is not implemented yet
+        case NOT_IMPLEMENTED = 200
+
         /// An unauthorized request has been made
         case UNAUTHORIZED = 100
 
@@ -101,6 +104,129 @@ extension VAPI {
         case U_GROUP_DELETE_PERMISSION = 5300
         /// `/u/group - DELETE`: The group to delete hasn't been found
         case U_GROUP_DELETE_NOT_FOUND = 5310
+
+        // MARK: /m/pool/assign: 6xxx
+
+        /// `/m/pool/assign - PUT`: The `velocity.pool.assign` permission is missing
+        case M_POOL_ASSIGN_PUT_PERMISSION = 6200
+        /// `/m/pool/assign - PUT`: The group hasn't been found
+        case M_POOL_ASSIGN_PUT_GROUP_NOT_FOUND = 6210
+        /// `/m/pool/assign - PUT`: The mediapool hasn't been found
+        case M_POOL_ASSIGN_PUT_MEDIAPOOL_NOT_FOUND = 6211
+
+        /// `/m/pool/assign - DELETE`: The `velocity.pool.revoke` permission is missing
+        case M_POOL_ASSIGN_DELETE_PERMISSION = 6300
+        /// `/m/pool/assign - DELETE`: The group hasn't been found
+        case M_POOL_ASSIGN_DELETE_GROUP_NOT_FOUND = 6310
+        /// `/m/pool/assign - DELETE`: The mediapool hasn't been found
+        case M_POOL_ASSIGN_DELETE_MEDIAPOOL_NOT_FOUND = 6311
+
+        // MARK: /m/pool/list: 7xxx
+
+        /// `/m/pool/list - POST`: The `velocity.pool.list` permission is missing
+        case M_POOL_LIST_POST_PERMISSION = 7100
+        /// `/m/pool/list - POST`: The  `gid` hasn't been found
+        case M_POOL_LIST_POST_GROUP_NOT_FOUND = 7110
+
+        // MARK: /m/media/create: 8xxx
+
+        /// `/m/media/create - PUT`: The `velocity.media.create` permission is missing
+        case M_MEDIA_CREATE_PUT_PERMISSION = 8200
+        /// `/m/media/create - PUT`: The group does not have the `manage` permission on the mediapool
+        case M_MEDIA_CREATE_PUT_GROUP_PERMISSION = 8201
+        /// `/m/media/create - PUT`: The  `gid` hasn't been found
+        case M_MEDIA_CREATE_PUT_GROUP_NOT_FOUND = 8210
+        /// `/m/media/create - PUT`: The  `mpid` hasn't been found
+        case M_MEDIA_CREATE_PUT_MEDIAPOOL_NOT_FOUND = 8211
+        /// `/m/media/create - PUT`: A file with the same `name` does already exist
+        case M_MEDIA_CREATE_PUT_CONFLICT = 8220
+        /// `/m/media/create - PUT`: The  quota has been surpassed
+        case M_MEDIA_CREATE_PUT_QUOTA = 8221
+
+        // MARK: /m/media/upload: 9xxx
+
+        /// `/m/media/upload - PUT`: The `velocity.media.create` permission is missing
+        case M_MEDIA_UPLOAD_PUT_PERMISSION = 9200
+        /// `/m/media/upload - PUT`: The group does not have the `manage` permission on the mediapool
+        case M_MEDIA_UPLOAD_PUT_GROUP_PERMISSION = 9201
+        /// `/m/media/upload - PUT`: HTTP header: `Content-Length` field is missing
+        case M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH = 9210
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-authkey` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_AUTHKEY = 9211
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-mpid` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_MPID = 9212
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-gid` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_GID = 9213
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-name` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_NAME = 9214
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-type` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_TYPE = 9215
+        /// `/m/media/upload - PUT`: HTTP header: `x-velocity-readonly` field is missing
+        case M_MEDIA_UPLOAD_PUT_X_VELOCITY_READONLY = 9216
+        /// `/m/media/upload - PUT`: The  `gid` hasn't been found
+        case M_MEDIA_UPLOAD_PUT_GROUP_NOT_FOUND = 9217
+        /// `/m/media/upload - PUT`: The  `mpid` hasn't been found
+        case M_MEDIA_UPLOAD_PUT_MEDIAPOOL_NOT_FOUND = 9218
+        /// `/m/media/upload - PUT`: A file with the same `name` does already exist
+        case M_MEDIA_UPLOAD_PUT_CONFLICT = 9220
+        /// `/m/media/upload - PUT`: The  quota has been surpassed
+        case M_MEDIA_UPLOAD_PUT_QUOTA = 9221
+        /// `/m/media/upload - PUT`: The effective content lenght surpassed the promised `Content-Length`
+        case M_MEDIA_UPLOAD_PUT_TOO_MANY_BYTES = 9222
+
+        // MARK: /m/media/list: 10xxx
+
+        /// `/m/media/list - POST`: The `velocity.media.list` permission is missing
+        case M_MEDIA_LIST_POST_PERMISSION = 10100
+        /// `/m/media/list - POST`: The `gid` has not been found
+        case M_MEDIA_LIST_POST_GROUP_NOT_FOUND = 10110
+
+        /// `/v/nic/list - POST`: The `velocity.nic.list` permission is missing
+        case V_NIC_LIST_POST_PERMISSION = 11100
+
+        /// `/v/vm/efi - PUT`: The `velocity.vm.create` permission is missing
+        case V_VM_EFI_PUT_PERMISSION = 12200
+        /// `/v/vm/efi - PUT`: The `gid` has not been found
+        case V_VM_EFI_PUT_GROUP_NOT_FOUND = 12210
+        /// `/v/vm/efi - PUT`: The `mid` of some media has not been found
+        case V_VM_EFI_PUT_MEDIA_NOT_FOUND = 12211
+        /// `/v/vm/efi - PUT`: The group for a certain `mid` has not been found
+        case V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND = 12212
+        /// `/v/vm/efi - PUT`: The mediapool for a certain `mid` has not been found
+        case V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND = 12213
+        /// `/v/vm/efi - PUT`: The `nicid` of a host NIC has not been found
+        case V_VM_EFI_PUT_HOST_NIC_NOT_FOUND = 12214
+        /// `/v/vm/efi - PUT`: Some quota in the `CPU` space has been surpassed
+        case V_VM_EFI_PUT_CPU_QUOTA = 12220
+        /// `/v/vm/efi - PUT`: Some quota in the `MEMORY` space has been surpassed
+        case V_VM_EFI_PUT_MEMORY_QUOTA = 12221
+        /// `/v/vm/efi - PUT`: Some quota in the `MEDIA` space has been surpassed
+        case V_VM_EFI_PUT_MEDIA_QUOTA = 12222
+        /// `/v/vm/efi - PUT`: There is already a VM with the same `name` in the group
+        case V_VM_EFI_PUT_CONFLICT = 12223
+        /// `/v/vm/efi - PUT`: There is already display with the same `name` in the VM
+        case V_VM_EFI_PUT_DISPLAY_CONFLICT = 12224
+        /// `/v/vm/efi - PUT`: An invalid `mode` has been supplied for a disk
+        case V_VM_EFI_PUT_DISK_MODE = 12225
+        /// `/v/vm/efi - PUT`: An invalid `type` has been supplied for a nic
+        case V_VM_EFI_PUT_NIC_TYPE = 12226
+        /// `/v/vm/efi - PUT`: A NIC with type `BRIDGE` has been used, but no host NIC was supplied
+        case V_VM_EFI_PUT_HOST_NIC_REQUIRED = 12227
+
+        // MARK: /v/vm/state: 11xxx
+
+        /// `/v/vm/state - POST`: The `velocity.vm.view` permission is missing
+        case V_VM_STATE_POST_PERMISSION = 13100
+        /// `/v/vm/state - POST`: The requested VMID has not been found
+        case V_VM_STATE_POST_VM_NOT_FOUND = 13110
+
+        /// `/v/vm/state - PUT`: The `velocity.vm.state` permission is missing
+        case V_VM_STATE_PUT_PERMISSION = 13200
+        /// `/v/vm/state - PUT`: The requested VMID has not been found
+        case V_VM_STATE_PUT_VM_NOT_FOUND = 13210
+        /// `/v/vm/state - PUT`: The requested state transition can not be completed
+        case V_VM_STATE_PUT_NOT_ALLOWED = 13220
+
     }
 }
 
@@ -108,6 +234,8 @@ extension VAPI.ErrorCode {
     /// Returns the matching `HTTP` status code for an error code
     func get_http_status() -> HTTPStatus {
         switch self {
+
+        case .NOT_IMPLEMENTED: return .notImplemented
 
         case .UNAUTHORIZED: return .unauthorized
 
@@ -158,12 +286,84 @@ extension VAPI.ErrorCode {
         case .U_GROUP_DELETE_PERMISSION: return .forbidden
         case .U_GROUP_DELETE_NOT_FOUND: return .notFound
 
+        // /m/pool/assign - PUT
+        case .M_POOL_ASSIGN_PUT_PERMISSION: return .forbidden
+        case .M_POOL_ASSIGN_PUT_GROUP_NOT_FOUND: return .notFound
+        case .M_POOL_ASSIGN_PUT_MEDIAPOOL_NOT_FOUND: return .notFound
+
+        // /m/pool/assign - DELETE
+        case .M_POOL_ASSIGN_DELETE_PERMISSION: return .forbidden
+        case .M_POOL_ASSIGN_DELETE_GROUP_NOT_FOUND: return .notFound
+        case .M_POOL_ASSIGN_DELETE_MEDIAPOOL_NOT_FOUND: return .notFound
+
+        // /m/pool/list - POST
+        case .M_POOL_LIST_POST_PERMISSION: return .forbidden
+        case .M_POOL_LIST_POST_GROUP_NOT_FOUND: return .notFound
+
+        // /m/media/create - PUT
+        case .M_MEDIA_CREATE_PUT_PERMISSION: return .forbidden
+        case .M_MEDIA_CREATE_PUT_GROUP_PERMISSION: return .forbidden
+        case .M_MEDIA_CREATE_PUT_GROUP_NOT_FOUND: return .notFound
+        case .M_MEDIA_CREATE_PUT_MEDIAPOOL_NOT_FOUND: return .notFound
+        case .M_MEDIA_CREATE_PUT_CONFLICT: return .conflict
+        case .M_MEDIA_CREATE_PUT_QUOTA: return .notAcceptable
+
+        // /m/media/upload - PUT
+        case .M_MEDIA_UPLOAD_PUT_PERMISSION: return .forbidden
+        case .M_MEDIA_UPLOAD_PUT_GROUP_PERMISSION: return .forbidden
+        case .M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_AUTHKEY: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_MPID: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_GID: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_NAME: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_TYPE: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_READONLY: return .badRequest
+        case .M_MEDIA_UPLOAD_PUT_GROUP_NOT_FOUND: return .notFound
+        case .M_MEDIA_UPLOAD_PUT_MEDIAPOOL_NOT_FOUND: return .notFound
+        case .M_MEDIA_UPLOAD_PUT_CONFLICT: return .conflict
+        case .M_MEDIA_UPLOAD_PUT_QUOTA: return .notAcceptable
+        case .M_MEDIA_UPLOAD_PUT_TOO_MANY_BYTES: return .payloadTooLarge
+
+        // /m/media/list - POST
+        case .M_MEDIA_LIST_POST_PERMISSION: return .forbidden
+        case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return .notFound
+
+        // /v/nic/list - POST
+        case .V_NIC_LIST_POST_PERMISSION: return .forbidden
+
+
+        // /v/vm/efi - PUT
+        case .V_VM_EFI_PUT_PERMISSION: return .forbidden
+        case .V_VM_EFI_PUT_GROUP_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_MEDIA_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_HOST_NIC_NOT_FOUND: return .notFound
+        case .V_VM_EFI_PUT_CPU_QUOTA: return .notAcceptable
+        case .V_VM_EFI_PUT_MEMORY_QUOTA: return .notAcceptable
+        case .V_VM_EFI_PUT_MEDIA_QUOTA: return .notAcceptable
+        case .V_VM_EFI_PUT_CONFLICT: return .conflict
+        case .V_VM_EFI_PUT_DISPLAY_CONFLICT: return .conflict
+        case .V_VM_EFI_PUT_DISK_MODE: return .notAcceptable
+        case .V_VM_EFI_PUT_NIC_TYPE: return .notAcceptable
+        case .V_VM_EFI_PUT_HOST_NIC_REQUIRED: return .notAcceptable
+
+        // /v/vm/state - POST
+        case .V_VM_STATE_POST_PERMISSION: return .forbidden
+        case .V_VM_STATE_POST_VM_NOT_FOUND: return .notFound
+
+        // /v/vm/state - PUT
+        case .V_VM_STATE_PUT_PERMISSION: return .forbidden
+        case .V_VM_STATE_PUT_VM_NOT_FOUND: return .notFound
+        case .V_VM_STATE_PUT_NOT_ALLOWED: return .notAcceptable
         }
     }
 
     /// Returns the matching error message for an error code
     func get_message() -> String {
         switch self {
+
+        case .NOT_IMPLEMENTED: return "Feature not implemented"
 
         case .UNAUTHORIZED: return "Unauthorized: Authkey is invalid or not present"
 
@@ -213,6 +413,75 @@ extension VAPI.ErrorCode {
         case .U_GROUP_DELETE_PERMISSION: return "Permission 'velocity.group.remove' is needed"
         case .U_GROUP_DELETE_NOT_FOUND: return "Group has not been found"
 
+        // /m/pool/assign - PUT
+        case .M_POOL_ASSIGN_PUT_PERMISSION: return "Permission 'velocity.pool.assign' is needed"
+        case .M_POOL_ASSIGN_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_POOL_ASSIGN_PUT_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+
+        // /m/pool/assign - DELETE
+        case .M_POOL_ASSIGN_DELETE_PERMISSION: return "Permission 'velocity.pool.revoke' is needed"
+        case .M_POOL_ASSIGN_DELETE_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_POOL_ASSIGN_DELETE_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+
+        // /m/pool/list - POST
+        case .M_POOL_LIST_POST_PERMISSION: return "Permission 'velocity.pool.list' is needed"
+        case .M_POOL_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
+
+        // /m/media/create - PUT
+        case .M_MEDIA_CREATE_PUT_PERMISSION: return "Permission 'velocity.media.create' is needed"
+        case .M_MEDIA_CREATE_PUT_GROUP_PERMISSION: return "The group does not have the 'manage' permission on the mediapool"
+        case .M_MEDIA_CREATE_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_MEDIA_CREATE_PUT_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+        case .M_MEDIA_CREATE_PUT_CONFLICT: return "A file with the same name does already exist in this pool"
+        case .M_MEDIA_CREATE_PUT_QUOTA: return "Some quota has been surpassed"
+
+        // /m/media/upload - PUT
+        case .M_MEDIA_UPLOAD_PUT_PERMISSION: return "Permission 'velocity.media.create' is needed"
+        case .M_MEDIA_UPLOAD_PUT_GROUP_PERMISSION: return "The group does not have the 'manage' permission on the mediapool"
+        case .M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH: return "The HTTP header is missing the 'Content-Length' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_AUTHKEY: return "The HTTP header is missing the 'x-velocity-authkey' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_MPID: return "The HTTP header is missing the 'x-velocity-mpid' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_GID: return "The HTTP header is missing the 'x-velocity-gid' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_NAME: return "The HTTP header is missing the 'x-velocity-name' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_TYPE: return "The HTTP header is missing the 'x-velocity-type' field"
+        case .M_MEDIA_UPLOAD_PUT_X_VELOCITY_READONLY: return "The HTTP header is missing the 'x-velocity-readonly' field"
+        case .M_MEDIA_UPLOAD_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .M_MEDIA_UPLOAD_PUT_MEDIAPOOL_NOT_FOUND: return "Mediapool has not been found"
+        case .M_MEDIA_UPLOAD_PUT_CONFLICT: return "A file with the same name does already exist in this pool"
+        case .M_MEDIA_UPLOAD_PUT_QUOTA: return "Some quota has been surpassed"
+        case .M_MEDIA_UPLOAD_PUT_TOO_MANY_BYTES: return "More bytes were submitted than promised by 'Content-Length'"
+
+        // /m/media/list - POST
+        case .M_MEDIA_LIST_POST_PERMISSION: return "Permission 'velocity.media.list' is needed"
+        case .M_MEDIA_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
+
+        // /v/nic/list - POST
+        case .V_NIC_LIST_POST_PERMISSION: return "Permission 'velocity.nic.list' is needed"
+
+        // /v/vm/efi - PUT
+        case .V_VM_EFI_PUT_PERMISSION: return "Permission 'velocity.vm.create' is needed"
+        case .V_VM_EFI_PUT_GROUP_NOT_FOUND: return "Group has not been found"
+        case .V_VM_EFI_PUT_MEDIA_NOT_FOUND: return "Media has not been found"
+        case .V_VM_EFI_PUT_MEDIA_GROUP_NOT_FOUND: return "The owning group has not been found"
+        case .V_VM_EFI_PUT_MEDIA_MEDIAPOOL_NOT_FOUND: return "The owning mediapool has not been found"
+        case .V_VM_EFI_PUT_HOST_NIC_NOT_FOUND: return "Host NIC has not been found"
+        case .V_VM_EFI_PUT_CPU_QUOTA: return "CPU quota surpassed"
+        case .V_VM_EFI_PUT_MEMORY_QUOTA: return "Memory quota surpassed"
+        case .V_VM_EFI_PUT_MEDIA_QUOTA: return "Media quota surpassed"
+        case .V_VM_EFI_PUT_CONFLICT: return "A VM with the same name does already exist in this group"
+        case .V_VM_EFI_PUT_DISPLAY_CONFLICT: return "A display with the same name does already exist for the VM"
+        case .V_VM_EFI_PUT_DISK_MODE: return "An invalid attachment mode has been used for a disk"
+        case .V_VM_EFI_PUT_NIC_TYPE: return "An invalid interface type has been used for a NIC"
+        case .V_VM_EFI_PUT_HOST_NIC_REQUIRED: return "A NIC of type 'BRIDGE' needs a host NIC"
+
+        // /v/vm/state - POST
+        case .V_VM_STATE_POST_PERMISSION: return "Permission 'velocity.vm.view' is needed"
+        case .V_VM_STATE_POST_VM_NOT_FOUND: return "Virtual machine has not been found"
+
+        // /v/vm/state - PUT
+        case .V_VM_STATE_PUT_PERMISSION: return "Permission 'velocity.vm.state' is needed"
+        case .V_VM_STATE_PUT_VM_NOT_FOUND: return "Virtual machine has not been found"
+        case .V_VM_STATE_PUT_NOT_ALLOWED: return "State transition not allowed"
         }
     }
 }
@@ -226,10 +495,29 @@ extension VAPI {
         let message: String
     }
 
-    /// Construct a new error from an error code
+    /// Resolves the promise but embeds a error struct into the Response
+    /// - Parameter response: The eventloop promise to resolve
+    /// - Parameter code: The code of the error
+    func promise_error(_ promise: EventLoopPromise<Void>, code: ErrorCode) throws -> EventLoopFuture<Response> {
+        let response = try self.error(code: code)
+        promise.succeed()
+        return promise.futureResult.always { r in }.map {
+            return response
+        }
+    }
+
+    /// Construct a new error from an error code and an additional string
     /// - Parameter code: The error code to return
-    func error(code: ErrorCode) throws -> Response {
-        let error = Error(code: code, message: code.get_message())
+    /// - Parameter additional: The additional message
+    func error(code: ErrorCode, _ additional: String? = nil) throws -> Response {
+        var msg = "\(code.get_message())"
+        if let additional = additional {
+            msg = "\(code.get_message()): \(additional)"
+        }
+
+        let error = Error(code: code, message: msg)
+
+        VTrace("ERROR (\(code.get_http_status())): \(error)")
 
         var headers = HTTPHeaders()
         headers.add(name: .contentType, value: "application/json")
@@ -237,15 +525,15 @@ extension VAPI {
         return try Response(status: code.get_http_status(), headers: headers, body: .init(data: self.encoder.encode(error)))
     }
 
-    /// Construct a new error from an error code and an additional string
-    /// - Parameter code: The error code to return
+    /// Resolves the promise but embeds a error struct with additional information into the Response
+    /// - Parameter response: The eventloop promise to resolve
+    /// - Parameter code: The code of the error
     /// - Parameter additional: The additional message
-    func error(code: ErrorCode, _ additional: String) throws -> Response {
-        let error = Error(code: code, message: "\(code.get_message()): \(additional)")
-
-        var headers = HTTPHeaders()
-        headers.add(name: .contentType, value: "application/json")
-
-        return try Response(status: code.get_http_status(), headers: headers, body: .init(data: self.encoder.encode(error)))
+    func promise_error(_ promise: EventLoopPromise<Void>, code: ErrorCode, _ additional: String) throws -> EventLoopFuture<Response> {
+        let response = try self.error(code: code, additional)
+        promise.succeed()
+        return promise.futureResult.always { r in }.map {
+            return response
+        }
     }
 }
