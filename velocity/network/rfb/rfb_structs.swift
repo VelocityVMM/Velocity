@@ -333,7 +333,7 @@ struct VRFBRect {
     func pack(px_format: VRFBPixelFormat) -> [UInt8] {
         // The color format of an CGImage is BGRA?
         let bytes_per_px = UInt8(px_format.bits_per_pixel / 8)
-        var data = Array<UInt8>(repeating: 0xff, count: Int(self.image.width) * Int(self.image.height) * Int(bytes_per_px))
+        var data = Array<UInt8>()
 
         data.insert(contentsOf: UInt16(0).pack(), at: 0)
         data.insert(contentsOf: UInt16(0).pack(), at: 2)
@@ -346,25 +346,20 @@ struct VRFBRect {
         // For now, this only works with 32 bpp
         // TODO: Implement other pixel formats
         if px_format.bits_per_pixel == 32 {
+            let cfdata = self.image.dataProvider!.data!
 
-            let colorSpace = CGColorSpaceCreateDeviceRGB()
-            let newImageSize = UInt32(self.image.width) * UInt32(self.image.height)
-            data.reserveCapacity(data.count + Int(newImageSize*4))
-            var pixelData = [UInt8](repeating: 0xff, count: Int(newImageSize*4))
+            let sond = [UInt8](cfdata as Data)
 
-            guard let newContext = CGContext(data: &pixelData, width: self.image.width, height: self.image.height, bitsPerComponent: self.image.bitsPerComponent, bytesPerRow: self.image.bytesPerRow, space: colorSpace, bitmapInfo: self.image.bitmapInfo.rawValue) else {
-                fatalError("Failed to create new CGContext")
-            }
+            let newImageSize = (Int(self.image.width) * Int(self.image.height)) * 4
 
-            // Draw the original image onto the new CGImage
-            newContext.draw(self.image, in: CGRect(x: 0, y: 0, width: self.image.width, height: self.image.height))
-
-            // And now insert the pixels into the array
-            for px in stride(from: 0, through: pixelData.count-1, by: 4) {
-                // TODO: Make this more reasonable and less hardcoded
-                data[12 + px] = pixelData[px]
-                data[12 + px + 1] = pixelData[px + 1]
-                data[12 + px + 2] = pixelData[px + 2]
+            // Check if the two sizes match up, else send a grey picture.
+            // This will most commonly happen when MacOS scales our VM window around and the
+            // real dimensions change
+            if newImageSize != sond.count {
+                VWarn("Invalid image size: expected \(newImageSize) for delivery, got \(sond.count)")
+                data.append(contentsOf: Array<UInt8>(repeating: 0x55, count: newImageSize))
+            } else {
+                data.append(contentsOf: sond)
             }
         }
         return data
