@@ -67,8 +67,9 @@ class VRFBSession : Loggable {
     /// The security negotiated security type
     var security: VRFBSecurityType = VRFBSecurityType.None
 
-    /// The framebuffer update request in flight, if there is some
-    var cur_fb_update: VRFBFBUpdateRequest? = nil
+    /// The framebuffer update requests that are in flight, if there are some.
+    /// New update requests are appended at the back
+    var fb_updates: [VRFBFBUpdateRequest] = []
     /// The dispatch queue to operate on
     let queue: DispatchQueue
 

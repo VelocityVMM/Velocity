@@ -49,7 +49,7 @@ extension VRFBSession {
 
         // (This should never happen)
         // Check if we don't have any fb updates in flight, this would violate the RFB protocol
-        if self.cur_fb_update != nil {
+        if !self.fb_updates.isEmpty {
             VErr("[SetPixelFormat] PixelFormat changed while FB update in flight (Faulty RFB client implementation)")
         }
 
@@ -95,7 +95,8 @@ extension VRFBSession {
             return
         }
 
-        self.cur_fb_update = request
+        // Push our new framebuffer update
+        self.fb_updates.append(request)
         VTrace("Received \(request)")
 
         if !request.incremental {
@@ -117,7 +118,8 @@ extension VRFBSession {
     /// Sends out a `FramebufferUpdate` to the client
     /// - Parameter image: The image to send
     internal func update_fb(image: CGImage) throws {
-        guard let _ = self.cur_fb_update else {
+        // Get the oldest update in the queue
+        guard let update = self.fb_updates.first else {
             VTrace("Updated framebuffer but no request in flight")
             return
         }
@@ -137,7 +139,6 @@ extension VRFBSession {
 
         VTrace("Sending \(data.count) bytes of pixel data")
         try self.connection.send_arr(data)
-        self.cur_fb_update = nil
     }
 
     /// The handler for a client `KeyEvent` message
