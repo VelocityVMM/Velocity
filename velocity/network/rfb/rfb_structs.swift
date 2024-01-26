@@ -348,18 +348,18 @@ struct VRFBRect {
         if px_format.bits_per_pixel == 32 {
             let cfdata = self.image.dataProvider!.data!
 
-            let sond = [UInt8](cfdata as Data)
+            let data_array = [UInt8](cfdata as Data)
 
             let newImageSize = (Int(self.image.width) * Int(self.image.height)) * 4
 
             // Check if the two sizes match up, else send a grey picture.
             // This will most commonly happen when MacOS scales our VM window around and the
             // real dimensions change
-            if newImageSize != sond.count {
-                VWarn("Invalid image size: expected \(newImageSize) for delivery, got \(sond.count)")
+            if newImageSize != data_array.count {
+                VWarn("Invalid image size: expected \(newImageSize) for delivery, got \(data_array.count)")
                 data.append(contentsOf: Array<UInt8>(repeating: 0x55, count: newImageSize))
             } else {
-                data.append(contentsOf: sond)
+                data.append(contentsOf: data_array)
             }
         }
         return data
