@@ -3,7 +3,7 @@
 //  velocity
 //
 //  Created by zimsneexh on 24.05.23.
-//  Copyright (c) zimsneexh 2023
+//  Copyright (c) 2023 The Velocity contributors
 
 import Foundation
 import Virtualization
@@ -15,7 +15,7 @@ var VELOCITY_CODENAME = "Xen Catalyst"
 
 public func main() {
     print("Velocity \(VELOCITY_VERSION) (\(VELOCITY_CODENAME)) - VMManager for Apple's Virtualization.framework")
-    print("Copyright (c) 2023 zimsneexh (https://zsxh.eu)")
+    print("Copyright (c) 2023 The Velocity contributors (https://github.com/VelocityVMM)")
     print("")
 
     if ProcessInfo.processInfo.environment["TERM"] != nil {

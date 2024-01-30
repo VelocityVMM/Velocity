@@ -2,7 +2,7 @@
 
 Velocity is a Proxmox-VE like virtualization platform that leverages the power of Apple's Virtualization Framework for its VMs. The goal is to provide an easy way of creating, managing and using Virtual machines on a (headless) Mac.
 
-Velocity exposes an API that allows interfacing with the Velocity daemon. This allows Velocity to run completely headless and use only a  [web interface](https://github.com/zimsneexh/VelocityUI) for interaction and management. Users can also automate the process of creating and managing VMs through this API.
+Velocity exposes an API that allows interfacing with the Velocity daemon. This allows Velocity to run completely headless and use only a  [web interface](https://github.com/VelocityVMM/webinterface) for interaction and management. Users can also automate the process of creating and managing VMs through this API.
 
 ## API
 
