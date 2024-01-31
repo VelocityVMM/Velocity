@@ -99,18 +99,6 @@ extension VRFBSession {
         self.fb_updates.append(request)
         VTrace("Received \(request)")
 
-        if !request.incremental {
-            VDebug("Client requested full frame update")
-            if let cur_frame = self.vm_window.last_frame {
-                try self.update_fb(image: cur_frame)
-            }
-
-            // If the client requested the initial framebuffer update,
-            // it expects the request to stay valid?
-            // So we just push the request after it has been cleared and move on
-            // self.cur_fb_update = request
-        }
-
         // Remove the first `10` bytes of the message
         message.removeFirst(10)
     }
