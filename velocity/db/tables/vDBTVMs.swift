@@ -64,7 +64,7 @@ extension VDB {
 
                 t.unique(self.vmid, self.name)
 
-                t.foreignKey(self.gid, references: t_groups.table, t_groups.gid)
+                t.foreignKey(self.gid, references: t_groups.table, t_groups.gid, update: .cascade, delete: .cascade)
             })
         }
 
