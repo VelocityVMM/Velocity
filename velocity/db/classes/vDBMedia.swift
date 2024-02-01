@@ -80,6 +80,19 @@ extension VDB {
             return self.pool.path.appending(self.mid)
         }
 
+        /// Tries to delete the media, including the underlying file
+        func delete() throws {
+            VTrace("Deleting media \(self.mid) @ \(self.get_file_path())")
+
+            // We first delete the DB entry, that can be reverted if FS deletion fails
+            try self.db.db.transaction {
+                let query = self.db.t_media.table.filter(self.db.t_media.mid == self.mid).delete()
+                try self.db.db.run(query)
+
+                try FileManager.default.removeItem(atPath: self.get_file_path().string)
+            }
+        }
+
         /// Creates new media from the information provided, registering it to the supplied database
         /// - Parameter db: The database to register the new media in
         /// - Parameter info: The information to use for creation
