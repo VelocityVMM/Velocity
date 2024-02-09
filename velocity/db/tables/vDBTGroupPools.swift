@@ -58,7 +58,7 @@ extension VDB {
 
                 t.primaryKey(self.mpid, self.gid)
 
-                t.foreignKey(self.gid, references: t_groups.table, t_groups.gid)
+                t.foreignKey(self.gid, references: t_groups.table, t_groups.gid, update: .cascade, delete: .cascade)
             })
         }
     }

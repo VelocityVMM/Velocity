@@ -58,7 +58,7 @@ extension VDB {
 
                 t.primaryKey(self.vmid, self.name)
 
-                t.foreignKey(self.vmid, references: t_vms.table, t_vms.vmid)
+                t.foreignKey(self.vmid, references: t_vms.table, t_vms.vmid, update: .cascade, delete: .cascade)
             })
         }
 

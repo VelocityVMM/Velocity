@@ -49,9 +49,9 @@ extension VDB {
 
                 t.primaryKey(self.gid, self.uid, self.pid)
 
-                t.foreignKey(self.gid, references: groups.table, groups.gid)
-                t.foreignKey(self.uid, references: users.table, users.uid)
-                t.foreignKey(self.pid, references: permissions.table, permissions.pid)
+                t.foreignKey(self.gid, references: groups.table, groups.gid, update: .cascade, delete: .cascade)
+                t.foreignKey(self.uid, references: users.table, users.uid, update: .cascade, delete: .cascade)
+                t.foreignKey(self.pid, references: permissions.table, permissions.pid, update: .cascade, delete: .cascade)
             })
         }
     }

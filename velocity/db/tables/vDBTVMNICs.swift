@@ -50,7 +50,7 @@ extension VDB {
                 t.column(self.type)
                 t.column(self.host)
 
-                t.foreignKey(self.vmid, references: t_vms.table, t_vms.vmid)
+                t.foreignKey(self.vmid, references: t_vms.table, t_vms.vmid, update: .cascade, delete: .cascade)
             })
         }
 

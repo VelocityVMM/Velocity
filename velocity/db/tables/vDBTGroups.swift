@@ -79,6 +79,13 @@ extension VDB {
 
         /// Removes the group from the database
         func delete() throws {
+            if self.gid == 0 {
+                throw SystemProtectionError(protection: .RootGroupDeletion)
+            }
+
+            for media in try self.get_media() {
+                try media.delete()
+            }
             let query = self.db.t_groups.table.filter(self.db.t_groups.gid == self.gid).delete()
             try self.db.db.run(query)
         }

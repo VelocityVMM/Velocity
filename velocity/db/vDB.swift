@@ -80,3 +80,32 @@ extension Connection {
         try self.scalar(table.filter(predicate).count) > 0;
     }
 }
+
+/// Errors that triggered a protection to prevent the user
+/// from destroying the hypervisor
+struct SystemProtectionError : Error, LocalizedError {
+    /// The protection that kicked in
+    let protection: Protection
+
+    init(protection: Protection) {
+        self.protection = protection
+    }
+
+    /// Describes the error
+    public var description: String {
+        switch self.protection {
+        case .RootGroupDeletion:
+            return "The root group can not be deleted"
+        case .RootUserDeletion:
+            return "The root user can not be deleted"
+        }
+    }
+
+    /// All the kinds of protections the root group can experience
+    enum Protection {
+        /// Protects the root group (0) from deletion
+        case RootGroupDeletion
+        /// Protects the root user (0) from deletion
+        case RootUserDeletion
+    }
+}
