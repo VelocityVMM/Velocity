@@ -68,6 +68,10 @@ extension VDB {
 
         /// Removes the user from the database
         func delete() throws {
+            if self.uid == 0 {
+                throw SystemProtectionError(protection: .RootUserDeletion)
+            }
+
             let query = self.db.t_users.table.filter(self.db.t_users.uid == self.uid).delete();
             try self.db.db.run(query);
         }
