@@ -75,7 +75,7 @@ extension VDB {
         }
 
         /// The possible modes for a NIC
-        enum NICType : String, Decodable {
+        enum NICType : String, Decodable, Encodable {
             case NAT = "NAT"
             case BRIDGE = "BRIDGE"
         }

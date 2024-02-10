@@ -142,7 +142,7 @@ extension VDB {
         }
 
         /// All possible modes a disk can be attached
-        enum DiskMode : String, Decodable {
+        enum DiskMode : String, Decodable, Encodable {
             case USB = "USB"
             case VIRTIO = "VIRTIO"
 

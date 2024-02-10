@@ -29,7 +29,7 @@ import Virtualization
 extension VZ {
 
     /// A structure that describes a display for a virtual machine
-    struct DisplayConfiguration {
+    struct DisplayConfiguration : Encodable {
 
         /// A friendly name for the display
         let name: String
@@ -44,7 +44,6 @@ extension VZ {
         func get_scanout() -> VZVirtioGraphicsScanoutConfiguration {
             return VZVirtioGraphicsScanoutConfiguration(widthInPixels: Int(self.width), heightInPixels: Int(self.height))
         }
-
     }
 
 }
