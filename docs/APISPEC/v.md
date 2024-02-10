@@ -30,6 +30,12 @@ A user can request state changes from the server, but can only transition to tho
 
 [Virtual machine management](#v-vm)
 
+- VM management
+  
+  - [`/v/vm/list` - POST](#post-v-vm-list): List all available virtual machines
+  
+  - [`/v/vm` - POST](#post-v-vm): Get information about a virtual machine
+
 - VM creation
   
   - [`/v/vm/efi` - PUT](#put-v-vm-efi): Create a `EFI` virtual machine
@@ -47,6 +53,105 @@ A user can request state changes from the server, but can only transition to tho
 - [`/v/nic/list` - POST](#post-v-nic-list): List available host NICs
 
 # Virtual machine management <a name="v-vm"></a>
+
+# `/v/vm/list` - POST <a name="post-v-vm-list"></a>
+
+List all available virtual machines for a group
+
+> **Note**
+> 
+> The calling user needs the `velocity.vm.view` permission on the target group
+
+**Request:**
+
+```json
+{
+  "authkey": "<authkey>",
+  "gid": "<GID>",
+}
+```
+
+**Response:**
+
+- `200`:
+
+```json
+{
+  "vms": [
+    {
+      "vmid": "<VMID>",
+      "name": "<Name>",
+      "cpus": "<CPU count>",
+      "memory_mib": "<Memory in MiB>",
+      "state": "<VM state>"
+    }
+  ]
+}
+```
+
+- `401 - Unauthorized`: The calling user lacks permissions
+
+- `404 - Not Found`: The `GID` couldn't be found
+
+# `/v/vm` - POST <a name="post-v-vm"></a>
+
+Retrieve information about a virtual machine
+
+> **Note**
+> 
+> The calling user needs the `velocity.vm.view` permission on the group owning the VM
+
+**Request:**
+
+```json
+{
+    "authkey": "<authkey>",
+    "vmid": "<VMID>"
+}
+```
+
+**Response:**
+
+- `200`:
+
+```json
+{
+  "vmid": "<VMID>",
+  "name": "<VM name>",
+  "type": "<EFI/...>",
+  "state": "<VM state>",
+
+  "cpus": "<Amount of CPUs assigned>",
+  "memory_mib": "<Memory size in MiB>",
+
+  "displays": [
+    {
+      "name": "<Friendly name>",
+      "width": "<Screen width>",
+      "height": "<Screen height>",
+      "ppi": "<Pixels per inch>"
+    }
+  ],
+  "media": [
+    {
+      "mid": "<MID>",
+      "mode": "<USB / BLOCK / VIRTIO>",
+      "readonly": true
+    }
+  ],
+  "nics": [
+    {
+      "type": "<NAT / BRIDGE>",
+      "host": "<Host NICID (BRIDGE only)>"
+    }
+  ],
+
+  "rosetta": true,
+  "autostart": true
+}
+```
+
+- `404 - Not Found`: The `VMID` couldn't be found or the user lacks permissions to view the vm
 
 # `/v/vm/efi` - PUT <a name="put-v-vm-efi"></a>
 
