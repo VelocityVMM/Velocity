@@ -227,6 +227,16 @@ extension VAPI {
         /// `/v/vm/state - PUT`: The requested state transition can not be completed
         case V_VM_STATE_PUT_NOT_ALLOWED = 13220
 
+        // MARK: /v/vm: 16xxx
+
+        /// `/v/vm - POST`: The requested VMID has not been found
+        case V_VM_POST_VM_NOT_FOUND = 16210
+
+        // MARK: /v/vm/list: 17xxx
+
+        /// `/v/vm/list - POST`: The group has not been found
+        case V_VM_LIST_POST_GROUP_NOT_FOUND = 17210
+
     }
 }
 
@@ -356,6 +366,12 @@ extension VAPI.ErrorCode {
         case .V_VM_STATE_PUT_PERMISSION: return .forbidden
         case .V_VM_STATE_PUT_VM_NOT_FOUND: return .notFound
         case .V_VM_STATE_PUT_NOT_ALLOWED: return .notAcceptable
+
+        // /v/vm - POST
+        case .V_VM_POST_VM_NOT_FOUND: return .notFound
+
+        // /v/vm/list - POST
+        case .V_VM_LIST_POST_GROUP_NOT_FOUND: return .notFound
         }
     }
 
@@ -482,6 +498,12 @@ extension VAPI.ErrorCode {
         case .V_VM_STATE_PUT_PERMISSION: return "Permission 'velocity.vm.state' is needed"
         case .V_VM_STATE_PUT_VM_NOT_FOUND: return "Virtual machine has not been found"
         case .V_VM_STATE_PUT_NOT_ALLOWED: return "State transition not allowed"
+
+        // /v/vm - POST
+        case .V_VM_POST_VM_NOT_FOUND: return "Virtual machine has not been found or is not accessible"
+
+        // /v/vm/list - POST
+        case .V_VM_LIST_POST_GROUP_NOT_FOUND: return "Group has not been found"
         }
     }
 }
