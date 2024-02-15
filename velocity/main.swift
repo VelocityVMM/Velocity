@@ -25,6 +25,14 @@ public func main() {
         VInfo("Running in XCode, no escape codes")
     }
 
+    let signal_source = DispatchSource.makeSignalSource(signal: SIGINT, queue: .main);
+    signal_source.setEventHandler {
+        /// TODO: Properly shutdown webserver & rfb server, send shutdown req to VMs..
+        exit(0);
+    }
+    signal(SIGINT, SIG_IGN);
+    signal_source.resume();
+
     VInfo("Starting up..")
     VelocityConfig.setup()
 
