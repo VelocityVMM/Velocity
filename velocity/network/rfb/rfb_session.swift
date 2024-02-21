@@ -75,23 +75,23 @@ class VRFBSession : Loggable {
 
     /// Established a new RFB session using the supplied socket by performing the RFB handshake
     /// - Parameter socket: The socket to use for communication
-    init(_ server: VRFBServer, vm_manager: VMManager, connection: VNWConnection) throws {
+    init(vm_manager: VMManager, connection: VNWConnection) throws {
         // TODO: Use authentication to use the correct virtual machine
         guard let vm = vm_manager.vms.first?.value else {
             velocity.VWarn("Dropped RFB connection: No available VM", "[RFBS][\(connection.describe())]")
-            connection.connection.cancel()
+            connection.cancel()
             throw VRFBSessionError("No available virtual machine")
         }
 
         guard let vm_window = vm.window else {
             velocity.VWarn("Dropped RFB connection: No displays for VM \(vm.vvm.name)", "[RFBS][\(connection.describe())]")
-            connection.connection.cancel()
+            connection.cancel()
             throw VRFBSessionError("No display for the requested virtual machine '\(vm.vvm.vmid)'")
         }
 
         if vm.state != .running {
             velocity.VWarn("VM '\(vm.vvm.name)' is not running", "[RFBS][\(connection.describe())]")
-            connection.connection.cancel()
+            connection.cancel()
             throw VRFBSessionError("Virtual machine '\(vm.vvm.vmid)' is not running")
         }
 
@@ -103,7 +103,7 @@ class VRFBSession : Loggable {
         self.queue = DispatchQueue(label: "eu.zimsneexh.Velocity.RFBSession.\(connection.describe())", attributes: .concurrent)
 
         // Register a callback for when the connection is ready
-        self.connection.cb_on_ready = {
+        self.connection.ready_callback {
 
             self.queue.async {
                 do {

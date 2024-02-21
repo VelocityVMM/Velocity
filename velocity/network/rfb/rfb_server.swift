@@ -63,11 +63,11 @@ class VRFBServer : Loggable {
     internal func addNewConnection(connection: NWConnection) {
         do {
             VInfo("Incoming connection: \(connection.describe())")
-            let new_con = VNWConnection(connection: connection)
+            let new_con = VNetworkKitConnection(connection: connection)
 
             // Create the new session by attaching it to the appropriate virtual machine
             // We can dispose this reference to that object due to it attaching itself to the provided vm
-            let _ = try VRFBSession(self, vm_manager: self.manager, connection: new_con)
+            let _ = try VRFBSession(vm_manager: self.manager, connection: new_con)
         } catch let error {
             VErr("Failed to establish a session with \(connection.describe()): \(error)")
             return

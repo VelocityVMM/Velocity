@@ -56,6 +56,7 @@
 		50BF16002B30628300102231 /* rfb_session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF15FF2B30628300102231 /* rfb_session.swift */; };
 		50BF16022B3062A400102231 /* rfb_structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16012B3062A400102231 /* rfb_structs.swift */; };
 		50BF16052B3062BB00102231 /* rfb_util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16042B3062BB00102231 /* rfb_util.swift */; };
+		50D3E6712B85410400E75014 /* NetworkKitConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D3E6702B85410400E75014 /* NetworkKitConnection.swift */; };
 		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
 		50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */; };
 		50F1C0D82AB4844C004F8FF5 /* vAPI_m_pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */; };
@@ -123,6 +124,7 @@
 		50BF15FF2B30628300102231 /* rfb_session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_session.swift; sourceTree = "<group>"; };
 		50BF16012B3062A400102231 /* rfb_structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_structs.swift; sourceTree = "<group>"; };
 		50BF16042B3062BB00102231 /* rfb_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_util.swift; sourceTree = "<group>"; };
+		50D3E6702B85410400E75014 /* NetworkKitConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkKitConnection.swift; sourceTree = "<group>"; };
 		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
 		50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
 		50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_m_pool.swift; sourceTree = "<group>"; };
@@ -282,6 +284,7 @@
 			children = (
 				50BF15FA2B30621E00102231 /* rfb */,
 				5075244D2A37A2810072B094 /* vNWConnection.swift */,
+				50D3E66F2B8540ED00E75014 /* nw_connections */,
 			);
 			path = network;
 			sourceTree = "<group>";
@@ -335,6 +338,14 @@
 				50BF16012B3062A400102231 /* rfb_structs.swift */,
 			);
 			path = rfb;
+			sourceTree = "<group>";
+		};
+		50D3E66F2B8540ED00E75014 /* nw_connections */ = {
+			isa = PBXGroup;
+			children = (
+				50D3E6702B85410400E75014 /* NetworkKitConnection.swift */,
+			);
+			path = nw_connections;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -435,6 +446,7 @@
 				476083922A260F0200A93368 /* nsimage.swift in Sources */,
 				5037DB3B2B3EE57200BDBD1C /* rfb_s_handle.swift in Sources */,
 				5056EC7B2A72411700D93422 /* vAPI.swift in Sources */,
+				50D3E6712B85410400E75014 /* NetworkKitConnection.swift in Sources */,
 				500504F92AC410DA00BB0163 /* vDBHostNIC.swift in Sources */,
 				47D62A252A1E72C4006FFE2A /* main.swift in Sources */,
 				4707A5662A22A09200E0B517 /* log.swift in Sources */,
