@@ -57,6 +57,7 @@
 		50BF16022B3062A400102231 /* rfb_structs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16012B3062A400102231 /* rfb_structs.swift */; };
 		50BF16052B3062BB00102231 /* rfb_util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BF16042B3062BB00102231 /* rfb_util.swift */; };
 		50D3E6712B85410400E75014 /* NetworkKitConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D3E6702B85410400E75014 /* NetworkKitConnection.swift */; };
+		50D3E6732B8541F200E75014 /* WebsocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D3E6722B8541F200E75014 /* WebsocketConnection.swift */; };
 		50D65A272A933FD8004B5FDF /* vDBTPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */; };
 		50EDBE5E2A8B44CF00B4A094 /* vDBTGroups.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */; };
 		50F1C0D82AB4844C004F8FF5 /* vAPI_m_pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */; };
@@ -125,6 +126,7 @@
 		50BF16012B3062A400102231 /* rfb_structs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_structs.swift; sourceTree = "<group>"; };
 		50BF16042B3062BB00102231 /* rfb_util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = rfb_util.swift; sourceTree = "<group>"; };
 		50D3E6702B85410400E75014 /* NetworkKitConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkKitConnection.swift; sourceTree = "<group>"; };
+		50D3E6722B8541F200E75014 /* WebsocketConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketConnection.swift; sourceTree = "<group>"; };
 		50D65A262A933FD8004B5FDF /* vDBTPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTPermissions.swift; sourceTree = "<group>"; };
 		50EDBE5D2A8B44CF00B4A094 /* vDBTGroups.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vDBTGroups.swift; sourceTree = "<group>"; };
 		50F1C0D72AB4844C004F8FF5 /* vAPI_m_pool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vAPI_m_pool.swift; sourceTree = "<group>"; };
@@ -344,6 +346,7 @@
 			isa = PBXGroup;
 			children = (
 				50D3E6702B85410400E75014 /* NetworkKitConnection.swift */,
+				50D3E6722B8541F200E75014 /* WebsocketConnection.swift */,
 			);
 			path = nw_connections;
 			sourceTree = "<group>";
@@ -435,6 +438,7 @@
 				504C2E412AB3573B00130F85 /* vDBMedia.swift in Sources */,
 				500505002AC48EE900BB0163 /* vDBVM.swift in Sources */,
 				5037DB382B3E0B5400BDBD1C /* rfb_s_handshake.swift in Sources */,
+				50D3E6732B8541F200E75014 /* WebsocketConnection.swift in Sources */,
 				50A5BD892A95471800440303 /* vAPI_u.swift in Sources */,
 				501D9CF52AF240E400F6F1F6 /* EFIStoreManager.swift in Sources */,
 				50BC4E8C2A9F152F0048FC91 /* vAPIError.swift in Sources */,
