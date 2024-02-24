@@ -23,14 +23,29 @@
 //
 
 ///
-/// Bridge header for the Velocity project
+/// Acceleration functions for making some things faster.
 ///
-/// This header includes all the needed C headers to expose them to Swift
+/// Swift is nice, but sometimes, good old `C`-style control over pointers
+/// and data is needed to achieve the wanted performance reliably.
+/// This module contains such functions.
 ///
 
-#ifndef bridge_h
-#define bridge_h
+#include <stdint.h>
 
-#include "acceleration/acceleration.h"
-
-#endif
+/// Packs the supplied `data` into the correct pixel format for `24` bit color depth rgba
+/// - Parameter data: The array of pixel data to mutate
+/// - Parameter len: The length of the data in bytes
+/// - Parameter offset_r: The left shift of the `R` channel in bits
+/// - Parameter offset_g: The left shift of the `G` channel in bits
+/// - Parameter offset_b: The left shift of the `B` channel in bits
+/// - Parameter offset_a: The left shift of the `A` channel in bits
+///
+/// This function assumes the source pixel data is in `BGRA` format
+void pack_rfb_pixels_rgba32(
+                            uint8_t * data,
+                            size_t len,
+                            uint8_t shift_r,
+                            uint8_t shift_g,
+                            uint8_t shift_b,
+                            uint8_t shift_a
+                            );

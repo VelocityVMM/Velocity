@@ -23,14 +23,38 @@
 //
 
 ///
-/// Bridge header for the Velocity project
-///
-/// This header includes all the needed C headers to expose them to Swift
+/// Implementation of acceleration functions
 ///
 
-#ifndef bridge_h
-#define bridge_h
+#include <stdio.h>
+#include <stdint.h>
 
-#include "acceleration/acceleration.h"
+/// Packs the provided data according to the supplied pixel format
+extern "C" void pack_rfb_pixels_rgba32(
+                                       uint8_t * data,
+                                       size_t len,
+                                       uint8_t shift_r,
+                                       uint8_t shift_g,
+                                       uint8_t shift_b,
+                                       uint8_t shift_a) {
 
-#endif
+    // Create some cache variables
+    uint8_t r, g, b, a = 0;
+
+    // Iterate over all pixels
+    for (size_t i = 0; i < len; i += 4) {
+
+        // Create a pointer for extra speedy access
+        uint8_t* ptr = data + i;
+
+        b = *ptr;
+        g = *(ptr+1);
+        r = *(ptr+2);
+        a = *(ptr+3);
+
+        // Reinterpret the pointer as 32 bit and shift the new values into it
+        *(uint32_t*)ptr = (a << shift_a) | (r << shift_r) | (g << shift_g) | (b << shift_b);
+    }
+
+    return;
+}

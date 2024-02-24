@@ -348,9 +348,10 @@ struct VRFBRect {
         if px_format.bits_per_pixel == 32 {
             let cfdata = self.image.dataProvider!.data!
 
-            let data_array = [UInt8](cfdata as Data)
+            var data_array = [UInt8](cfdata as Data)
 
-            let newImageSize = (Int(self.image.width) * Int(self.image.height)) * 4
+            let count_pixels = Int(self.image.width) * Int(self.image.height)
+            let newImageSize = count_pixels * 4
 
             // Check if the two sizes match up, else send a grey picture.
             // This will most commonly happen when MacOS scales our VM window around and the
@@ -359,6 +360,20 @@ struct VRFBRect {
                 VWarn("Invalid image size: expected \(newImageSize) for delivery, got \(data_array.count)")
                 data.append(contentsOf: Array<UInt8>(repeating: 0x55, count: newImageSize))
             } else {
+
+                // Let the accelerated function crunch our data
+                data_array.withUnsafeMutableBytes { pointer in
+                    pack_rfb_pixels_rgba32(
+                        pointer.baseAddress,
+                        newImageSize,
+                        px_format.red_shift,
+                        px_format.green_shift,
+                        px_format.blue_shift,
+                        24
+                    )
+                }
+
+                // Append the modified data to the message
                 data.append(contentsOf: data_array)
             }
         }
