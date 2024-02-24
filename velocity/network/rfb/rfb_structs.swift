@@ -100,11 +100,11 @@ struct VRFBPixelFormat {
     var blue_max: UInt16 = 255
 
     /// The amount of bits the `red` channel is shifted to the left
-    var red_shift: UInt8 = 16
+    var red_shift: UInt8 = 0
     /// The amount of bits the `green` channel is shifted to the left
     var green_shift: UInt8 = 8
     /// The amount of bits the `blue` channel is shifted to the left
-    var blue_shift: UInt8 = 0
+    var blue_shift: UInt8 = 16
 
     // Pack with 24 bits of padding
     func pack() -> [UInt8] {
