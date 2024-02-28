@@ -28,6 +28,77 @@ import Vapor
 extension VAPI {
     /// Registers all endpoints within the namespace `/v/vm`
     func register_endpoints_v_vm(route: RoutesBuilder) throws {
+        route.post("list") { req in
+            let request: Structs.V.VM.LIST.POST.Req = try req.content.decode(Structs.V.VM.LIST.POST.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return try self.error(code: .UNAUTHORIZED)
+            }
+
+            let c_user = key.user
+
+            guard let group = try self.db.group_select(gid: request.gid) else {
+                self.VDebug("\(c_user.info()) tried to list VMs: GROUP \(request.gid) NOT FOUND")
+                return try self.error(code: .V_VM_LIST_POST_GROUP_NOT_FOUND)
+            }
+
+            guard try c_user.has_permission(permission: "velocity.vm.view", group: group) else {
+                self.VDebug("\(c_user.info()) tried to list VMs: FORBIDDEN")
+                return try self.error(code: .V_VM_EFI_PUT_PERMISSION)
+            }
+
+            var vms: [Structs.V.VM.LIST.POST.Res.VMInfo] = []
+
+            for vm in try self.db.vms_get(group: group) {
+                vms.append(Structs.V.VM.LIST.POST.Res.VMInfo(
+                    vmid: vm.vmid,
+                    name: vm.name,
+                    cpus: vm.cpu_count,
+                    memory_mib: vm.memory_size_mib))
+            }
+
+            return try self.response(Structs.V.VM.LIST.POST.Res(vms: vms))
+        }
+
+        route.post { req in
+            let request: Structs.V.VM.POST.Req = try req.content.decode(Structs.V.VM.POST.Req.self)
+
+            guard let key = self.get_authkey(authkey: request.authkey) else {
+                return try self.error(code: .UNAUTHORIZED)
+            }
+
+            let c_user = key.user
+
+            guard let vm = self.vm_manager.get_vm(vmid: request.vmid) else {
+                self.VDebug("\(c_user.info()) tried to retrieve VM info: VMID (\(request.vmid)) NOT FOUND")
+                return try self.error(code: .V_VM_EFI_PUT_PERMISSION)
+            }
+
+            if try !c_user.add_permission(group: vm.vvm.group, permission: "velocity.vm.view") {
+                self.VDebug("\(c_user.info()) tried to retrieve VM info: FORBIDDEN \(request.vmid)")
+                return try self.error(code: .V_VM_EFI_PUT_PERMISSION)
+            }
+
+            let disks = try self.db.t_vmdisks.select_vm_disks(vm: vm.vvm).0
+            let displays = try self.db.t_vmdisplays.select_vm_displays(vm: vm.vvm)
+            let nics = try self.db.t_vmnics.select_vm_nics(vm: vm.vvm).0
+
+            let res = Structs.V.VM.POST.Res(
+                vmid: vm.vvm.vmid,
+                name: vm.vvm.name,
+                type: "EFI",
+                state: vm.get_state(),
+                cpus: vm.vvm.cpu_count,
+                memory_mib: vm.vvm.memory_size_mib,
+                displays: displays,
+                media: disks,
+                nics: nics,
+                rosetta: vm.vvm.rosetta,
+                autostart: vm.vvm.autostart)
+
+            return try self.response(res)
+        }
+
         route.put("efi") { req in
             let request: Structs.V.VM.EFI.PUT.Req = try req.content.decode(Structs.V.VM.EFI.PUT.Req.self)
 
@@ -188,6 +259,58 @@ extension VAPI {
 extension VAPI.Structs.V {
     /// `/v/vm`
     struct VM {
+        /// `/v/vm` - POST
+        struct POST {
+            struct Req : Decodable {
+                let authkey: String
+                let vmid: VMID
+            }
+            struct Res : Encodable {
+                let vmid: VMID
+                let name: String
+                let type: String
+                let state: VirtualMachine.State
+
+                let cpus: UInt64
+                let memory_mib: UInt64
+
+                let displays: [VZ.DisplayConfiguration]
+                let media: [VZ.DiskConfiguration]
+                let nics: [VZ.NICConfiguration]
+
+                let rosetta: Bool
+                let autostart: Bool
+            }
+        }
+
+        /// `/v/vm/list`
+        struct LIST {
+            /// `/v/vm/list` - POST
+            struct POST {
+                struct Req : Decodable {
+                    let authkey: String
+                    let gid: GID
+                }
+                struct Res : Encodable {
+                    let vms: [VMInfo]
+
+                    struct VMInfo: Encodable {
+                        let vmid: VMID
+                        let name: String
+                        let cpus: UInt64
+                        let memory_mib: UInt64
+
+                        init(vmid: VMID, name: String, cpus: UInt64, memory_mib: UInt64) {
+                            self.vmid = vmid
+                            self.name = name
+                            self.cpus = cpus
+                            self.memory_mib = memory_mib
+                        }
+                    }
+                }
+            }
+        }
+
         /// `/v/vm/efi`
         struct EFI {
             /// `/v/vm/efi` - PUT
@@ -206,21 +329,6 @@ extension VAPI.Structs.V {
 
                     let rosetta: Bool
                     let autostart: Bool
-                }
-                struct Display : Decodable {
-                    let name: String
-                    let width: Int64
-                    let height: Int64
-                    let ppi: Int64
-                }
-                struct Disk : Decodable {
-                    let mid: MID
-                    let mode: VDB.TVMDisks.DiskMode
-                    let readonly: Bool
-                }
-                struct NIC : Decodable {
-                    let type: VDB.TVMNICs.NICType
-                    let host: NICID?
                 }
 
                 struct Res: Encodable {
@@ -252,6 +360,22 @@ extension VAPI.Structs.V {
                 let vmid: VMID
                 let state: String
             }
+        }
+
+        struct Display : Decodable, Encodable {
+            let name: String
+            let width: Int64
+            let height: Int64
+            let ppi: Int64
+        }
+        struct Disk : Decodable, Encodable {
+            let mid: MID
+            let mode: VDB.TVMDisks.DiskMode
+            let readonly: Bool
+        }
+        struct NIC : Decodable, Encodable {
+            let type: VDB.TVMNICs.NICType
+            let host: NICID?
         }
     }
 }

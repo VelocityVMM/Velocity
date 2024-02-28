@@ -8,6 +8,9 @@
 import Foundation
 import SQLite
 
+/// The user id is a Int64
+typealias UID = Int64
+
 extension VDB {
 
     /// A user in the database

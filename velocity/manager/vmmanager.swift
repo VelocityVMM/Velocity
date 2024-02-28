@@ -47,7 +47,7 @@ class VMManager : Loggable {
         self.db = db
 
         // Iterate over all virtual machines available in the database
-        for vm in try self.db.t_vms.get_all_vms(db: self.db) {
+        for vm in try self.db.vms_get(group: nil) {
 
             VDebug("Loading virtual machine '\(vm.name)' [\(vm.vmid)]")
 

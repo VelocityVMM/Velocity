@@ -28,7 +28,7 @@ import Virtualization
 extension VZ {
 
     /// A disk configuration that can be used to create a `VZStorageDeviceConfiguration`
-    struct DiskConfiguration {
+    struct DiskConfiguration : Encodable {
 
         /// The piece of media this disk wraps
         let media: VDB.Media
@@ -50,6 +50,21 @@ extension VZ {
             case .VIRTIO:
                 return VZVirtioBlockDeviceConfiguration(attachment: attachment)
             }
+        }
+
+        /// Provide coding keys for encoding this type
+        enum CodingKeys: String, CodingKey {
+            case mid
+            case mode
+            case readonly
+        }
+
+        /// Implement `Encodable`
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.media.mid, forKey: .mid)
+            try container.encode(self.mode, forKey: .mode)
+            try container.encode(self.readonly, forKey: .readonly)
         }
     }
 }

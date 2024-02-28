@@ -29,7 +29,7 @@ import Virtualization
 extension VZ {
 
     /// A NIC configuration that can be converted to a `VZNetworkDeviceConfiguration`
-    enum NICConfiguration {
+    enum NICConfiguration : Encodable {
 
         /// A NAT NIC
         case NAT
@@ -48,6 +48,24 @@ extension VZ {
             }
 
             return configuration
+        }
+
+        /// Provide coding keys for encoding this type
+        enum CodingKeys: String, CodingKey {
+            case type
+            case host
+        }
+
+        /// Implement `Encodable`
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            switch self {
+            case .NAT:
+                try container.encode("NAT", forKey: .type)
+            case .BRIDGE(let host):
+                try container.encode("BRIDGE", forKey: .type)
+                try container.encode(host.nicid, forKey: .host)
+            }
         }
     }
 }

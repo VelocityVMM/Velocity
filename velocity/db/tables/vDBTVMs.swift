@@ -86,11 +86,46 @@ extension VDB {
             return VM(db: db, vmid: vmid, info: info)
         }
 
-        /// Retrieve all VMs that are stored in this database
-        func get_all_vms(db: VDB) throws -> [VM] {
+        /// Retrieves a virtual machine by its `VMID` and checks if the user has access to it
+        /// - Parameter db: The database to use for retrieval
+        /// - Parameter vmid: The ID of the virtual machine to retrieve
+        /// - Parameter user: The user that requests the virtual machine (`nil` for no check)
+        /// - Returns: The virtual machine or `nil` if the VM is not found or the user has no access to it
+        ///
+        /// This function will check if the supplied user has permissions to view the virtual machine,
+        /// else it will return `nil`
+        func get_vm(db: VDB, vmid: VMID, user: User? = nil) throws -> VM? {
+            guard let row = try db.db.pluck(db.t_vms.table.filter(db.t_vms.vmid == vmid)) else {
+                return nil;
+            }
+
+            guard let vm = try VM.from_row(db: db, row: row) else {
+                return nil
+            }
+
+            if let user = user {
+                if try !user.has_permission(permission: "velocity.vm.view", group: vm.group) {
+                    return nil
+                }
+            }
+
+            return vm
+        }
+
+        /// Retrieves all VMs that are owned by the supplied group
+        /// - Parameter db: The database to query for the virtual machines
+        /// - Parameter group: The group that owns the virtual machines (`nil` for all virtual machines)
+        func get_vms(db: VDB, group: Group?) throws -> [VM] {
             var vms: [VM] = []
 
-            for row in try db.db.prepare(self.table) {
+            var query: Table? = nil;
+            if let group = group {
+                query = db.t_vms.table.where(db.t_vms.gid == group.gid)
+            } else {
+                query = db.t_vms.table
+            }
+
+            for row in try db.db.prepare(query!) {
                 guard let vm = try VM.from_row(db: db, row: row) else {
                     continue
                 }
@@ -125,13 +160,25 @@ extension VDB {
         return try self.t_vms.insert(db: self, info: info)
     }
 
+    /// Retrieves a virtual machine by its `VMID` and checks if the user has access to it
+    /// - Parameter vmid: The ID of the virtual machine to retrieve
+    /// - Parameter user: The user that requests the virtual machine (`nil` for no check)
+    /// - Returns: The virtual machine or `nil` if the VM is not found or the user has no access to it
+    ///
+    /// This function will check if the supplied user has permissions to view the virtual machine,
+    /// else it will return `nil`
+    func vm_get(vmid: VMID) throws -> VM? {
+        return try self.t_vms.get_vm(db: self, vmid: vmid)
+    }
+
+    /// Retrieves all VMs that are owned by the supplied group
+    /// - Parameter group: The group that owns the virtual machines (`nil` for all virtual machines)
+    func vms_get(group: Group?) throws -> [VM] {
+        return try self.t_vms.get_vms(db: self, group: group)
+    }
+
     /// Selects all VMs that have the `autostart` field set to `true`
     func vms_get_autostart_vms() throws -> [VM] {
         return try self.t_vms.get_autostart_vms(db: self)
-    }
-
-    /// Retrieve all VMs that are stored in this database
-    func vms_get_all_vms() throws -> [VM] {
-        return try self.t_vms.get_all_vms(db: self)
     }
 }
