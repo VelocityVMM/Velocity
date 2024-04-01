@@ -29,8 +29,9 @@ class VAPI : Loggable {
     let vm_manager: VMManager
     /// JSON encoder
     let encoder: JSONEncoder
-    /// The currently registered authkeys. Can contain expired keys
-    var authkeys: Dictionary<String, Authkey> = Dictionary()
+    /// The authenticator
+    let authenticator: Authenticator
+
 
     /// Starts the VAPI on the supplied port using the supplied database
     /// - Parameter db: The VDB connection to use for this api
@@ -50,6 +51,7 @@ class VAPI : Loggable {
 
         self.app = Application(env)
         self.encoder = JSONEncoder()
+        self.authenticator = Authenticator()
 
         self.app.logger.logLevel = .critical
 
@@ -137,37 +139,6 @@ class VAPI : Loggable {
         }
     }
 
-    /// Generates a new authkey identifying the user and stores in this API instance
-    /// - Parameter user: The user to associate with this authkey
-    func generate_authkey(user: VDB.User) -> Authkey {
-        let key = Authkey(user: user)
-
-        self.authkeys[key.key.uuidString] = key
-
-        VTrace("New authkey for \(user.info()): \(key.key.uuidString), valid until: \(key.expiration_date()), \(self.authkeys.count) active keys")
-
-        return key
-    }
-
-    /// Searches for an authkey and checks if it isn't expired
-    /// - Parameter authkey: The authkey's uuid string handed out to the client
-    /// - Parameter date: (optional) A specific date to use, else use the current from `Date.now`
-    /// - Returns: The authkey if it is still valid, else `nil`
-    func get_authkey(authkey: String, date: Date? = nil) -> Authkey? {
-        // Search for the key
-        guard let key = self.authkeys[authkey] else {
-            return nil
-        }
-
-        if (key.is_expired(date: date)) {
-            // If the key is expired, remove it from the active keys
-            self.authkeys.removeValue(forKey: authkey)
-            return nil
-        }
-
-        return key
-    }
-
     /// Creates a Vapor response structure from the provided `Encodable`
     /// - Parameter r: The response structure, if `nil` the response will have no body
     /// - Parameter status: (default: `.ok`) The response status
@@ -221,4 +192,56 @@ class VAPI : Loggable {
         // velocity.nic
         VDB.PermissionTemplate("velocity.nic.list", "List available host NICs"),
     ]
+}
+
+extension VAPI {
+
+    /// The main authenticator for the Velocity API - Checks for authkey in Bearer authentication
+    internal class Authenticator: BearerAuthenticator, Loggable {
+        let context = "[VAPI][Authentication]"
+
+        /// The currently registered authkeys. Can contain expired keys
+        var authkeys: Dictionary<String, Authkey> = Dictionary()
+
+        /// Authenticates a authkey
+        func authenticate(bearer: Vapor.BearerAuthorization, for request: Vapor.Request) -> NIOCore.EventLoopFuture<Void> {
+            if let key = self.get_authkey(authkey: bearer.token) {
+                VTrace("\(key.user.info()) accessed \(request.url)")
+                request.auth.login(key.user)
+            }
+
+            return request.eventLoop.makeSucceededFuture(())
+        }
+
+        /// Generates a new authkey identifying the user and stores in this API instance
+        /// - Parameter user: The user to associate with this authkey
+        func generate_authkey(user: VDB.User) -> Authkey {
+            let key = Authkey(user: user)
+
+            self.authkeys[key.key.uuidString] = key
+
+            VTrace("New authkey for \(user.info()): \(key.key.uuidString), valid until: \(key.expiration_date()), \(self.authkeys.count) active keys")
+
+            return key
+        }
+
+        /// Searches for an authkey and checks if it isn't expired
+        /// - Parameter authkey: The authkey's uuid string handed out to the client
+        /// - Parameter date: (optional) A specific date to use, else use the current from `Date.now`
+        /// - Returns: The authkey if it is still valid, else `nil`
+        func get_authkey(authkey: String, date: Date? = nil) -> Authkey? {
+            // Search for the key
+            guard let key = self.authkeys[authkey] else {
+                return nil
+            }
+
+            if (key.is_expired(date: date)) {
+                // If the key is expired, remove it from the active keys
+                self.authkeys.removeValue(forKey: authkey)
+                return nil
+            }
+
+            return key
+        }
+    }
 }
