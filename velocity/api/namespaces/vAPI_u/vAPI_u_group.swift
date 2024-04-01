@@ -171,14 +171,12 @@ extension VAPI.Structs.U {
         /// `/u/group` - POST
         struct POST {
             struct Req : Decodable {
-                let authkey: String
                 let gid: Int64
             }
         }
         /// `/u/group` - PUT
         struct PUT {
             struct Req : Codable {
-                let authkey: String
                 let parent_gid: Int64
                 let name: String
             }
@@ -191,7 +189,6 @@ extension VAPI.Structs.U {
         /// `/u/group` - DELETE
         struct DELETE {
             struct Req : Codable {
-                let authkey: String
                 let gid: Int64
             }
         }

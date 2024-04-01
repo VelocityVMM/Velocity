@@ -231,7 +231,6 @@ extension VAPI.Structs.U {
         /// `/u/user` - PUT
         struct PUT {
             struct Req : Codable {
-                let authkey: String
                 let name: String
                 let password: String
             }
@@ -243,14 +242,12 @@ extension VAPI.Structs.U {
         /// `/u/user` - DELETE
         struct DELETE {
             struct Req : Codable {
-                let authkey: String
                 let uid: Int64
             }
         }
         /// `/u/user` - POST
         struct POST {
             struct Req : Codable {
-                let authkey: String
                 let uid: Int64?
             }
         }
@@ -274,7 +271,6 @@ extension VAPI.Structs.U {
             /// `/u/user/permission` - PUT
             struct PUT {
                 struct Req : Codable {
-                    let authkey: String
                     let uid: Int64
                     let gid: Int64
                     let permission: String
@@ -283,7 +279,6 @@ extension VAPI.Structs.U {
             /// `/u/user/permission` - DELETE
             struct DELETE {
                 struct Req : Decodable {
-                    let authkey: String
                     let uid: Int64
                     let gid: Int64
                     let permission: String?

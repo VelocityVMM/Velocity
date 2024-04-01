@@ -263,7 +263,6 @@ extension VAPI.Structs.M {
             /// `/m/media/list` - POST
             struct POST {
                 struct Req : Decodable {
-                    let authkey: String
                     let gid: GID
                 }
                 struct Res : Encodable {
@@ -284,7 +283,6 @@ extension VAPI.Structs.M {
             /// `/m/media/create` - PUT
             struct PUT {
                 struct Req : Decodable {
-                    let authkey: String
                     let mpid: MPID
                     let gid: Int64
                     let name: String

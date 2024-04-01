@@ -122,7 +122,6 @@ extension VAPI.Structs.M {
             /// `/m/pool/assign` - PUT
             struct PUT {
                 struct Req : Decodable {
-                    let authkey: String
                     let gid: GID
                     let mpid: MPID
                     let quota: Int64
@@ -133,7 +132,6 @@ extension VAPI.Structs.M {
             /// `/m/pool/assign` - DELETE
             struct DELETE {
                 struct Req : Decodable {
-                    let authkey: String
                     let gid: GID
                     let mpid: MPID
                 }
@@ -145,7 +143,6 @@ extension VAPI.Structs.M {
             /// `/m/pool/list` - POST
             struct POST {
                 struct Req : Decodable {
-                    let authkey: String
                     let gid: GID
                 }
                 struct Res : Encodable {

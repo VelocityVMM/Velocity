@@ -311,7 +311,6 @@ extension VAPI.Structs.V {
             /// `/v/vm/efi` - PUT
             struct PUT {
                 struct Req : Decodable {
-                    let authkey: String
                     let name: String
                     let gid: GID
 
@@ -336,14 +335,12 @@ extension VAPI.Structs.V {
             /// `/v/vm/state` - POST
             struct POST {
                 struct Req : Decodable {
-                    let authkey: String
                     let vmid: VMID
                 }
             }
             /// `/v/vm/state` - PUT
             struct PUT : Decodable{
                 struct Req : Decodable {
-                    let authkey: String
                     let vmid: VMID
                     let state: VirtualMachine.StateRequest
                     let force: Bool
