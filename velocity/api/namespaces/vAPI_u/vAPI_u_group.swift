@@ -35,14 +35,13 @@ extension VAPI {
         //
 
         // Retrieve group information
-        route.post() { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post() { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.GROUP.POST.Req = try req.content.decode(Structs.U.GROUP.POST.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.group.view", group: nil) else {
                 self.VDebug("\(c_user.info()) requested group information for group \(request.gid): FORBIDDEN")
@@ -59,22 +58,21 @@ extension VAPI {
         }
 
         // Create a new group
-        route.put() {req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .put() {req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.GROUP.PUT.Req = try req.content.decode(Structs.U.GROUP.PUT.Req.self)
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let user = key.user
-
             guard let group = try self.db.group_select(gid: request.parent_gid) else {
-                self.VDebug("\(user.info()) tried to create new group: parent group NOT FOUND")
+                self.VDebug("\(c_user.info()) tried to create new group: parent group NOT FOUND")
                 return try self.error(code: .U_GROUP_PUT_PARENT_NOT_FUND)
             }
 
-            guard try user.has_permission(permission: "velocity.group.create", group: group) else {
-                self.VDebug("\(user.info()) tried to create new group: FORBIDDEN")
+            guard try c_user.has_permission(permission: "velocity.group.create", group: group) else {
+                self.VDebug("\(c_user.info()) tried to create new group: FORBIDDEN")
                 return try self.error(code: .U_GROUP_PUT_PERMISSION)
             }
 
@@ -82,47 +80,44 @@ extension VAPI {
             case .failure(_):
                 return try self.error(code: .U_GROUP_PUT_CONFLICT)
             case .success(let new_group):
-                self.VDebug("\(user.info()) CREATED \(new_group.info()), permissions: \(try user.get_permissions(group: new_group).count)")
+                self.VDebug("\(c_user.info()) CREATED \(new_group.info()), permissions: \(try c_user.get_permissions(group: new_group).count)")
 
                 return try self.response(Structs.U.GROUP.PUT.Res(gid: new_group.gid, parent_gid: new_group.parent_gid, name: new_group.name))
             }
         }
 
         // Delete an existing group
-        route.delete() {req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .delete() {req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.GROUP.DELETE.Req = try req.content.decode(Structs.U.GROUP.DELETE.Req.self)
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let user = key.user
-
-            guard try user.has_permission(permission: "velocity.group.remove", group: nil) else {
-                self.VDebug("\(user.info()) tried to remove group: FORBIDDEN")
+            guard try c_user.has_permission(permission: "velocity.group.remove", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to remove group: FORBIDDEN")
                 return try self.error(code: .U_GROUP_DELETE_PERMISSION)
             }
 
             guard let delete_group = try self.db.group_select(gid: request.gid) else {
-                self.VDebug("\(user.info()) tried to remove non-existing group {\(request.gid)}")
+                self.VDebug("\(c_user.info()) tried to remove non-existing group {\(request.gid)}")
                 return try self.error(code: .U_GROUP_DELETE_NOT_FOUND)
             }
 
             try delete_group.delete()
-            self.VDebug("\(user.info()) DELETED \(delete_group.info())")
+            self.VDebug("\(c_user.info()) DELETED \(delete_group.info())")
 
             return try self.response(nil)
         }
 
         // List all groups
-        route.post("list") { req in
-            let request: Structs.U.GROUP.LIST.POST.Req = try req.content.decode(Structs.U.GROUP.LIST.POST.Req.self)
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post("list") { req in
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
+            let c_user = try req.auth.require(VDB.User.self)
 
             // A fast lookup table for the groups added to the result array
             var groups_map: Dictionary<Int64, VDB.Group> = Dictionary()
@@ -205,9 +200,6 @@ extension VAPI.Structs.U {
         struct LIST {
             /// `/u/group/list` - POST
             struct POST {
-                struct Req : Decodable {
-                    let authkey: String
-                }
                 struct Res : Encodable {
                     let groups: [VDB.Group.UserGroupInfo]
                 }

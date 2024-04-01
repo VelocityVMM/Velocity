@@ -35,66 +35,63 @@ extension VAPI {
         //
 
         // Create a new user
-        route.put() {req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .put() {req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.USER.PUT.Req = try req.content.decode(Structs.U.USER.PUT.Req.self)
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let user = key.user
-
-            guard try user.has_permission(permission: "velocity.user.create", group: nil) else {
-                self.VDebug("\(user.info()) tried to create new user: FORBIDDEN")
+            guard try c_user.has_permission(permission: "velocity.user.create", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to create new user: FORBIDDEN")
                 return try self.error(code: .U_USER_PUT_PERMISSION)
             }
 
             guard try !self.db.user_exists(username: request.name) else {
-                self.VDebug("\(user.info()) tried to create duplicate user '\(request.name)'")
+                self.VDebug("\(c_user.info()) tried to create duplicate user '\(request.name)'")
                 return try self.error(code: .U_USER_PUT_CONFLICT)
             }
 
             let new_user = try self.db.user_create(username: request.name, password: request.password).get()
-            self.VDebug("\(user.info()) CREATED \(new_user.info())")
+            self.VDebug("\(c_user.info()) CREATED \(new_user.info())")
 
 
             return try self.response(Structs.U.USER.PUT.Res(uid: new_user.uid, name: new_user.username))
         }
 
         // Delete an existing user
-        route.delete() {req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .delete() {req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.USER.DELETE.Req = try req.content.decode(Structs.U.USER.DELETE.Req.self)
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let user = key.user
-
-            guard try user.has_permission(permission: "velocity.user.remove", group: nil) else {
-                self.VDebug("\(user.info()) tried to remove user: FORBIDDEN")
+            guard try c_user.has_permission(permission: "velocity.user.remove", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to remove user: FORBIDDEN")
                 return try self.error(code: .U_USER_DELETE_PERMISSION)
             }
 
             guard let delete_user = try self.db.user_select(uid: request.uid) else {
-                self.VDebug("\(user.info()) tried to remove non-existing user {\(request.uid)}")
+                self.VDebug("\(c_user.info()) tried to remove non-existing user {\(request.uid)}")
                 return try self.error(code: .U_USER_DELETE_NOT_FOUND, "uid = \(request.uid)")
             }
 
             try delete_user.delete()
-            self.VDebug("\(user.info()) DELETED \(delete_user.info())")
+            self.VDebug("\(c_user.info()) DELETED \(delete_user.info())")
 
             return try self.response(nil, status: .ok)
         }
 
-        route.post() { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post() { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.USER.POST.Req = try req.content.decode(Structs.U.USER.POST.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard let uid = request.uid else {
                 self.VDebug("\(c_user.info()) requested user information")
@@ -115,14 +112,12 @@ extension VAPI {
             return try self.response(user)
         }
 
-        route.post("list") { req in
-            let request: Structs.U.USER.LIST.POST.Req = try req.content.decode(Structs.U.USER.LIST.POST.Req.self)
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post("list") { req in
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
+            let c_user = try req.auth.require(VDB.User.self)
 
             guard try c_user.has_permission(permission: "velocity.user.list", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to list users: FORBIDDEN")
@@ -146,14 +141,13 @@ extension VAPI {
         let permissions = route.grouped("permission")
 
         // Add new permissions
-        permissions.put() { req in
+        permissions
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .put() { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.USER.PERMISSION.PUT.Req = try req.content.decode(Structs.U.USER.PERMISSION.PUT.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             // First check if the user has the permission to assign
             guard try c_user.has_permission(permission: "velocity.user.assign", group: nil) else {
@@ -192,14 +186,13 @@ extension VAPI {
         }
 
         // Remove a permission
-        permissions.delete() { req in
+        permissions
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .delete() { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.U.USER.PERMISSION.DELETE.Req = try req.content.decode(Structs.U.USER.PERMISSION.DELETE.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             // First check if the user has the permission to revoke
             guard try c_user.has_permission(permission: "velocity.user.revoke", group: nil) else {
@@ -266,9 +259,6 @@ extension VAPI.Structs.U {
         struct LIST {
             /// `/u/user/list` - POST
             struct POST {
-                struct Req : Decodable {
-                    let authkey: String
-                }
                 struct Res : Encodable {
                     let users: [UserInfo]
                 }

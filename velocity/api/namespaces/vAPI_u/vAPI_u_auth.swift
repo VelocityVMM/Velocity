@@ -61,7 +61,7 @@ extension VAPI {
                 return try self.error(code: .U_AUTH_POST_AUTH_FAILED)
             }
 
-            let key = self.generate_authkey(user: user)
+            let key = self.authenticator.generate_authkey(user: user)
 
             self.VDebug("Authenticated \(user.info()) until \(key.expiration_date().description(with: .current))")
             return try self.response(Structs.U.AUTH.POST.Res(authkey: key.key.uuidString, expires: key.expiration_datetime()))
@@ -72,7 +72,7 @@ extension VAPI {
             let request: Structs.U.AUTH.DELETE.Req = try req.content.decode(Structs.U.AUTH.DELETE.Req.self)
 
             // Search for the key
-            guard let key = self.authkeys.removeValue(forKey: request.authkey) else {
+            guard let key = self.authenticator.authkeys.removeValue(forKey: request.authkey) else {
                 self.VDebug("Key \(request.authkey) hasn't been found")
                 return try self.response(nil)
             }
@@ -87,7 +87,7 @@ extension VAPI {
             let request: Structs.U.AUTH.PATCH.Req = try req.content.decode(Structs.U.AUTH.PATCH.Req.self)
 
             // Search for the key
-            guard let old_key = self.authkeys.removeValue(forKey: request.authkey) else {
+            guard let old_key = self.authenticator.authkeys.removeValue(forKey: request.authkey) else {
                 self.VDebug("Key \(request.authkey) hasn't been found")
                 return try self.error(code: .U_AUTH_PATCH_KEY_NOT_FOUND)
             }
@@ -98,9 +98,9 @@ extension VAPI {
                 return try self.error(code: .U_AUTH_PATCH_KEY_EXPIRED)
             }
 
-            let key = self.generate_authkey(user: old_key.user)
+            let key = self.authenticator.generate_authkey(user: old_key.user)
 
-            self.VDebug("Refreshed key for \(key.user.info()), valid until: \(key.expiration_date().description(with: .current)), \(self.authkeys.count) active keys")
+            self.VDebug("Refreshed key for \(key.user.info()), valid until: \(key.expiration_date().description(with: .current)), \(self.authenticator.authkeys.count) active keys")
             return try self.response(Structs.U.AUTH.PATCH.Res(authkey: key.key.uuidString, expires: key.expiration_datetime()))
         }
     }
