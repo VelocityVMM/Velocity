@@ -55,7 +55,6 @@ If the group is already assigned to the pool, this call will update the permissi
 
 ```json
 {
-    "authkey": "<authkey>",
     "gid": "<GID>",
     "mpid": "<MPID>",
     "quota": "<Quota in Bytes>",
@@ -84,7 +83,6 @@ Revoke a group's permissions from a mediapool
 
 ```json
 {
-    "authkey": "<authkey>",
     "gid": "<GID>",
     "mpid": "<MPID>"
 }
@@ -110,7 +108,6 @@ List back available pools for a group
 
 ```json
 {
-    "authkey": "<authkey>",
     "gid": "<GID>"
 }
 ```
@@ -150,7 +147,6 @@ Allocate new media on a pool (`pid`) owned by a group (`gid`)
 
 ```json
 {
-    "authkey": "<authkey>",
     "mpid": "<MPID>",
     "gid": "<GID>",
     "name": "<Media name>",
@@ -184,11 +180,9 @@ In contrast to the whole rest of the Velocity API, uploads are handled uniquely:
 
 **Request:**
 
-- `HTTP` Header:
+- `HTTP` Additional HTTP Headers:
   
   - `Content-Length`: The amount of bytes to be submitted. The server will not accept any more bytes than specified here
-  
-  - `x-velocity-authkey`: The `authkey`
   
   - `x-velocity-mpid`: The mediapool id (`MPID`)
   
@@ -235,7 +229,6 @@ Remove media (delete it)
 
 ```json
 {
-    "authkey": "<authkey>",
     "mid": "<MID>"
 }
 ```
@@ -260,7 +253,6 @@ List back available media to a group
 
 ```json
 {
-    "authkey": "<authkey>",
     "gid": "<GID>"
 }
 ```

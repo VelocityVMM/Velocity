@@ -137,7 +137,7 @@ If an authkey lease is about to expire, this call can be used to create a new au
 
 ## `/u/user` - POST <a name="post-u-user"></a>
 
-Retrieve information about the current user. The `authkey` is used to infer the user, unless the `uid` field is specified.
+Retrieve information about the current user. The request's `authkey` is used to infer the user, unless the `uid` field is specified.
 
 > **Note**
 > 
@@ -147,7 +147,6 @@ Retrieve information about the current user. The `authkey` is used to infer the 
 
 ```json
 {
-  "authkey": "<authkey>",
   "uid": "<UID (optional)>"
 }
 ```
@@ -192,7 +191,6 @@ Create a new user
 
 ```json
 {
-  "authkey": "<authkey>",
   "name": "<username>",
   "password": "<password>"
 }
@@ -225,7 +223,6 @@ This call removes the user with the supplied `UID`. This also removes the user's
 
 ```json
 {
-  "authkey": "<authkey>",
   "uid": "<UID>"
 }
 ```
@@ -249,9 +246,7 @@ List all users on this velocity instance
 **Request:**
 
 ```json
-{
-  "authkey": "<authkey>"
-}
+<NO BODY>
 ```
 
 **Response:**
@@ -289,7 +284,6 @@ Put new permissions for a user on a specific group
 
 ```json
 {
-  "authkey": "<authkey>",
   "uid": "<UID>",
   "gid": "<GID>",
   "permission": "<permission identifier>"
@@ -318,7 +312,6 @@ Remove user permissions
 
 ```json
 {
-  "authkey": "<authkey>",
   "uid": "<UID>",
   "gid": "<GID>",
   "permission": "<permission>"
@@ -349,7 +342,6 @@ Retrieve information about a group
 
 ```json
 {
-  "authkey": "<authkey>",
   "gid": "<GID>"
 }
 ```
@@ -395,7 +387,6 @@ Create a new group. There cannot be duplicate group names in a parent group.
 
 ```json
 {
-  "authkey": "<authkey>",
   "name": "<groupname>",
   "parent_gid": "<GID>"
 }
@@ -433,7 +424,6 @@ This call removes all the VMs and images owned by this group.
 
 ```json
 {
-  "authkey": "<authkey>",
   "gid": "<GID>"
 }
 ```
@@ -459,9 +449,7 @@ List back all existing groups on this velocity instance
 **Request:**
 
 ```json
-{
-  "authkey": "<authkey>"
-}
+<NO BODY>
 ```
 
 **Response:**

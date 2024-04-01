@@ -16,6 +16,12 @@ The API is divided into several namespaces:
 - [`/m`](m.md): Pool and media management
 - [`/v`](v.md): Virtual machine management
 
+### Authentication
+
+Velocity handles authentication using the `Bearer` authentication method with the token being aliased as the `Authkey`.
+
+Refer to the [Vapor manual](https://docs.vapor.codes/security/authentication/#bearer) for more information.
+
 ### Errors
 
 If the API enconters some kind of error, it will respond with a http-response code in a non-200 range and an error as follows:
