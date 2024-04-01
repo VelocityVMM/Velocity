@@ -7,6 +7,7 @@
 
 import Foundation
 import SQLite
+import Vapor
 
 /// The user id is a Int64
 typealias UID = Int64
@@ -15,7 +16,7 @@ extension VDB {
 
     /// A user in the database
     /// > Warning: Altered member variables do not commit to the database unless `commit()` is called on the object
-    class User : Loggable, Encodable {
+    class User : Loggable, Encodable, Authenticatable {
         /// The logging context
         internal let context: String;
         /// A reference to the database for later use
