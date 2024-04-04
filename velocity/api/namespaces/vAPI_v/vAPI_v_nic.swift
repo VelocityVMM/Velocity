@@ -28,14 +28,12 @@ import Vapor
 extension VAPI {
     /// Registers all endpoints within the namespace `/v/nic`
     func register_endpoints_v_nic(route: RoutesBuilder) throws {
-        route.post("list") { req in
-            let request: Structs.V.NIC.LIST.POST.Req = try req.content.decode(Structs.V.NIC.LIST.POST.Req.self)
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post("list") { req in
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
+            let c_user = try req.auth.require(VDB.User.self)
 
             guard try c_user.has_permission(permission: "velocity.nic.list", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to list host NICs: FORBIDDEN")
@@ -65,9 +63,6 @@ extension VAPI.Structs.V {
         struct LIST {
             /// `/v/nic/list` - POST
             struct POST {
-                struct Req : Decodable {
-                    let authkey: String
-                }
                 struct Res: Encodable {
                     let host_nics: [NICInfo]
                 }

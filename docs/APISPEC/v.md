@@ -165,7 +165,6 @@ Create a new virtual machineCreate a new `EFI` virtual machine using the supplie
 
 ```json
 {
-  "authkey": "<authkey>",
   "name": "<VM name>",
   "gid": "<GID>",
 
@@ -274,7 +273,6 @@ Request the current vm [state](#vm-states)
 
 ```json
 {
-  "authkey": "<authkey>",
   "vmid": "<VMID>"
 }
 ```
@@ -312,7 +310,6 @@ Request a [state change](#vm-states) for the virtual machine. Valid states:
 
 ```json
 {
-  "authkey": "<authkey>",
   "vmid": "<VMID>",
   "state": "<VM state>",
   "force": true
@@ -351,9 +348,7 @@ List all available host `NICs` available for `BRIDGE` use
 **Request:**
 
 ```json
-{
-  "authkey": "<authkey>"
-}
+<NO BODY>
 ```
 
 **Response:**

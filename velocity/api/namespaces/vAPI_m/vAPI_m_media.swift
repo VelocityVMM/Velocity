@@ -29,14 +29,13 @@ extension VAPI {
     /// Registers all endpoints withing the namespace `/m/media`
     func register_endpoints_m_media(route: RoutesBuilder) throws {
 
-        route.post("list") { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post("list") { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.M.MEDIA.LIST.POST.Req = try req.content.decode(Structs.M.MEDIA.LIST.POST.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.media.list", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to list media for group \(request.gid): FORBIDDEN")
@@ -64,32 +63,31 @@ extension VAPI {
             return try self.response(Structs.M.MEDIA.LIST.POST.Res(media: media_info))
         }
 
-        route.put("create") { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .put("create") { req in
+
             let request: Structs.M.MEDIA.CREATE.PUT.Req = try req.content.decode(Structs.M.MEDIA.CREATE.PUT.Req.self)
+            let c_user = try req.auth.require(VDB.User.self)
 
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let user = key.user
-
-            guard try user.has_permission(permission: "velocity.media.create", group: nil) else {
-                self.VDebug("\(user.info()) tried to create new media '\(request.name)': FORBIDDEN")
+            guard try c_user.has_permission(permission: "velocity.media.create", group: nil) else {
+                self.VDebug("\(c_user.info()) tried to create new media '\(request.name)': FORBIDDEN")
                 return try self.error(code: .M_MEDIA_CREATE_PUT_PERMISSION)
             }
 
             guard let pool = self.db.pool_get(mpid: request.mpid) else {
-                self.VDebug("\(user.info()) tried to create new media '\(request.name)': MEDIAPOOL NOT FOUND")
+                self.VDebug("\(c_user.info()) tried to create new media '\(request.name)': MEDIAPOOL NOT FOUND")
                 return try self.error(code: .M_MEDIA_CREATE_PUT_MEDIAPOOL_NOT_FOUND)
             }
 
             guard let group = try self.db.group_select(gid: request.gid) else {
-                self.VDebug("\(user.info()) tried to create new media '\(request.name)': GROUP NOT FOUND")
+                self.VDebug("\(c_user.info()) tried to create new media '\(request.name)': GROUP NOT FOUND")
                 return try self.error(code: .M_MEDIA_CREATE_PUT_GROUP_NOT_FOUND)
             }
 
             guard try group.can_manage(pool: pool) else {
-                self.VDebug("\(user.info()) tried to create media in pool \(pool.name): Group lacks 'manage' permission")
+                self.VDebug("\(c_user.info()) tried to create media in pool \(pool.name): Group lacks 'manage' permission")
                 return try self.error(code: .M_MEDIA_CREATE_PUT_GROUP_PERMISSION)
             }
 
@@ -99,19 +97,24 @@ extension VAPI {
             case .failure(let error):
                 switch error {
                 case .Duplicate:
-                    self.VDebug("\(user.info()) tried to create new media '\(request.name)': DUPLICATE")
+                    self.VDebug("\(c_user.info()) tried to create new media '\(request.name)': DUPLICATE")
                     return try self.error(code: .M_MEDIA_CREATE_PUT_CONFLICT)
                 case .Quota:
-                    self.VDebug("\(user.info()) tried to create new media '\(request.name)': QUOTA SURPASSED")
+                    self.VDebug("\(c_user.info()) tried to create new media '\(request.name)': QUOTA SURPASSED")
                     return try self.error(code: .M_MEDIA_CREATE_PUT_QUOTA)
                 }
             case .success(let media):
-                self.VDebug("\(user.info()) created new media '\(media.name)' of \(media.size) bytes: \(media.mid)")
+                self.VDebug("\(c_user.info()) created new media '\(media.name)' of \(media.size) bytes: \(media.mid)")
                 return try self.response(Structs.M.MEDIA.CREATE.PUT.Res(mid: media.mid, size: media.size))
             }
         }
 
-        route.on(.PUT, "upload", body: .stream) { req -> EventLoopFuture<Response> in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .on(.PUT, "upload", body: .stream) { req -> EventLoopFuture<Response> in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let promise = req.eventLoop.makePromise(of: Void.self)
 
             // MARK: Gather all fields
@@ -121,10 +124,6 @@ extension VAPI {
             }
             guard let content_length: Int64 = Int64(content_length) else {
                 return try self.promise_error(promise, code: .M_MEDIA_UPLOAD_PUT_CONTENT_LENGTH, "Need a Int")
-            }
-
-            guard let authkey = req.headers["x-velocity-authkey"].first else {
-                return try self.promise_error(promise, code: .M_MEDIA_UPLOAD_PUT_X_VELOCITY_AUTHKEY, "Field missing")
             }
 
             guard let mpid = req.headers["x-velocity-mpid"].first else {
@@ -159,11 +158,6 @@ extension VAPI {
 
             // MARK: Check validity
 
-            guard let key = self.get_authkey(authkey: authkey) else {
-                return try self.promise_error(promise, code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.media.create", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to upload media '\(name)': FORBIDDEN")
@@ -269,7 +263,6 @@ extension VAPI.Structs.M {
             /// `/m/media/list` - POST
             struct POST {
                 struct Req : Decodable {
-                    let authkey: String
                     let gid: GID
                 }
                 struct Res : Encodable {
@@ -290,7 +283,6 @@ extension VAPI.Structs.M {
             /// `/m/media/create` - PUT
             struct PUT {
                 struct Req : Decodable {
-                    let authkey: String
                     let mpid: MPID
                     let gid: Int64
                     let name: String

@@ -28,14 +28,13 @@ import Vapor
 extension VAPI {
     /// Registers all endpoints within the namespace `/v/vm`
     func register_endpoints_v_vm(route: RoutesBuilder) throws {
-        route.post("list") { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post("list") { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.LIST.POST.Req = try req.content.decode(Structs.V.VM.LIST.POST.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard let group = try self.db.group_select(gid: request.gid) else {
                 self.VDebug("\(c_user.info()) tried to list VMs: GROUP \(request.gid) NOT FOUND")
@@ -60,14 +59,13 @@ extension VAPI {
             return try self.response(Structs.V.VM.LIST.POST.Res(vms: vms))
         }
 
-        route.post { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.POST.Req = try req.content.decode(Structs.V.VM.POST.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard let vm = self.vm_manager.get_vm(vmid: request.vmid) else {
                 self.VDebug("\(c_user.info()) tried to retrieve VM info: VMID (\(request.vmid)) NOT FOUND")
@@ -99,14 +97,13 @@ extension VAPI {
             return try self.response(res)
         }
 
-        route.put("efi") { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .put("efi") { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.EFI.PUT.Req = try req.content.decode(Structs.V.VM.EFI.PUT.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.vm.create", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to create EFI VM: FORBIDDEN")
@@ -204,14 +201,13 @@ extension VAPI {
 
         }
 
-        route.post("state") { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .post("state") { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.STATE.POST.Req = try req.content.decode(Structs.V.VM.STATE.POST.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.vm.view", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to retrieve VM state: FORBIDDEN")
@@ -226,14 +222,13 @@ extension VAPI {
             return try self.response(Structs.V.VM.STATE.Res(vmid: vm.vvm.vmid, state: vm.get_state().rawValue))
         }
 
-        route.put("state") { req in
+        route
+            .grouped(self.authenticator)
+            .grouped(VDB.User.guardMiddleware())
+            .put("state") { req in
+
+            let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.STATE.PUT.Req = try req.content.decode(Structs.V.VM.STATE.PUT.Req.self)
-
-            guard let key = self.get_authkey(authkey: request.authkey) else {
-                return try self.error(code: .UNAUTHORIZED)
-            }
-
-            let c_user = key.user
 
             guard try c_user.has_permission(permission: "velocity.vm.state", group: nil) else {
                 self.VDebug("\(c_user.info()) tried to change VM state: FORBIDDEN")
@@ -316,7 +311,6 @@ extension VAPI.Structs.V {
             /// `/v/vm/efi` - PUT
             struct PUT {
                 struct Req : Decodable {
-                    let authkey: String
                     let name: String
                     let gid: GID
 
@@ -341,14 +335,12 @@ extension VAPI.Structs.V {
             /// `/v/vm/state` - POST
             struct POST {
                 struct Req : Decodable {
-                    let authkey: String
                     let vmid: VMID
                 }
             }
             /// `/v/vm/state` - PUT
             struct PUT : Decodable{
                 struct Req : Decodable {
-                    let authkey: String
                     let vmid: VMID
                     let state: VirtualMachine.StateRequest
                     let force: Bool
