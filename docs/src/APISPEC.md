@@ -1,6 +1,6 @@
 # Velocity API specification `v 1.0`
 
-This is a proposal for the `1.0` version of the Velocity API specification.
+This is the `1.0` version of the Velocity API specification.
 
 The Velocity API uses `JSON` as its language.
 
@@ -12,9 +12,9 @@ For resources, velocity uses so-called "pools" and virtual machines are managed 
 
 The API is divided into several namespaces:
 
-- [`/u`](u.md): User and group management
-- [`/m`](m.md): Pool and media management
-- [`/v`](v.md): Virtual machine management
+- [`/u`](./APISPEC/u.md): User and group management
+- [`/m`](./APISPEC/m.md): Pool and media management
+- [`/v`](./APISPEC/v.md): Virtual machine management
 
 ### Authentication
 
@@ -35,7 +35,7 @@ If the API enconters some kind of error, it will respond with a http-response co
 
 Some additional fields may be added to the error response depending on calls but this layout is guaranteed.
 
-For an exhaustive list of available error codes, refer to the [ERRORS](errors.md) article.
+For an exhaustive list of available error codes, refer to the [ERRORS](./APISPEC/errors.md) article.
 
 Some http-response codes are fixed:
 
@@ -51,7 +51,7 @@ Velocity's main work horse are groups. Each Virtual machine is owned by a group,
 
 Each user can be assigned to a group with permissions. These permissions for groups persist for all subgroups. This allows a user that has a permission in a parent group to use it in subgroups. This allows for building a structured and manageable entity and user tree.
 
-For permissions, read the [PERMISSIONS](permissions.md) article.
+For permissions, read the [PERMISSIONS](./APISPEC/permissions.md) article.
 
 ```mermaid
 classDiagram

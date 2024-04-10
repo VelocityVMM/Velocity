@@ -5,7 +5,7 @@ A virtual machine needs media to work with. Velocity attaches media to a group a
 The pool id (`mpid`) identifies the pool, but does not hold **any** reference to where the data is stored. This allows for pools to be moved on the filesystem without loosing references to the files. The Velocity administrator is in charge of tracking the pool ids.
 
 > **Warning**
-> 
+>
 > The administrator is in charge of keeping the `mpid` stable between restarts and configuration changes, else media references may become invalid
 
 A pool allows groups to access media with two permissions:
@@ -48,18 +48,18 @@ Assign a group to a mediapool with permissions
 If the group is already assigned to the pool, this call will update the permissions
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.pool.assign` permission on the target group
 
 **Request:**
 
 ```json
 {
-    "gid": "<GID>",
-    "mpid": "<MPID>",
-    "quota": "<Quota in Bytes>",
-    "write": true,
-    "manage": true
+  "gid": "<GID>",
+  "mpid": "<MPID>",
+  "quota": "<Quota in Bytes>",
+  "write": true,
+  "manage": true
 }
 ```
 
@@ -76,15 +76,15 @@ If the group is already assigned to the pool, this call will update the permissi
 Revoke a group's permissions from a mediapool
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.pool.revoke` permission on the target group
 
 **Request:**
 
 ```json
 {
-    "gid": "<GID>",
-    "mpid": "<MPID>"
+  "gid": "<GID>",
+  "mpid": "<MPID>"
 }
 ```
 
@@ -101,14 +101,14 @@ Revoke a group's permissions from a mediapool
 List back available pools for a group
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.pool.list` permission on the target group
 
 **Request:**
 
 ```json
 {
-    "gid": "<GID>"
+  "gid": "<GID>"
 }
 ```
 
@@ -118,14 +118,14 @@ List back available pools for a group
 
 ```json
 {
-    "pools": [
-        {
-            "mpid": "<MPID>",
-            "name": "<Pool name>",
-            "write": true,
-            "manage": true,
-        }
-    ]
+  "pools": [
+    {
+      "mpid": "<MPID>",
+      "name": "<Pool name>",
+      "write": true,
+      "manage": true
+    }
+  ]
 }
 ```
 
@@ -140,18 +140,18 @@ List back available pools for a group
 Allocate new media on a pool (`pid`) owned by a group (`gid`)
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.media.create` permission on the target group
 
 **Request:**
 
 ```json
 {
-    "mpid": "<MPID>",
-    "gid": "<GID>",
-    "name": "<Media name>",
-    "type": "<Media type>",
-    "size": "<Size in Bytes>"
+  "mpid": "<MPID>",
+  "gid": "<GID>",
+  "name": "<Media name>",
+  "type": "<Media type>",
+  "size": "<Size in Bytes>"
 }
 ```
 
@@ -161,8 +161,8 @@ Allocate new media on a pool (`pid`) owned by a group (`gid`)
 
 ```json
 {
-    "mid": "<MID>",
-    "size": "<Size in Bytes>"
+  "mid": "<MID>",
+  "size": "<Size in Bytes>"
 }
 ```
 
@@ -181,29 +181,29 @@ In contrast to the whole rest of the Velocity API, uploads are handled uniquely:
 **Request:**
 
 - `HTTP` Additional HTTP Headers:
-  
+
   - `Content-Length`: The amount of bytes to be submitted. The server will not accept any more bytes than specified here
-  
+
   - `x-velocity-mpid`: The mediapool id (`MPID`)
-  
+
   - `x-velocity-gid`: The group id (`GID`)
-  
+
   - `x-velocity-name`: The name of the file
-  
+
   - `x-velocity-type`: The type of file
-  
+
   - `x-velocity-readonly`: If the file should be read only or not (`true` or `false`)
 
 - `body`: The binary data for the file
 
 **Response:**
 
-* `200`: Media uploaded
+- `200`: Media uploaded
 
 ```json
 {
-    "mid": "<MID>",
-    "size": "<Size in Bytes>"
+  "mid": "<MID>",
+  "size": "<Size in Bytes>"
 }
 ```
 
@@ -222,14 +222,14 @@ In contrast to the whole rest of the Velocity API, uploads are handled uniquely:
 Remove media (delete it)
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.media.remove` permission
 
 **Request:**
 
 ```json
 {
-    "mid": "<MID>"
+  "mid": "<MID>"
 }
 ```
 
@@ -246,14 +246,14 @@ Remove media (delete it)
 List back available media to a group
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.media.list` permission on the target group
 
 **Request:**
 
 ```json
 {
-    "gid": "<GID>"
+  "gid": "<GID>"
 }
 ```
 
@@ -263,16 +263,16 @@ List back available media to a group
 
 ```json
 {
-    "media": [
-        {
-            "mid": "<MID>",
-            "mpid": "<MPID>",
-            "name": "<Media name>",
-            "type": "<Media type>",
-            "size": "<Size in Bytes>",
-            "readonly": true
-        }
-    ]
+  "media": [
+    {
+      "mid": "<MID>",
+      "mpid": "<MPID>",
+      "name": "<Media name>",
+      "type": "<Media type>",
+      "size": "<Size in Bytes>",
+      "readonly": true
+    }
+  ]
 }
 ```
 

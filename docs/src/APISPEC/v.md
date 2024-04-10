@@ -31,19 +31,19 @@ A user can request state changes from the server, but can only transition to tho
 [Virtual machine management](#v-vm)
 
 - VM management
-  
+
   - [`/v/vm/list` - POST](#post-v-vm-list): List all available virtual machines
-  
+
   - [`/v/vm` - POST](#post-v-vm): Get information about a virtual machine
 
 - VM creation
-  
+
   - [`/v/vm/efi` - PUT](#put-v-vm-efi): Create a `EFI` virtual machine
 
 - VM state management
-  
+
   - [`/v/vm/state` - POST](#post-v-vm-state): Get the current VM state
-  
+
   - [`/v/vm/state` - PUT](#put-v-vm-state): Request a VM state change
 
 - VM management
@@ -59,7 +59,7 @@ A user can request state changes from the server, but can only transition to tho
 List all available virtual machines for a group
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.vm.view` permission on the target group
 
 **Request:**
@@ -67,7 +67,7 @@ List all available virtual machines for a group
 ```json
 {
   "authkey": "<authkey>",
-  "gid": "<GID>",
+  "gid": "<GID>"
 }
 ```
 
@@ -98,15 +98,15 @@ List all available virtual machines for a group
 Retrieve information about a virtual machine
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.vm.view` permission on the group owning the VM
 
 **Request:**
 
 ```json
 {
-    "authkey": "<authkey>",
-    "vmid": "<VMID>"
+  "authkey": "<authkey>",
+  "vmid": "<VMID>"
 }
 ```
 
@@ -158,7 +158,7 @@ Retrieve information about a virtual machine
 Create a new virtual machineCreate a new `EFI` virtual machine using the supplied data
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.vm.create` permission on the target group
 
 **Request:**
@@ -208,35 +208,35 @@ Create a new virtual machineCreate a new `EFI` virtual machine using the supplie
 - `memory_mib`: The amount of memory assigned to the guest in `MiB`
 
 - `displays`: An array of displays
-  
+
   - `description`: A way if identifying this display
-  
+
   - `width`: The width in `px`
-  
+
   - `height`: The height in `px`
 
 - `media`: An array of attached media devices
-  
+
   - `mid`: The `MID` of the media to attach
-  
+
   - `mode`: The mode the device should use:
-    
+
     - `USB`: The media is attached via `USB`
-    
+
     - `BLOCK`: The `VZVirtioBlockDeviceConfiguration` is used to emulate a block device
-    
+
     - `VIRTIO`: Use `VirtIO` for device attachment
-  
+
   - `readonly`: Block writing to the media, if not already blocked by other rules
 
 - `nics`: An array of attached [network devices](#nic-info)
-  
+
   - `type` The type of `NIC`:
-    
+
     - `NAT`: Use a `NAT`
-    
+
     - `BRIDGE`: Bridge a host network device
-  
+
   - `host`: (only needed when `BRIDGE`): The host device to bridge (`NICID`)
 
 - `rosetta`: Whether to enable the rosetta `x86` translation layer if available on the host
@@ -266,7 +266,7 @@ Create a new virtual machineCreate a new `EFI` virtual machine using the supplie
 Request the current vm [state](#vm-states)
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.vm.view` permission on the group the vm belongs to
 
 **Request:**
@@ -303,7 +303,7 @@ Request a [state change](#vm-states) for the virtual machine. Valid states:
 - `PAUSED`
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.vm.state` permission on the group the vm belongs to
 
 **Request:**
@@ -342,7 +342,7 @@ If the `force` flag is set to `true` state changes will be forceful (eg. shutdow
 List all available host `NICs` available for `BRIDGE` use
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.nic.list` permission somewhere
 
 **Request:**

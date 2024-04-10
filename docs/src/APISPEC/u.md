@@ -101,7 +101,7 @@ If a user desires to drop the current `authkey` immediately, this endpoint can b
 - `200`: Authkey dropped
 
 > **Note**
-> 
+>
 > For security reasons, dropping a non-existing authkey does still result in a `200` response code.
 
 ## `/u/auth` - PATCH <a name="patch-u-auth"></a>
@@ -109,7 +109,7 @@ If a user desires to drop the current `authkey` immediately, this endpoint can b
 If an authkey lease is about to expire, this call can be used to create a new authkey using the expiring key.
 
 > **Note**
-> 
+>
 > This will immediately drop the old authkey in favor of the newly generated one
 
 **Request:**
@@ -140,7 +140,7 @@ If an authkey lease is about to expire, this call can be used to create a new au
 Retrieve information about the current user. The request's `authkey` is used to infer the user, unless the `uid` field is specified.
 
 > **Note**
-> 
+>
 > To query information about other users, the calling user needs the `velocity.user.view` permission
 
 **Request:**
@@ -184,7 +184,7 @@ Retrieve information about the current user. The request's `authkey` is used to 
 Create a new user
 
 > **Note**
-> 
+>
 > Only users that have the `velocity.user.create` permission
 
 **Request:**
@@ -214,7 +214,7 @@ Create a new user
 ## `/u/user` - DELETE <a name="delete-u-user"></a>
 
 > **Note**
-> 
+>
 > Only users that have the `velocity.user.remove` permission for the user's parent group can remove users
 
 This call removes the user with the supplied `UID`. This also removes the user's group that is named the same as the user and all of its VMs and images.
@@ -240,7 +240,7 @@ This call removes the user with the supplied `UID`. This also removes the user's
 List all users on this velocity instance
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.user.list` permission
 
 **Request:**
@@ -273,11 +273,11 @@ List all users on this velocity instance
 Put new permissions for a user on a specific group
 
 > **Note**
-> 
+>
 > A user cannot assign other users to higher groups than its own. He needs the `velocity.user.assign` permission for the group to assign to
 
 > **Note**
-> 
+>
 > A user can only forward permissions itself has. If the user tries to give permissions to another user that it doesn't have, this call will fail
 
 **Request:**
@@ -305,7 +305,7 @@ The permissions array lists the permissions that the user should receive.
 Remove user permissions
 
 > **Note**
-> 
+>
 > Only users that have the `velocity.user.revoke` permission for the target group can do this
 
 **Request:**
@@ -335,7 +335,7 @@ The `permission` field is optional. If it is set, this will remove the listed pe
 Retrieve information about a group
 
 > **Note**
-> 
+>
 > The calling user needs the `velocity.group.view` permission on the requested group
 
 **Request:**
@@ -380,7 +380,7 @@ Retrieve information about a group
 Create a new group. There cannot be duplicate group names in a parent group.
 
 > **Note**
-> 
+>
 > The user needs the `velocity.group.create` permission on the parent group
 
 **Request:**
@@ -415,7 +415,7 @@ Create a new group. There cannot be duplicate group names in a parent group.
 Remove a group from a parent group
 
 > **Note**
-> 
+>
 > The user needs the `velocity.group.remove` permission on the parent group
 
 This call removes all the VMs and images owned by this group.
@@ -441,9 +441,9 @@ This call removes all the VMs and images owned by this group.
 List back all existing groups on this velocity instance
 
 > **Note**
-> 
+>
 > The calling user needs at least one permission on a group for its name (and subgroups) to be displayed.
-> 
+>
 > Do note that groups that are essential to recreating the tree will get listed, too
 
 **Request:**

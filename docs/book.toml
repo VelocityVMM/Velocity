@@ -1,0 +1,13 @@
+[book]
+authors = ["Max Kofler"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Velocity"
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+
+[output.html]
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+additional-css = ["custom.css"]

@@ -15,7 +15,7 @@ User management
 Create new users.
 
 > **Note**
-> 
+>
 > Do keep in mind that this permission allows a user to create new users for the system and thus consume unique usernames!
 
 ## remove (`velocity.user.remove`)
@@ -23,7 +23,7 @@ Create new users.
 Remove users that are in the group from the system.
 
 > **Note**
-> 
+>
 > This destroys users at the system level, if a user should only be able to revoke a user from a group, it should have the `revoke` permission
 
 ## assign (`velocity.user.assign`)
