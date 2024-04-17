@@ -105,15 +105,16 @@ extension VAPI {
             let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.EFI.PUT.Req = try req.content.decode(Structs.V.VM.EFI.PUT.Req.self)
 
-            guard try c_user.has_permission(permission: "velocity.vm.create", group: nil) else {
-                self.VDebug("\(c_user.info()) tried to create EFI VM: FORBIDDEN")
-                return try self.error(code: .V_VM_EFI_PUT_PERMISSION)
-            }
-
             guard let group = try self.db.group_select(gid: request.gid) else {
                 self.VDebug("\(c_user.info()) tried to create EFI VM: GROUP NOT FOUND")
                 return try self.error(code: .V_VM_EFI_PUT_GROUP_NOT_FOUND)
             }
+
+            guard try c_user.has_permission(permission: "velocity.vm.create", group: group) else {
+                self.VDebug("\(c_user.info()) tried to create EFI VM: FORBIDDEN")
+                return try self.error(code: .V_VM_EFI_PUT_PERMISSION)
+            }
+
 
             self.VDebug("\(c_user.info()) is creating VM: \(request)")
 
@@ -209,15 +210,16 @@ extension VAPI {
             let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.STATE.POST.Req = try req.content.decode(Structs.V.VM.STATE.POST.Req.self)
 
-            guard try c_user.has_permission(permission: "velocity.vm.view", group: nil) else {
-                self.VDebug("\(c_user.info()) tried to retrieve VM state: FORBIDDEN")
-                return try self.error(code: .V_VM_STATE_POST_PERMISSION)
-            }
-
             guard let vm = self.vm_manager.get_vm(vmid: request.vmid) else {
                 self.VDebug("\(c_user.info()) tried to retrieve VM state: VM NOT FOUND")
                 return try self.error(code: .V_VM_STATE_POST_VM_NOT_FOUND)
             }
+
+            guard try c_user.has_permission(permission: "velocity.vm.view", group: vm.vvm.group) else {
+                self.VDebug("\(c_user.info()) tried to retrieve VM state: FORBIDDEN")
+                return try self.error(code: .V_VM_STATE_POST_PERMISSION)
+            }
+
 
             return try self.response(Structs.V.VM.STATE.Res(vmid: vm.vvm.vmid, state: vm.get_state().rawValue))
         }
@@ -230,15 +232,16 @@ extension VAPI {
             let c_user = try req.auth.require(VDB.User.self)
             let request: Structs.V.VM.STATE.PUT.Req = try req.content.decode(Structs.V.VM.STATE.PUT.Req.self)
 
-            guard try c_user.has_permission(permission: "velocity.vm.state", group: nil) else {
-                self.VDebug("\(c_user.info()) tried to change VM state: FORBIDDEN")
-                return try self.error(code: .V_VM_STATE_PUT_PERMISSION)
-            }
-
             guard let vm = self.vm_manager.get_vm(vmid: request.vmid) else {
                 self.VDebug("\(c_user.info()) tried to retrieve VM state: VM NOT FOUND")
                 return try self.error(code: .V_VM_STATE_POST_VM_NOT_FOUND)
             }
+
+            guard try c_user.has_permission(permission: "velocity.vm.state", group: vm.vvm.group) else {
+                self.VDebug("\(c_user.info()) tried to change VM state: FORBIDDEN")
+                return try self.error(code: .V_VM_STATE_PUT_PERMISSION)
+            }
+
 
             let res = try vm.request_state_transition(state: request.state, force: request.force)
 
