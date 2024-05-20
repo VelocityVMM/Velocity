@@ -22,4 +22,8 @@
 // SOFTWARE.
 //
 
-import Foundation
+
+// Launch the Velocity hypervisor
+
+let hypervisor = LibVelocity();
+hypervisor.run();
