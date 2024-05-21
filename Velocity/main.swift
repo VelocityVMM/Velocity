@@ -25,5 +25,5 @@
 
 // Launch the Velocity hypervisor
 
-let hypervisor = LibVelocity();
+let hypervisor = LibVelocity(1);
 hypervisor.run();

@@ -1,10 +1,12 @@
+use log::info;
+
 #[swift_bridge::bridge]
 mod ffi {
     extern "Rust" {
         type LibVelocity;
 
         #[swift_bridge(init)]
-        fn new() -> LibVelocity;
+        fn new(loglevel: u32) -> LibVelocity;
 
         fn run(&self);
     }
@@ -15,7 +17,16 @@ pub struct LibVelocity {}
 
 impl LibVelocity {
     /// Create a new instance of the hypervisor
-    pub fn new() -> Self {
+    pub fn new(loglevel: u32) -> Self {
+        if std::env::var("RUST_LOG").is_err() {
+            match loglevel {
+                0 => std::env::set_var("RUST_LOG", "info"),
+                1 => std::env::set_var("RUST_LOG", "debug"),
+                _ => std::env::set_var("RUST_LOG", "trace"),
+            }
+        }
+        pretty_env_logger::init();
+
         Self {}
     }
 
@@ -30,6 +41,6 @@ impl LibVelocity {
 
     /// The async main function that runs the hypervisor
     async fn run_async(&self) {
-        println!("Velocity");
+        info!("Starting Velocity");
     }
 }

@@ -13,8 +13,8 @@ public class LibVelocity: LibVelocityRefMut {
     }
 }
 extension LibVelocity {
-    public convenience init() {
-        self.init(ptr: __swift_bridge__$LibVelocity$new())
+    public convenience init(_ loglevel: UInt32) {
+        self.init(ptr: __swift_bridge__$LibVelocity$new(loglevel))
     }
 }
 public class LibVelocityRefMut: LibVelocityRef {
