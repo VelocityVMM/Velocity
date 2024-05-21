@@ -4,7 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["staticlib"]
+crate-type = ["staticlib", "lib"]
+
+[[bin]]
+name = "velocity"
+path = "src/main.rs"
 
 [build-dependencies]
 swift-bridge-build = "0.1"
