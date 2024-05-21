@@ -21,6 +21,15 @@ impl LibVelocity {
 
     /// Start up and run the hypervisor
     pub fn run(&self) {
-        println!("Velocity")
+        tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .expect("Create async runtime")
+            .block_on(self.run_async())
+    }
+
+    /// The async main function that runs the hypervisor
+    async fn run_async(&self) {
+        println!("Velocity");
     }
 }
