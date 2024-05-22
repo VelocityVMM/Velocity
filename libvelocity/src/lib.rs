@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use log::info;
 
 #[swift_bridge::bridge]
@@ -32,15 +33,21 @@ impl LibVelocity {
 
     /// Start up and run the hypervisor
     pub fn run(&self) {
-        tokio::runtime::Builder::new_multi_thread()
+        match tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()
             .expect("Create async runtime")
             .block_on(self.run_async())
+        {
+            Err(e) => println!("{:?}", e),
+            Ok(()) => {}
+        };
     }
 
     /// The async main function that runs the hypervisor
-    async fn run_async(&self) {
+    async fn run_async(&self) -> Result<()> {
         info!("Starting Velocity");
+
+        Ok(())
     }
 }
