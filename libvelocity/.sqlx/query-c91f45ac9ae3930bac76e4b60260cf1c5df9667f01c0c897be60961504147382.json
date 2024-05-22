@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT uid, username, pwhash FROM users WHERE username = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "uid",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "username",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "pwhash",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "c91f45ac9ae3930bac76e4b60260cf1c5df9667f01c0c897be60961504147382"
+}

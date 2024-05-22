@@ -1,6 +1,8 @@
 use anyhow::{Context, Result};
 use log::info;
 
+pub mod model;
+
 #[swift_bridge::bridge]
 mod ffi {
     extern "Rust" {
