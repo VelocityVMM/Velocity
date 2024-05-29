@@ -1,6 +1,7 @@
-use anyhow::{Context, Result};
+use error::VResult;
 use log::info;
 
+pub mod error;
 pub mod model;
 
 #[swift_bridge::bridge]
@@ -47,7 +48,7 @@ impl LibVelocity {
     }
 
     /// The async main function that runs the hypervisor
-    async fn run_async(&self) -> Result<()> {
+    async fn run_async(&self) -> VResult<()> {
         info!("Starting Velocity");
 
         Ok(())

@@ -2,7 +2,10 @@ use std::fmt::Display;
 
 use sqlx::SqlitePool;
 
-use anyhow::{bail, Context, Result};
+use crate::{
+    error::{VErrorExt, VResult},
+    str,
+};
 
 /// A user in the Velocity system
 #[derive(Debug)]
@@ -58,7 +61,7 @@ impl User {
     /// * `db` - The database to create the new user in
     /// * `username` - The unique username to use for the new user
     /// * `pwhash` - The password hash the user can authenticate with
-    pub async fn create(db: &SqlitePool, username: &str, pwhash: &str) -> Result<User> {
+    pub async fn create(db: &SqlitePool, username: &str, pwhash: &str) -> VResult<User> {
         sqlx::query!(
             "INSERT INTO users (username, pwhash) VALUES (?, ?)",
             username,
@@ -66,7 +69,7 @@ impl User {
         )
         .execute(db)
         .await
-        .with_context(|| format!("Failed to insert user '{username}'"))?;
+        .ctx(str!("Failed to insert user '{username}'"))?;
 
         User::select_username(db, username).await
     }
@@ -85,7 +88,7 @@ impl User {
         uid: u32,
         username: &str,
         pwhash: &str,
-    ) -> Result<User> {
+    ) -> VResult<User> {
         sqlx::query!(
             "INSERT INTO users (uid, username, pwhash) VALUES (?, ?, ?)",
             uid,
@@ -94,7 +97,7 @@ impl User {
         )
         .execute(db)
         .await
-        .with_context(|| format!("Failed to insert user '{username}' ({uid})"))?;
+        .ctx(str!("Failed to insert user '{username}' ({uid})"))?;
 
         User::select_username(db, username).await
     }
@@ -107,14 +110,14 @@ impl User {
     ///
     /// # Returns
     /// The user or `None` if it does not exist
-    pub async fn try_select_username(db: &SqlitePool, username: &str) -> Result<Option<User>> {
+    pub async fn try_select_username(db: &SqlitePool, username: &str) -> VResult<Option<User>> {
         let res = sqlx::query!(
             "SELECT uid, username, pwhash FROM users WHERE username = ?",
             username
         )
         .fetch_optional(db)
         .await
-        .with_context(|| format!("Failed to select user '{username}'"))?;
+        .ctx(str!("Failed to select user '{username}'"))?;
 
         let res = match res {
             None => return Ok(None),
@@ -129,12 +132,13 @@ impl User {
     /// # Arguments
     /// * `db` - The database to select from
     /// * `username` - The username of the user to select
-    pub async fn select_username(db: &SqlitePool, username: &str) -> Result<User> {
+    pub async fn select_username(db: &SqlitePool, username: &str) -> VResult<User> {
         let user = Self::try_select_username(db, username).await?;
 
         match user {
             Some(user) => Ok(user),
-            None => bail!(UserError::UsernameNotFound(username.to_owned())),
+            None => UserError::UsernameNotFound(username.to_owned())
+                .ctx(str!("Selecting user by username: '{username}'")),
         }
     }
 
@@ -146,11 +150,11 @@ impl User {
     ///
     /// # Returns
     /// The user or `None` if it doesn't exist
-    pub async fn try_select_uid(db: &SqlitePool, uid: u32) -> Result<Option<User>> {
+    pub async fn try_select_uid(db: &SqlitePool, uid: u32) -> VResult<Option<User>> {
         let res = sqlx::query!("SELECT uid, username, pwhash FROM users WHERE uid = ?", uid)
             .fetch_optional(db)
             .await
-            .with_context(|| format!("Failed to select user {uid}"))?;
+            .ctx(str!("Failed to select user {uid}"))?;
 
         let res = match res {
             None => return Ok(None),
@@ -165,12 +169,12 @@ impl User {
     /// # Arguments
     /// * `db` - The database to select from
     /// * `uid` - The user id of the user to select
-    pub async fn select_uid(db: &SqlitePool, uid: u32) -> Result<User> {
+    pub async fn select_uid(db: &SqlitePool, uid: u32) -> VResult<User> {
         let user = Self::try_select_uid(db, uid).await?;
 
         match user {
             Some(user) => Ok(user),
-            None => bail!(UserError::UserIDNotFound(uid)),
+            None => UserError::UserIDNotFound(uid).ctx(str!("Selecting user by uid: {uid}")),
         }
     }
 
@@ -178,7 +182,7 @@ impl User {
     ///
     /// # Arguments
     /// * `db` - The database to apply the new values to
-    pub async fn apply(&self, db: &SqlitePool) -> Result<()> {
+    pub async fn apply(&self, db: &SqlitePool) -> VResult<()> {
         sqlx::query!(
             "UPDATE users SET username = ?, pwhash = ? WHERE uid = ?",
             self.username,
@@ -187,7 +191,7 @@ impl User {
         )
         .execute(db)
         .await
-        .with_context(|| "Failed to update user")?;
+        .ctx(str!("Failed to update user"))?;
 
         Ok(())
     }
