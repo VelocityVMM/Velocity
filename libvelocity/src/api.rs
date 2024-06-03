@@ -18,17 +18,27 @@
 //!
 //! This mechanism is individual per method, meaning that a `/u/auth` can have
 //! its `POST` method at version `1` and its `DELETE` method at version `2`.
+//!
+//! ## Routes
+//! - [`/u`: User management](u)
 
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
+    Json, Router,
 };
 use log::error;
 use serde::Serialize;
 use serde_json::{json, Value};
 
-use crate::error::VError;
+use crate::{error::VError, VelocityState};
+
+pub mod u;
+
+#[doc(hidden)]
+pub fn get_router(velocity: VelocityState) -> Router {
+    Router::new().nest("/u", u::get_router(velocity))
+}
 
 /// All errors that can be transmitted via the velocity API
 pub struct VelocityAPIError(VError);
