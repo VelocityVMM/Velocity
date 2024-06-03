@@ -1,6 +1,7 @@
 use error::VResult;
 use log::info;
 
+pub mod api;
 pub mod error;
 pub mod model;
 
