@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, io};
 
 use crate::model::UserError;
 
@@ -11,6 +11,7 @@ pub enum VErrorType {
     SQLX(sqlx::Error),
     /// An error that has to do with users
     User(UserError),
+    IO(io::Error),
 }
 
 impl Display for VErrorType {
@@ -18,6 +19,7 @@ impl Display for VErrorType {
         match self {
             Self::SQLX(e) => e.fmt(f),
             Self::User(e) => e.fmt(f),
+            Self::IO(e) => e.fmt(f),
         }
     }
 }
@@ -35,3 +37,10 @@ impl From<UserError> for VErrorType {
     }
 }
 impl VErrorIn for UserError {}
+
+impl From<io::Error> for VErrorType {
+    fn from(value: io::Error) -> Self {
+        Self::IO(value)
+    }
+}
+impl VErrorIn for io::Error {}
