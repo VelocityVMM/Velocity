@@ -8,3 +8,6 @@ pub use authkey::*;
 
 mod authmanager;
 pub use authmanager::*;
+
+mod permission;
+pub use permission::*;

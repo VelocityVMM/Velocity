@@ -27,7 +27,7 @@ use axum::{
     response::Response,
 };
 use log::trace;
-use model::AuthManager;
+use model::{AuthManager, Permission};
 use sqlx::SqlitePool;
 use tokio::sync::RwLock;
 
@@ -102,6 +102,10 @@ impl LibVelocity {
                 .ctx(|| "Failed to create root user")?,
             Some(u) => u,
         };
+
+        Permission::ensure_default_permissions(&db)
+            .await
+            .ctx(str!("Ensuring default permissions"))?;
 
         // Create the initial app route
         let app = api::get_router(Arc::new(RwLock::new(Velocity {
