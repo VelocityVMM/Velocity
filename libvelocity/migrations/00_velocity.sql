@@ -4,6 +4,14 @@ CREATE TABLE IF NOT EXISTS users (
     pwhash TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS groups (
+    gid INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    parent_gid INTEGER,
+    groupname TEXT NOT NULL UNIQUE,
+    UNIQUE (parent_gid, groupname),
+    FOREIGN KEY (parent_gid) REFERENCES groups(gid)
+);
+
 CREATE TABLE IF NOT EXISTS permissions (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL UNIQUE

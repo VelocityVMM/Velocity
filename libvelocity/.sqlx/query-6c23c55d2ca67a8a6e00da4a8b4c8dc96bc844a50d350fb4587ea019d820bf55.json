@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO groups (parent_gid, groupname) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "6c23c55d2ca67a8a6e00da4a8b4c8dc96bc844a50d350fb4587ea019d820bf55"
+}

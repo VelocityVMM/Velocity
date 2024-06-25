@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT gid, parent_gid, groupname FROM groups WHERE gid = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "gid",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "parent_gid",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "groupname",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "c6f4b089420d5be0be6e0a4e3eee58fedec9e23582567c2866402c3be39b97f8"
+}

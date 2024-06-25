@@ -27,7 +27,7 @@ use axum::{
     response::Response,
 };
 use log::trace;
-use model::{AuthManager, Permission};
+use model::{AuthManager, Group, Permission};
 use sqlx::SqlitePool;
 use tokio::sync::RwLock;
 
@@ -101,6 +101,17 @@ impl LibVelocity {
                 .await
                 .ctx(|| "Failed to create root user")?,
             Some(u) => u,
+        };
+
+        let g_root = Group::try_select_gid(&db, 0)
+            .await
+            .ctx(|| "Failed to retrieve root group")?;
+
+        match g_root {
+            None => Group::create_with_gid(&db, 0, "root", None)
+                .await
+                .ctx(|| "Failed to create root group")?,
+            Some(g) => g,
         };
 
         Permission::ensure_default_permissions(&db)

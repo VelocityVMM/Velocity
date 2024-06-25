@@ -3,6 +3,9 @@
 mod user;
 pub use user::*;
 
+mod group;
+pub use group::*;
+
 mod authkey;
 pub use authkey::*;
 

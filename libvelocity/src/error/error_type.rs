@@ -1,6 +1,6 @@
 use std::{fmt::Display, io};
 
-use crate::model::{PermissionError, UserError};
+use crate::model::{GroupError, PermissionError, UserError};
 
 use super::VErrorIn;
 
@@ -11,6 +11,8 @@ pub enum VErrorType {
     SQLX(sqlx::Error),
     /// An error that has to do with users
     User(UserError),
+    /// An error that has to do with groups
+    Group(GroupError),
     /// An error that has to do with permissions
     Permission(PermissionError),
     IO(io::Error),
@@ -21,6 +23,7 @@ impl Display for VErrorType {
         match self {
             Self::SQLX(e) => e.fmt(f),
             Self::User(e) => e.fmt(f),
+            Self::Group(e) => e.fmt(f),
             Self::Permission(e) => e.fmt(f),
             Self::IO(e) => e.fmt(f),
         }
@@ -40,6 +43,13 @@ impl From<UserError> for VErrorType {
     }
 }
 impl VErrorIn for UserError {}
+
+impl From<GroupError> for VErrorType {
+    fn from(value: GroupError) -> Self {
+        Self::Group(value)
+    }
+}
+impl VErrorIn for GroupError {}
 
 impl From<PermissionError> for VErrorType {
     fn from(value: PermissionError) -> Self {
