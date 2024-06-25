@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// A user in the Velocity system
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct User {
     /// The user id is the primary key, so it is guarded
     uid: u32,
