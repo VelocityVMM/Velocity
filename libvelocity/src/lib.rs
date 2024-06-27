@@ -15,8 +15,8 @@
 //!
 //! [The documentation for the API can be found here](api).
 //!
-use std::sync::Arc;
 
+use api::VelocityState;
 use error::VResult;
 use log::info;
 
@@ -29,7 +29,6 @@ use axum::{
 use log::trace;
 use model::{AuthManager, Group, Permission};
 use sqlx::SqlitePool;
-use tokio::sync::RwLock;
 
 use crate::{error::VErrorExt, model::User};
 
@@ -37,7 +36,6 @@ pub mod api;
 pub mod error;
 pub mod model;
 
-pub type VelocityState = Arc<RwLock<Velocity>>;
 
 #[swift_bridge::bridge]
 #[allow(clippy::unnecessary_cast)]
@@ -119,10 +117,10 @@ impl LibVelocity {
             .ctx(str!("Ensuring default permissions"))?;
 
         // Create the initial app route
-        let app = api::get_router(Arc::new(RwLock::new(Velocity {
+        let app = api::get_router(VelocityState::new(Velocity {
             db,
             auth_manager: AuthManager::default(),
-        })));
+        }));
 
         let app = app.fallback(fallback).layer(middleware::from_fn(printer));
 

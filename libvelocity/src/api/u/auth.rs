@@ -67,7 +67,8 @@ pub async fn u_auth_post_1(
     State(velocity): State<VelocityState>,
     Json(payload): Json<POSTReq1>,
 ) -> Result<impl IntoResponse, VelocityAPIError> {
-    let user = User::try_select_username(&velocity.read().await.db, &payload.username).await?;
+    let user =
+        User::try_select_username(&velocity.velocity.read().await.db, &payload.username).await?;
 
     let user = match user {
         Some(user) => user,
@@ -79,6 +80,7 @@ pub async fn u_auth_post_1(
 
     if user.pwhash == payload.password {
         let key = velocity
+            .velocity
             .write()
             .await
             .auth_manager
@@ -129,6 +131,7 @@ pub async fn u_auth_patch_1(
     Json(payload): Json<PATCHReq1>,
 ) -> impl IntoResponse {
     let key = velocity
+        .velocity
         .write()
         .await
         .auth_manager
@@ -175,6 +178,7 @@ pub async fn u_auth_delete_1(
     Json(payload): Json<DELETEReq1>,
 ) -> impl IntoResponse {
     velocity
+        .velocity
         .write()
         .await
         .auth_manager

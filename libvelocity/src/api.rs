@@ -22,6 +22,8 @@
 //! ## Routes
 //! - [`/u`: User management](u)
 
+use std::sync::Arc;
+
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -30,8 +32,9 @@ use axum::{
 use log::error;
 use serde::Serialize;
 use serde_json::{json, Value};
+use tokio::sync::RwLock;
 
-use crate::{error::VError, VelocityState};
+use crate::{error::VError, Velocity};
 
 pub mod u;
 
@@ -82,6 +85,23 @@ pub trait ToJSONPanic: Serialize {
             Err(e) => {
                 panic!("Expected flawless conversion to JSON value: {e}")
             }
+        }
+    }
+}
+
+/// A wrapper for velocity as the API state
+#[derive(Clone)]
+pub struct VelocityState {
+    /// The wrapped velocity instance
+    pub velocity: Arc<RwLock<Velocity>>,
+}
+
+impl VelocityState {
+    /// Creates a new velocity API state wrapper from
+    /// an existing velocity instance
+    pub fn new(velocity: Velocity) -> Self {
+        Self {
+            velocity: Arc::new(RwLock::new(velocity)),
         }
     }
 }
