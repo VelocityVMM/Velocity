@@ -33,7 +33,11 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use tokio::sync::RwLock;
 
-use crate::{error::VError, Velocity};
+use crate::{
+    error::{VError, VResult},
+    model::User,
+    Velocity,
+};
 
 pub mod u;
 
@@ -102,5 +106,14 @@ impl VelocityState {
         Self {
             velocity: Arc::new(RwLock::new(velocity)),
         }
+    }
+
+    /// Tries to get the owner of the supplied authkey
+    /// # Arguments
+    /// * `key` - The key string to check for
+    /// # Returns
+    /// The user that is authenticated by `key` or `None`
+    pub async fn get_authkey_owner(&self, key: &str) -> VResult<Option<User>> {
+        self.velocity.read().await.get_authkey_owner(key).await
     }
 }

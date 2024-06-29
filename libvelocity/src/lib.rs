@@ -21,10 +21,10 @@ use error::VResult;
 use log::info;
 
 use axum::{
+    body::Body,
     extract::Request,
-    http::StatusCode,
+    http::{Response, StatusCode},
     middleware::{self, Next},
-    response::Response,
 };
 use log::trace;
 use model::{AuthManager, Group, Permission};
@@ -36,6 +36,7 @@ pub mod api;
 pub mod error;
 pub mod model;
 
+pub mod authentication;
 
 #[swift_bridge::bridge]
 #[allow(clippy::unnecessary_cast)]
@@ -147,8 +148,19 @@ pub struct Velocity {
     auth_manager: AuthManager,
 }
 
-async fn printer(request: Request, next: Next) -> Response {
+async fn printer(request: Request, next: Next) -> Response<Body> {
     trace!("[{}] {}", request.method(), request.uri());
 
     next.run(request).await
+}
+
+impl Velocity {
+    /// Tries to get the owner of the supplied authkey
+    /// # Arguments
+    /// * `key` - The key string to check for
+    /// # Returns
+    /// The user that is authenticated by `key` or `None`
+    pub async fn get_authkey_owner(&self, key: &str) -> VResult<Option<User>> {
+        self.auth_manager.get_user(key, &self.db).await
+    }
 }
