@@ -19,6 +19,7 @@
 use std::{collections::LinkedList, fmt::Display};
 
 mod error_type;
+use axum::http::StatusCode;
 pub use error_type::*;
 
 /// A error to be passed around the Velocity program
@@ -54,6 +55,11 @@ impl VError {
                 l
             },
         }
+    }
+
+    /// Returns a axum statuscode that matches the error
+    pub fn get_statuscode(&self) -> StatusCode {
+        self.error.get_statuscode()
     }
 }
 

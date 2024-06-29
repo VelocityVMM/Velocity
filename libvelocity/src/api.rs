@@ -25,7 +25,6 @@
 use std::sync::Arc;
 
 use axum::{
-    http::StatusCode,
     response::{IntoResponse, Response},
     Json, Router,
 };
@@ -51,7 +50,7 @@ impl IntoResponse for VelocityAPIError {
         error!("{:?}", self.0);
         let err = self.0.error.to_string();
         (
-            StatusCode::INTERNAL_SERVER_ERROR,
+            self.0.get_statuscode(),
             Json(json!({
                 "code": 1000,
                 "message": err

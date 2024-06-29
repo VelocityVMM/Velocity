@@ -1,5 +1,7 @@
 use std::{fmt::Display, io};
 
+use axum::http::StatusCode;
+
 use crate::model::{GroupError, PermissionError, UserError};
 
 use super::VErrorIn;
@@ -15,6 +17,8 @@ pub enum VErrorType {
     Group(GroupError),
     /// An error that has to do with permissions
     Permission(PermissionError),
+    /// A permission has been denied
+    PermissionDenied(String),
     IO(io::Error),
 }
 
@@ -25,7 +29,18 @@ impl Display for VErrorType {
             Self::User(e) => e.fmt(f),
             Self::Group(e) => e.fmt(f),
             Self::Permission(e) => e.fmt(f),
+            Self::PermissionDenied(e) => write!(f, "Permission denied: {e}"),
             Self::IO(e) => e.fmt(f),
+        }
+    }
+}
+
+impl VErrorType {
+    /// Returns the matching axum status code for the error
+    pub fn get_statuscode(&self) -> StatusCode {
+        match self {
+            Self::PermissionDenied(_) => StatusCode::FORBIDDEN,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
