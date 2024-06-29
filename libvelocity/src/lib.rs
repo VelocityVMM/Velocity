@@ -112,7 +112,7 @@ impl LibVelocity {
             Some(g) => g,
         };
 
-        Permission::ensure_default_permissions(&db)
+        Permission::ensure_default_permissions(&db, &u_root, &g_root)
             .await
             .ctx(str!("Ensuring default permissions"))?;
 

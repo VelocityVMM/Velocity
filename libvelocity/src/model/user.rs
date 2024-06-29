@@ -7,6 +7,8 @@ use crate::{
     str,
 };
 
+use super::{Group, Permission};
+
 /// A user in the Velocity system
 #[derive(Debug, Clone)]
 pub struct User {
@@ -194,6 +196,32 @@ impl User {
         .ctx(str!("Failed to update user"))?;
 
         Ok(())
+    }
+
+    /// Returns whether the user has `permission` on `group`
+    /// # Arguments
+    /// * `db` - The database connection to perform the check on
+    /// * `permission` - The permission to check for
+    /// * `group` - The group tho check for permission
+    pub async fn has_permission(
+        &self,
+        db: &SqlitePool,
+        permission: &str,
+        group: &Group,
+    ) -> VResult<bool> {
+        Permission::is_granted_raw(db, permission, self.uid, group.gid()).await
+    }
+
+    /// Returns whether the user has `permission` somewhere in the group tree
+    /// # Arguments
+    /// * `db` - The database connection to perform the check on
+    /// * `permission` - The permission to check for
+    pub async fn has_permission_somewhere(
+        &self,
+        db: &SqlitePool,
+        permission: &str,
+    ) -> VResult<bool> {
+        Permission::is_granted_somewhere_raw(db, permission, self.uid).await
     }
 }
 

@@ -14,3 +14,6 @@ pub use authmanager::*;
 
 mod permission;
 pub use permission::*;
+
+mod entitlement;
+pub use entitlement::*;

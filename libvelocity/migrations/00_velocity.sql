@@ -16,3 +16,12 @@ CREATE TABLE IF NOT EXISTS permissions (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name TEXT NOT NULL UNIQUE
 );
+
+CREATE TABLE IF NOT EXISTS userpermissions (
+    permission TEXT NOT NULL,
+    uid INTEGER NOT NULL,
+    gid INTEGER NOT NULL,
+    PRIMARY KEY (permission, uid),
+    FOREIGN KEY (uid) REFERENCES users(uid),
+    FOREIGN KEY (gid) REFERENCES groups(gid)
+);
