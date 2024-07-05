@@ -31,7 +31,7 @@ use axum::{
 use log::error;
 use serde::Serialize;
 use serde_json::{json, Value};
-use tokio::sync::RwLock;
+use tokio::sync::{RwLock, RwLockReadGuard};
 
 use crate::{
     error::{VError, VErrorType, VResult},
@@ -111,6 +111,12 @@ impl VelocityState {
         Self {
             velocity: Arc::new(RwLock::new(velocity)),
         }
+    }
+
+    /// Returns the underlying velocity instance wrapped in a guard
+    /// see [RwLockReadGuard] and [RwLock::read]
+    pub async fn read<'a>(&self) -> RwLockReadGuard<Velocity> {
+        self.velocity.read().await
     }
 
     /// Tries to get the owner of the supplied authkey

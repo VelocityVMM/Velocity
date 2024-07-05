@@ -1,8 +1,12 @@
 //! # `/u/user` - Endpoints for managing users
+//! ## Routes
+//! - [`/u/user/list`](list): List users
 //! ### PUT
 //! - [`/u/user/1 - PUT`](u_user_put_1): Create a new user
 //! ### DELETE
 //! - [`/u/user/1 - DELETE`](u_user_delete_1): Remove a user
+
+pub mod list;
 
 use axum::{
     extract::State,
@@ -28,11 +32,8 @@ pub fn get_router(velocity: VelocityState) -> Router {
         .route("/1", put(u_user_put_1))
         .route("/1", delete(u_user_delete_1))
         .with_state(velocity.clone())
-        .layer(from_fn_with_state(velocity, auth_middleware))
-    //.layer(from_fn_with_state(
-    //    AuthState::permission(velocity, "velocity.user.create"),
-    //    auth_middleware,
-    //))
+        .layer(from_fn_with_state(velocity.clone(), auth_middleware))
+        .nest("/list", list::get_router(velocity))
 }
 
 /// The request structure for the `/u/user/1 - PUT` endpoint

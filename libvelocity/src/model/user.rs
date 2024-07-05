@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use futures_util::TryStreamExt;
 use sqlx::SqlitePool;
 
 use crate::{
@@ -10,7 +11,7 @@ use crate::{
 use super::{Group, Permission};
 
 /// A user in the Velocity system
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, sqlx::FromRow)]
 pub struct User {
     /// The user id is the primary key, so it is guarded
     uid: u32,
@@ -234,6 +235,22 @@ impl User {
         permission: &str,
     ) -> VResult<bool> {
         Permission::is_granted_somewhere_raw(db, permission, self.uid).await
+    }
+
+    /// Returns all registered users in the database
+    /// # Arguments
+    /// * `db` - The database to operate on
+    pub async fn list(db: &SqlitePool) -> VResult<Vec<User>> {
+        let mut stream =
+            sqlx::query_as::<_, User>("SELECT uid, username, pwhash FROM users").fetch(db);
+
+        let mut res = Vec::new();
+
+        while let Some(user) = stream.try_next().await.ctx(str!("Listing users"))? {
+            res.push(user)
+        }
+
+        Ok(res)
     }
 }
 

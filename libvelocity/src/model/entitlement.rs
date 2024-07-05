@@ -12,6 +12,11 @@ pub enum Entitlement {
     ///
     /// This entitlement is global
     UserRemove,
+    /// Entitles users to list all registered
+    /// users on the Velocity system
+    ///
+    /// This entitlement is global
+    UserList,
 }
 
 impl Entitlement {
@@ -20,6 +25,7 @@ impl Entitlement {
         match self {
             Self::UserCreate => "velocity.user.create",
             Self::UserRemove => "velocity.user.remove",
+            Self::UserList => "velocity.user.list",
         }
     }
 }
