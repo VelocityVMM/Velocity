@@ -92,6 +92,11 @@ pub trait ToJSONPanic: Serialize {
     }
 }
 
+/// Returns an empty JSON value
+pub fn empty_json() -> Json<Value> {
+    json!({}).into()
+}
+
 /// A wrapper for velocity as the API state
 #[derive(Clone)]
 pub struct VelocityState {
