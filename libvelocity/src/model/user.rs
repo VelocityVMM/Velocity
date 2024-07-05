@@ -104,6 +104,18 @@ impl User {
         User::select_username(db, username).await
     }
 
+    /// Removes a user from the database by its `uid`
+    /// # Arguments
+    /// * `db` - The database to remove the user from
+    pub async fn remove(self, db: &SqlitePool) -> VResult<()> {
+        sqlx::query!("DELETE FROM users WHERE uid = ?", self.uid)
+            .execute(db)
+            .await
+            .ctx(str!("Failed to remove user {self}"))?;
+
+        Ok(())
+    }
+
     /// Tries to select a user by `username`
     ///
     /// # Arguments

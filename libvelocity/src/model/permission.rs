@@ -250,6 +250,11 @@ impl Permission {
             .ensure_granted(db, u_root, g_root)
             .await?;
 
+        Permission::ensure(db, Entitlement::UserRemove.str())
+            .await?
+            .ensure_granted(db, u_root, g_root)
+            .await?;
+
         Ok(())
     }
 }

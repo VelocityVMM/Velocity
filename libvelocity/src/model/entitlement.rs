@@ -7,6 +7,11 @@ pub enum Entitlement {
     ///
     /// This entitlement is global
     UserCreate,
+    /// Entitles users to remove other users
+    /// from the Velocity system
+    ///
+    /// This entitlement is global
+    UserRemove,
 }
 
 impl Entitlement {
@@ -14,6 +19,7 @@ impl Entitlement {
     pub fn str(&self) -> &'static str {
         match self {
             Self::UserCreate => "velocity.user.create",
+            Self::UserRemove => "velocity.user.remove",
         }
     }
 }
