@@ -34,8 +34,8 @@ use serde_json::{json, Value};
 use tokio::sync::RwLock;
 
 use crate::{
-    error::{VError, VResult},
-    model::User,
+    error::{VError, VErrorType, VResult},
+    model::{Entitlement, User},
     Velocity,
 };
 
@@ -120,5 +120,30 @@ impl VelocityState {
     /// The user that is authenticated by `key` or `None`
     pub async fn get_authkey_owner(&self, key: &str) -> VResult<Option<User>> {
         self.velocity.read().await.get_authkey_owner(key).await
+    }
+
+    /// Ensures a user has an entitlement globally
+    /// (On any group in the Velocity system)
+    /// # Arguments
+    /// * `user` - The user to check for
+    /// * `entitlement` - The entitlement to check
+    /// # Returns
+    /// The `user` or `None` if the permission is not granted
+    pub async fn global_permission_guard(
+        &self,
+        user: User,
+        entitlement: Entitlement,
+    ) -> Result<User, VError> {
+        if !user
+            .has_permission_somewhere(&self.velocity.read().await.db, entitlement.str())
+            .await?
+        {
+            Err(VError::new(VErrorType::PermissionDenied(format!(
+                "Permission '{}' is needed",
+                entitlement.str()
+            ))))
+        } else {
+            Ok(user)
+        }
     }
 }
