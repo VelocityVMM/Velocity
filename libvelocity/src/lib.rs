@@ -16,8 +16,11 @@
 //! [The documentation for the API can be found here](api).
 //!
 
+use std::path::PathBuf;
+
 use api::VelocityState;
 use error::VResult;
+use home::home_dir;
 use log::info;
 
 use axum::{
@@ -85,7 +88,14 @@ impl LibVelocity {
     async fn run_async(&self) -> VResult<()> {
         info!("Starting Velocity...");
 
-        let db = SqlitePool::connect("sqlite:///Users/max/Velocity/db.sqlite?mode=rwc")
+        let home_dir = home_dir().unwrap_or(PathBuf::from("./"));
+
+        let url = format!(
+            "sqlite://{}/Velocity/db.sqlite?mode=rwc",
+            home_dir.to_string_lossy()
+        );
+
+        let db = SqlitePool::connect(&url)
             .await
             .ctx(|| "Connecting to database")?;
 
@@ -95,7 +105,7 @@ impl LibVelocity {
             .await
             .ctx(|| "Failed to retrieve root user")?;
 
-        match u_root {
+        let u_root = match u_root {
             None => User::create_with_uid(&db, 0, "root", "root")
                 .await
                 .ctx(|| "Failed to create root user")?,
@@ -106,7 +116,7 @@ impl LibVelocity {
             .await
             .ctx(|| "Failed to retrieve root group")?;
 
-        match g_root {
+        let g_root = match g_root {
             None => Group::create_with_gid(&db, 0, "root", None)
                 .await
                 .ctx(|| "Failed to create root group")?,
