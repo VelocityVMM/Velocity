@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM userpermissions WHERE uid = ? AND gid = ? AND permission = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "41636603701c5bcd29237f6d6c914750419ca2f1a0a8f338a54dea118245ceb7"
+}

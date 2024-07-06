@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "WITH RECURSIVE tree(gid, parent_gid) AS (\n                SELECT gid, parent_gid FROM groups WHERE gid = ?\n                UNION ALL\n                SELECT t.gid, t.parent_gid FROM groups t\n                JOIN tree ON tree.parent_gid = t.gid\n                WHERE t.parent_gid != t.gid\n            ) SELECT * FROM userpermissions WHERE\n                (gid IN (SELECT gid FROM tree)\n                OR gid = 0)\n                AND uid = ?\n                AND permission = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "permission",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "uid",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "gid",
+        "ordinal": 2,
+        "type_info": "Int64"
+      },
+      {
+        "name": "delegable",
+        "ordinal": 3,
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "b0731578eeb3ae7a88f9a2cd12e1869ec98f4ebb9869d0a31d5eeee2da7f4c47"
+}

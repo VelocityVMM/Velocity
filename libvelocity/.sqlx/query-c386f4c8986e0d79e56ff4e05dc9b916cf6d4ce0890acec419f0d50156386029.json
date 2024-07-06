@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO userpermissions (permission, uid, gid, delegable) VALUES (?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "c386f4c8986e0d79e56ff4e05dc9b916cf6d4ce0890acec419f0d50156386029"
+}
