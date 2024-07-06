@@ -75,15 +75,23 @@ impl Permission {
     /// * `db` - The database connection to create the new permission link in
     /// * `user` - The user to grant the permission
     /// * `group` - The group to grant the permission on
-    pub async fn grant(&self, db: &SqlitePool, user: &User, group: &Group) -> VResult<()> {
+    /// * `delegable` - Whether the user can delegate this permission to other users
+    pub async fn grant(
+        &self,
+        db: &SqlitePool,
+        user: &User,
+        group: &Group,
+        delegable: bool,
+    ) -> VResult<()> {
         let uid = user.uid();
         let gid = group.gid();
 
         sqlx::query!(
-            "INSERT INTO userpermissions (permission, uid, gid) VALUES (?, ?, ?)",
+            "INSERT INTO userpermissions (permission, uid, gid, delegable) VALUES (?, ?, ?, ?)",
             self.name,
             uid,
             gid,
+            delegable
         )
         .execute(db)
         .await
@@ -95,8 +103,8 @@ impl Permission {
         ))?;
 
         debug!(
-            "Granted '{}' permission '{}' on group '{}'({gid})",
-            user.username, self.name, group.groupname
+            "Granted '{}' permission '{}' on group '{}'({gid}, delegate={})",
+            user.username, self.name, group.groupname, delegable,
         );
 
         Ok(())
@@ -111,9 +119,16 @@ impl Permission {
     /// * `db` - The database connection to create the new permission link in
     /// * `user` - The user to grant the permission
     /// * `group` - The group to grant the permission on
-    pub async fn ensure_granted(&self, db: &SqlitePool, user: &User, group: &Group) -> VResult<()> {
+    /// * `delegable` - Whether the user can delegate this permission to other users
+    pub async fn ensure_granted(
+        &self,
+        db: &SqlitePool,
+        user: &User,
+        group: &Group,
+        delegable: bool,
+    ) -> VResult<()> {
         if !self.is_granted(db, user, group).await? {
-            self.grant(db, user, group).await?;
+            self.grant(db, user, group, delegable).await?;
         }
 
         Ok(())
@@ -129,6 +144,17 @@ impl Permission {
         Self::is_granted_raw(db, &self.name, user.uid(), group.gid()).await
     }
 
+    /// Returns whether `user` can delegate this permission on `group`
+    /// to other users
+    ///
+    /// # Arguments
+    /// * `db` - The database connection to execute the query on
+    /// * `user` - The user to check for permission to delegate
+    /// * `group` - The group to check for delegation rights
+    pub async fn can_delegate(&self, db: &SqlitePool, user: &User, group: &Group) -> VResult<bool> {
+        Self::can_delegate_raw(db, &self.name, user.uid(), group.gid()).await
+    }
+
     /// Checks if `user` has been granted this permission in any group
     ///
     /// This function checks if the permission is granted on **any**
@@ -139,6 +165,20 @@ impl Permission {
     /// * `user` - The user to check the permissions of
     pub async fn is_granted_somewhere(&self, db: &SqlitePool, user: &User) -> VResult<bool> {
         Self::is_granted_somewhere_raw(db, &self.name, user.uid()).await
+    }
+
+    /// Revokes this permission from `user` on `group`
+    /// # Arguments
+    /// * `db` - The database connection to execute the query on
+    /// * `user` - The user to revoke the permission from
+    /// * `group` - The group to revoke the permission from
+    pub async fn revoke(&self, db: &SqlitePool, user: &User, group: &Group) -> VResult<()> {
+        Self::revoke_raw(db, &self.name, user.uid(), group.gid())
+            .await
+            .ctx(str!(
+                "Failed to revoke permission {} for {user} on {group}",
+                self.name
+            ))
     }
 
     /// Tries to select a permission by `name`
@@ -192,15 +232,25 @@ impl Permission {
         gid: u32,
     ) -> VResult<bool> {
         let res = sqlx::query!(
-            "SELECT * FROM userpermissions WHERE permission = ? AND uid = ? AND gid = ?",
-            permission,
+            "WITH RECURSIVE tree(gid, parent_gid) AS (
+                SELECT gid, parent_gid FROM groups WHERE gid = ?
+                UNION ALL
+                SELECT t.gid, t.parent_gid FROM groups t
+                JOIN tree ON tree.parent_gid = t.gid
+                WHERE t.parent_gid != t.gid
+            ) SELECT * FROM userpermissions WHERE
+                (gid IN (SELECT gid FROM tree)
+                OR gid = 0)
+                AND uid = ?
+                AND permission = ?",
+            gid,
             uid,
-            gid
+            permission
         )
         .fetch_optional(db)
         .await
         .ctx(str!(
-            "Failed to check if UID {uid} has permission '{permission}' on GID {gid}",
+            "Failed to check if UID {uid} has permission '{permission}' on GID {gid} or its parents",
         ))?;
 
         Ok(res.is_some())
@@ -233,6 +283,67 @@ impl Permission {
 
         Ok(res.is_some())
     }
+
+    /// Checks if `user` can delegate `permission` on `group` to other users
+    ///
+    /// # Arguments
+    /// * `db` - The database connection to execute the query on
+    /// * `permission` - The permission to check for
+    /// * `uid` - The user id to check the permissions of
+    /// * `gid` - The group id to check for granted permission
+    pub async fn can_delegate_raw(
+        db: &SqlitePool,
+        permission: &str,
+        uid: u32,
+        gid: u32,
+    ) -> VResult<bool> {
+        let res = sqlx::query!(
+            "WITH RECURSIVE tree(gid, parent_gid) AS (
+                SELECT gid, parent_gid FROM groups WHERE gid = ?
+                UNION ALL
+                SELECT t.gid, t.parent_gid FROM groups t
+                JOIN tree ON tree.parent_gid = t.gid
+                WHERE t.parent_gid != t.gid
+            ) SELECT * FROM userpermissions WHERE
+                (gid IN (SELECT gid FROM tree)
+                OR gid = 0)
+                AND uid = ?
+                AND permission = ?
+                AND delegable = true",
+            gid,
+            uid,
+            permission
+        )
+        .fetch_optional(db)
+        .await
+        .ctx(str!(
+            "Failed to check if UID {uid} can delegate '{permission}' on GID {gid} to other users",
+        ))?;
+
+        Ok(res.is_some())
+    }
+
+    /// Revokes a `permission` from a `uid` on a `gid`
+    /// # Arguments
+    /// * `db` - The database connection to execute the query on
+    /// * `permission` - The permission to remove
+    /// * `uid` - The user id of the user to remove the permission from
+    /// * `gid` - The group id of the group to remove the permission from
+    pub async fn revoke_raw(db: &SqlitePool, permission: &str, uid: u32, gid: u32) -> VResult<()> {
+        sqlx::query!(
+            "DELETE FROM userpermissions WHERE uid = ? AND gid = ? AND permission = ?",
+            uid,
+            gid,
+            permission
+        )
+        .execute(db)
+        .await
+        .ctx(str!(
+            "Feild to revoke permission '{permission}' from uid {uid} for gid {gid}",
+        ))?;
+
+        Ok(())
+    }
 }
 
 impl Permission {
@@ -247,17 +358,17 @@ impl Permission {
     ) -> VResult<()> {
         Permission::ensure(db, Entitlement::UserCreate.str())
             .await?
-            .ensure_granted(db, u_root, g_root)
+            .ensure_granted(db, u_root, g_root, true)
             .await?;
 
         Permission::ensure(db, Entitlement::UserRemove.str())
             .await?
-            .ensure_granted(db, u_root, g_root)
+            .ensure_granted(db, u_root, g_root, true)
             .await?;
 
         Permission::ensure(db, Entitlement::UserList.str())
             .await?
-            .ensure_granted(db, u_root, g_root)
+            .ensure_granted(db, u_root, g_root, true)
             .await?;
 
         Ok(())

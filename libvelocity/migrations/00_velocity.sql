@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS userpermissions (
     permission TEXT NOT NULL,
     uid INTEGER NOT NULL,
     gid INTEGER NOT NULL,
+    delegable BOOLEAN,
     PRIMARY KEY (permission, uid),
     FOREIGN KEY (uid) REFERENCES users(uid),
     FOREIGN KEY (gid) REFERENCES groups(gid)
