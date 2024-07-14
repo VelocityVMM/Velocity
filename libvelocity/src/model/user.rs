@@ -244,6 +244,46 @@ impl User {
         Permission::is_granted_somewhere_raw(db, permission, self.uid).await
     }
 
+    /// Returns whether this user can delegate `permission`
+    /// # Arguments
+    /// * `db` - The database to run the query on
+    /// * `permission` - The permission to check for delegation rights
+    /// * `group` - The group to check for delegation rights
+    pub async fn can_delegate(
+        &self,
+        db: &SqlitePool,
+        permission: &Permission,
+        group: &Group,
+    ) -> VResult<bool> {
+        permission.can_delegate(db, self, group).await
+    }
+
+    /// Grants another `user` `permission` on a `group`
+    /// # Arguments
+    /// * `db` - The database connection to perform the transaction on
+    /// * `permission` - The permission to grant
+    /// * `user` - The user to grant the permission on `group`
+    /// * `group` - The group to grant the permission on
+    /// * `delegable` - Whether the permitted user can pass on the permission
+    pub async fn grant_permission(
+        &self,
+        db: &SqlitePool,
+        permission: &Permission,
+        user: &User,
+        group: &Group,
+        delegable: bool,
+    ) -> VResult<()> {
+        if !self.can_delegate(db, permission, group).await? {
+            return Err(PermissionError::DelegationDenied(permission.name.to_owned()).into());
+        }
+
+        permission
+            .ensure_granted(db, user, group, delegable)
+            .await?;
+
+        Ok(())
+    }
+
     /// Returns all registered users in the database
     /// # Arguments
     /// * `db` - The database to operate on

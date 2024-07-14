@@ -96,29 +96,9 @@ impl Permission {
         group: &Group,
         delegable: bool,
     ) -> VResult<()> {
-        let uid = user.uid();
-        let gid = group.gid();
+        Self::grant_raw(db, &self.name, user.uid(), group.gid(), delegable).await?;
 
-        sqlx::query!(
-            "INSERT INTO userpermissions (permission, uid, gid, delegable) VALUES (?, ?, ?, ?)",
-            self.name,
-            uid,
-            gid,
-            delegable
-        )
-        .execute(db)
-        .await
-        .ctx(str!(
-            "Failed to give permission '{}' on group '{}' to '{}'",
-            self.name,
-            group.groupname,
-            user.username
-        ))?;
-
-        debug!(
-            "Granted '{}' permission '{}' on group '{}'({gid}, delegate={})",
-            user.username, self.name, group.groupname, delegable,
-        );
+        debug!("Granted {user} permission '{}' on {group}", self.name,);
 
         Ok(())
     }
@@ -229,6 +209,39 @@ impl Permission {
             None => PermissionError::PermissionNotFound(name.to_owned())
                 .ctx(str!("Selecting permission by name: '{name}'")),
         }
+    }
+
+    /// Grants a `uid` a `permission` on a `gid`
+    /// # Arguments
+    /// * `db` - The database connection to run the transaction against
+    /// * `permission` - The permission to grant
+    /// * `uid` - The user id of the user to be granted the permission
+    /// * `gid` - The group id of the group to grant the permission on
+    /// * `delegable` - Whether the user can delegate the permission
+    pub async fn grant_raw(
+        db: &SqlitePool,
+        permission: &str,
+        uid: u32,
+        gid: u32,
+        delegable: bool,
+    ) -> VResult<()> {
+        sqlx::query!(
+            "INSERT INTO userpermissions (permission, uid, gid, delegable) VALUES (?, ?, ?, ?)",
+            permission,
+            uid,
+            gid,
+            delegable
+        )
+        .execute(db)
+        .await
+        .ctx(str!(
+            "Failed to give permission '{}' on gid {} to uid {}",
+            permission,
+            gid,
+            uid
+        ))?;
+
+        Ok(())
     }
 
     /// Checks if `user` has been granted `permission` on `group`
@@ -343,6 +356,10 @@ impl Permission {
     /// * `uid` - The user id of the user to remove the permission from
     /// * `gid` - The group id of the group to remove the permission from
     pub async fn revoke_raw(db: &SqlitePool, permission: &str, uid: u32, gid: u32) -> VResult<()> {
+        if !Self::can_delegate_raw(db, permission, uid, gid).await? {
+            return Err(PermissionError::DelegationDenied(permission.to_owned()).into());
+        }
+
         sqlx::query!(
             "DELETE FROM userpermissions WHERE uid = ? AND gid = ? AND permission = ?",
             uid,
@@ -392,6 +409,10 @@ impl Display for PermissionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::PermissionNotFound(name) => write!(f, "Permission '{name}' not found"),
+            Self::PermissionDenied(name) => write!(f, "Permission was denied: {name}"),
+            Self::DelegationDenied(name) => {
+                write!(f, "Permission '{name}' is not allowed to be delegated")
+            }
         }
     }
 }

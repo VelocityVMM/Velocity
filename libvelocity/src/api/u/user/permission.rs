@@ -70,40 +70,21 @@ pub struct PUTReq1 {
 /// - The group to grant the user permission for
 pub async fn u_user_permission_put_1(
     State(velocity): State<VelocityState>,
-    Extension(user): Extension<User>,
+    Extension(req_user): Extension<User>,
     Json(request): Json<PUTReq1>,
 ) -> Result<impl IntoResponse, VelocityAPIError> {
     let req_user = velocity
-        .global_permission_guard(user, Entitlement::UserList)
+        .global_permission_guard(req_user, Entitlement::UserList)
         .await?;
 
     let db = &velocity.read().await.db;
 
-    let permission = match Permission::try_select_name(db, &request.permission).await? {
-        Some(permission) => permission,
-        None => return Ok(StatusCode::NOT_FOUND),
-    };
+    let user = User::select_uid(db, request.uid).await?;
+    let permission = Permission::select_name(db, &request.permission).await?;
+    let group = Group::select_gid(db, request.gid).await?;
 
-    let user = match User::try_select_uid(db, request.uid).await? {
-        Some(user) => user,
-        None => return Ok(StatusCode::NOT_FOUND),
-    };
-
-    let group = match Group::try_select_gid(db, request.gid).await? {
-        Some(group) => group,
-        None => return Ok(StatusCode::NOT_FOUND),
-    };
-
-    if !permission.can_delegate(db, &req_user, &group).await? {
-        error!(
-            "[PUT/1] User {req_user} cannot delegate permission {} on {group} without delegation permission",
-            permission.name
-        );
-        return Ok(StatusCode::FORBIDDEN);
-    }
-
-    permission
-        .grant(db, &user, &group, request.delegable)
+    req_user
+        .grant_permission(db, &permission, &user, &group, request.delegable)
         .await?;
 
     info!(
