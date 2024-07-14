@@ -1,7 +1,10 @@
 use std::fmt::Display;
 
+use crate::api::IntoAPIError;
+use axum::http::StatusCode;
 use log::debug;
 use sqlx::SqlitePool;
+use velocity_codegen::IntoAPIError;
 
 use crate::error::{VErrorExt, VResult};
 use crate::str;
@@ -18,10 +21,20 @@ pub struct Permission {
 }
 
 /// Errors that can occur when working with permissions
-#[derive(Debug)]
+#[derive(Debug, IntoAPIError)]
+#[repr(u16)]
 pub enum PermissionError {
     /// A permission has not been found
-    PermissionNotFound(String),
+    #[expose(StatusCode::NOT_FOUND)]
+    PermissionNotFound(String) = 0x10,
+
+    /// A permission has been denied
+    #[expose(StatusCode::FORBIDDEN)]
+    PermissionDenied(String) = 0x20,
+
+    /// A delegation has been forbidden
+    #[expose(StatusCode::FORBIDDEN)]
+    DelegationDenied(String) = 0x30,
 }
 
 impl Permission {

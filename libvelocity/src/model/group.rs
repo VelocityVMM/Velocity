@@ -1,6 +1,9 @@
 use std::fmt::Display;
 
+use crate::api::IntoAPIError;
+use axum::http::StatusCode;
 use sqlx::SqlitePool;
+use velocity_codegen::IntoAPIError;
 
 use crate::{
     error::{VErrorExt, VResult},
@@ -19,12 +22,15 @@ pub struct Group {
 }
 
 /// Errors that can occur when working with groups
-#[derive(Debug)]
+#[derive(Debug, IntoAPIError)]
+#[repr(u16)]
 pub enum GroupError {
     /// A group id (gid) has not been found
-    GroupIDNotFound(u32),
+    #[expose(StatusCode::NOT_FOUND)]
+    GroupIDNotFound(u32) = 0x10,
     /// A groupname has not been found
-    GroupnameNotFound(String),
+    #[expose(StatusCode::NOT_FOUND)]
+    GroupnameNotFound(String) = 0x20,
 }
 
 impl Group {

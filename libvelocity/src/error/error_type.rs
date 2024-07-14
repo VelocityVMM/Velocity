@@ -5,20 +5,21 @@ use axum::http::StatusCode;
 use crate::model::{GroupError, PermissionError, UserError};
 
 use super::VErrorIn;
+use crate::api::IntoAPIError;
 
 /// All the possible types of errors that can occur within Velocity
 #[derive(Debug)]
+#[repr(u16)]
 pub enum VErrorType {
-    /// An error that originated from the `sqlx` crate
-    SQLX(sqlx::Error),
     /// An error that has to do with users
-    User(UserError),
+    User(UserError) = 0x10,
     /// An error that has to do with groups
-    Group(GroupError),
+    Group(GroupError) = 0x20,
     /// An error that has to do with permissions
-    Permission(PermissionError),
-    /// A permission has been denied
-    PermissionDenied(String),
+    Permission(PermissionError) = 0x30,
+    /// An error that originated from the `sqlx` crate
+    SQLX(sqlx::Error) = 0xFF00,
+    /// An IO error
     IO(io::Error),
 }
 
@@ -29,7 +30,6 @@ impl Display for VErrorType {
             Self::User(e) => e.fmt(f),
             Self::Group(e) => e.fmt(f),
             Self::Permission(e) => e.fmt(f),
-            Self::PermissionDenied(e) => write!(f, "Permission denied: {e}"),
             Self::IO(e) => e.fmt(f),
         }
     }
@@ -39,9 +39,25 @@ impl VErrorType {
     /// Returns the matching axum status code for the error
     pub fn get_statuscode(&self) -> StatusCode {
         match self {
-            Self::PermissionDenied(_) => StatusCode::FORBIDDEN,
+            Self::User(e) => e.get_status(),
+            Self::Group(e) => e.get_status(),
+            Self::Permission(e) => e.get_status(),
+
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
+    }
+
+    pub fn get_code(&self) -> u32 {
+        let self_code = unsafe { *(self as *const Self as *const u16) };
+
+        let sub_code: u16 = match self {
+            Self::User(e) => e.get_code(),
+            Self::Group(e) => e.get_code(),
+            Self::Permission(e) => e.get_code(),
+            _ => 0xFFFF,
+        };
+
+        (self_code as u32) << 16 | sub_code as u32
     }
 }
 

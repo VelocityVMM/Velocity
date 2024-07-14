@@ -25,6 +25,7 @@
 use std::sync::Arc;
 
 use axum::{
+    http::StatusCode,
     response::{IntoResponse, Response},
     Json, Router,
 };
@@ -34,8 +35,8 @@ use serde_json::{json, Value};
 use tokio::sync::{RwLock, RwLockReadGuard};
 
 use crate::{
-    error::{VError, VErrorType, VResult},
-    model::{Entitlement, User},
+    error::{VError, VResult},
+    model::{Entitlement, PermissionError, User},
     Velocity,
 };
 
@@ -52,11 +53,12 @@ pub struct VelocityAPIError(VError);
 impl IntoResponse for VelocityAPIError {
     fn into_response(self) -> Response {
         error!("{:?}", self.0);
+
         let err = self.0.error.to_string();
         (
             self.0.get_statuscode(),
             Json(json!({
-                "code": 1000,
+                "code": self.0.error.get_code(),
                 "message": err
             })),
         )
@@ -90,6 +92,16 @@ pub trait ToJSONPanic: Serialize {
             }
         }
     }
+}
+
+/// A trait for errors to be able to be translated
+/// into API errors
+pub trait IntoAPIError {
+    /// Returns the error code for the error
+    fn get_code(&self) -> u16;
+    /// Returns the `http` status code for this error
+    /// For non-exposed errors, this returns `INTERNAL_SERVER_ERROR`
+    fn get_status(&self) -> StatusCode;
 }
 
 /// Returns an empty JSON value
@@ -144,10 +156,13 @@ impl VelocityState {
             .has_permission_somewhere(&self.velocity.read().await.db, entitlement.str())
             .await?
         {
-            Err(VError::new(VErrorType::PermissionDenied(format!(
-                "Permission '{}' is needed",
-                entitlement.str()
-            ))))
+            Err(VError::new(
+                PermissionError::PermissionDenied(format!(
+                    "Permission '{}' is needed",
+                    entitlement.str()
+                ))
+                .into(),
+            ))
         } else {
             Ok(user)
         }

@@ -118,6 +118,18 @@ where
     }
 }
 
+impl<U: VErrorIn> From<U> for VError {
+    fn from(value: U) -> Self {
+        Self::new(value.into())
+    }
+}
+
+impl<T> From<VError> for VResult<T> {
+    fn from(value: VError) -> Self {
+        Err(value)
+    }
+}
+
 impl Display for VError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Error: {} while", self.error)?;

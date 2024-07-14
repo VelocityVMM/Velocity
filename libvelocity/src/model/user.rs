@@ -1,14 +1,18 @@
 use std::fmt::Display;
 
+use axum::http::StatusCode;
 use futures_util::TryStreamExt;
 use sqlx::SqlitePool;
 
 use crate::{
+    api::IntoAPIError,
     error::{VErrorExt, VResult},
     str,
 };
 
-use super::{Group, Permission};
+use velocity_codegen::IntoAPIError;
+
+use super::{Group, Permission, PermissionError};
 
 /// A user in the Velocity system
 #[derive(Debug, Clone, sqlx::FromRow)]
@@ -22,12 +26,15 @@ pub struct User {
 }
 
 /// Errors that can occur when working with users
-#[derive(Debug)]
+#[derive(Debug, IntoAPIError)]
+#[repr(u16)]
 pub enum UserError {
     /// A user id (uid) has not been found
-    UserIDNotFound(u32),
+    #[expose(StatusCode::NOT:FOUND)]
+    UserIDNotFound(u32) = 0x10,
     /// A username has not been found
-    UsernameNotFound(String),
+    #[expose(StatusCode::NOT:FOUND)]
+    UsernameNotFound(String) = 0x20,
 }
 
 impl User {
