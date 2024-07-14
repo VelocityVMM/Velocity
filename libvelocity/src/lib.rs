@@ -32,6 +32,7 @@ use axum::{
 use log::trace;
 use model::{AuthManager, Group, Permission};
 use sqlx::SqlitePool;
+use tower_http::cors::CorsLayer;
 
 use crate::{error::VErrorExt, model::User};
 
@@ -131,7 +132,8 @@ impl LibVelocity {
         let app = api::get_router(VelocityState::new(Velocity {
             db,
             auth_manager: AuthManager::default(),
-        }));
+        }))
+        .layer(CorsLayer::permissive());
 
         let app = app.fallback(fallback).layer(middleware::from_fn(printer));
 
