@@ -84,7 +84,7 @@ pub async fn u_auth_post_1(
             .write()
             .await
             .auth_manager
-            .generate_now(user.uid(), Duration::from_secs(10));
+            .generate_now(user.uid(), Duration::from_secs(60));
         info!(
             "[POST/1] Authenticated user '{}' ({})",
             user.username,
@@ -135,7 +135,7 @@ pub async fn u_auth_patch_1(
         .write()
         .await
         .auth_manager
-        .refresh_key(&payload.authkey, Duration::from_secs(10));
+        .refresh_key(&payload.authkey, Duration::from_secs(60));
 
     match key {
         None => {
