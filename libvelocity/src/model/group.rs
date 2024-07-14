@@ -31,6 +31,10 @@ pub enum GroupError {
     /// A groupname has not been found
     #[expose(StatusCode::NOT_FOUND)]
     GroupnameNotFound(String) = 0x20,
+    /// A group with the same name does already
+    /// exist within the parent group
+    #[expose(StatusCode::CONFLICT)]
+    GroupDuplicate(String) = 0x30,
 }
 
 impl Group {
@@ -239,6 +243,18 @@ impl Group {
 
         Ok(())
     }
+
+    /// Removes a group from the database by its `gid`
+    /// # Arguments
+    /// * `db` - The database to remove the user from
+    pub async fn remove(self, db: &SqlitePool) -> VResult<()> {
+        sqlx::query!("DELETE FROM groups WHERE gid = ?", self.gid)
+            .execute(db)
+            .await
+            .ctx(str!("Failed to remove group {self}"))?;
+
+        Ok(())
+    }
 }
 
 impl Display for Group {
@@ -252,6 +268,9 @@ impl Display for GroupError {
         match self {
             Self::GroupIDNotFound(gid) => write!(f, "Group ID {gid} not found"),
             Self::GroupnameNotFound(groupname) => write!(f, "Groupname '{groupname}' not found"),
+            Self::GroupDuplicate(groupname) => {
+                write!(f, "Group name '{groupname}' does already exist")
+            }
         }
     }
 }

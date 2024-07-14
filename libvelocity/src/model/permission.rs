@@ -401,6 +401,16 @@ impl Permission {
             .ensure_granted(db, u_root, g_root, true)
             .await?;
 
+        Permission::ensure(db, Entitlement::GroupCreate.str())
+            .await?
+            .ensure_granted(db, u_root, g_root, true)
+            .await?;
+
+        Permission::ensure(db, Entitlement::GroupRemove.str())
+            .await?
+            .ensure_granted(db, u_root, g_root, true)
+            .await?;
+
         Ok(())
     }
 }

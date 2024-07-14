@@ -17,6 +17,14 @@ pub enum Entitlement {
     ///
     /// This entitlement is global
     UserList,
+    /// Entitles a user to create new groups
+    /// within the group he has been granted
+    /// this permission on
+    GroupCreate,
+    /// Entitles a user to remove groups
+    /// from the group he has been granted
+    /// this permission on
+    GroupRemove,
 }
 
 impl Entitlement {
@@ -26,6 +34,8 @@ impl Entitlement {
             Self::UserCreate => "velocity.user.create",
             Self::UserRemove => "velocity.user.remove",
             Self::UserList => "velocity.user.list",
+            Self::GroupCreate => "velocity.group.create",
+            Self::GroupRemove => "velocity.group.remove",
         }
     }
 }
