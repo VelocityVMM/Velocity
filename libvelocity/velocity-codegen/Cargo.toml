@@ -1,0 +1,13 @@
+[package]
+name = "velocity-codegen"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doctest = false
+proc-macro = true
+
+[dependencies]
+syn = { version = "2.0.38", features = ["full", "extra-traits"] }
+quote = "1.0.33"
+proc-macro2 = "1.0.69"
